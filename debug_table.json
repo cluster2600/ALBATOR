@@ -1,0 +1,6737 @@
+[
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Name and information link"
+     }
+    ],
+    "class": "gb-table-header-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "th"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Available for"
+     }
+    ],
+    "class": "gb-table-header-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "th"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Release date"
+     }
+    ],
+    "class": "gb-table-header-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "th"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122285",
+        "tag": "a",
+        "text": "Safari 18.3.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Mar 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122281",
+        "tag": "a",
+        "text": "iOS 18.3.2 and iPadOS 18.3.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Mar 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122283",
+        "tag": "a",
+        "text": "macOS Sequoia 15.3.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Mar 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122284",
+        "tag": "a",
+        "text": "visionOS 2.3.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Mar 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "tvOS 18.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV 4K (3rd generation)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Mar 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122174",
+        "tag": "a",
+        "text": "iOS 18.3.1 and iPadOS 18.3.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122173",
+        "tag": "a",
+        "text": "iPadOS 17.7.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPad Pro 12.9-inch 2nd generation, iPad Pro 10.5-inch, and iPad 6th generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia 15.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma 14.7.4"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura 13.7.4"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "watchOS 11.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 6 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "visionOS 2.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Feb 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121866",
+        "tag": "a",
+        "text": "GarageBand 10.4.12"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma 14.4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "30 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122073",
+        "tag": "a",
+        "text": "visionOS 2.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122066",
+        "tag": "a",
+        "text": "iOS 18.3 and iPadOS 18.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122067",
+        "tag": "a",
+        "text": "iPadOS 17.7.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPad Pro 12.9-inch 2nd generation, iPad Pro 10.5-inch, and iPad 6th generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122068",
+        "tag": "a",
+        "text": "macOS Sequoia 15.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122069",
+        "tag": "a",
+        "text": "macOS Sonoma 14.7.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122070",
+        "tag": "a",
+        "text": "macOS Ventura 13.7.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122071",
+        "tag": "a",
+        "text": "watchOS 11.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 6 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122072",
+        "tag": "a",
+        "text": "tvOS 18.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122074",
+        "tag": "a",
+        "text": "Safari 18.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "27 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "tvOS 18.2.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 18.2.1 and iPadOS 18.2.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "06 Jan 2025"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121846",
+        "tag": "a",
+        "text": "Safari 18.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121837",
+        "tag": "a",
+        "text": "iOS 18.2 and iPadOS 18.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121838",
+        "tag": "a",
+        "text": "iPadOS 17.7.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPad Pro 12.9-inch 2nd generation, iPad Pro 10.5-inch, and iPad 6th generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121839",
+        "tag": "a",
+        "text": "macOS Sequoia 15.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121840",
+        "tag": "a",
+        "text": "macOS Sonoma 14.7.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121842",
+        "tag": "a",
+        "text": "macOS Ventura 13.7.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121843",
+        "tag": "a",
+        "text": "watchOS 11.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 6 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121844",
+        "tag": "a",
+        "text": "tvOS 18.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121845",
+        "tag": "a",
+        "text": "visionOS 2.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "11 Dec 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121756",
+        "tag": "a",
+        "text": "Safari 18.1.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Nov 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121755",
+        "tag": "a",
+        "text": "visionOS 2.1.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Nov 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121752",
+        "tag": "a",
+        "text": "iOS 18.1.1 and iPadOS 18.1.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Nov 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121754",
+        "tag": "a",
+        "text": "iOS 17.7.2 and iPadOS 17.7.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Nov 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121753",
+        "tag": "a",
+        "text": "macOS Sequoia 15.1.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Nov 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121571",
+        "tag": "a",
+        "text": "Safari 18.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121563",
+        "tag": "a",
+        "text": "iOS 18.1 and iPadOS 18.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121567",
+        "tag": "a",
+        "text": "iOS 17.7.1 and iPadOS 17.7.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121564",
+        "tag": "a",
+        "text": "macOS Sequoia 15.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121570",
+        "tag": "a",
+        "text": "macOS Sonoma 14.7.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121568",
+        "tag": "a",
+        "text": "macOS Ventura 13.7.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121565",
+        "tag": "a",
+        "text": "watchOS 11.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 6 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121569",
+        "tag": "a",
+        "text": "tvOS 18.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121566",
+        "tag": "a",
+        "text": "visionOS 2.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "28 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/122043",
+        "tag": "a",
+        "text": "Apple Music 1.5.0.152 for Windows"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Windows 10 22H2 and later for Intel machines, Windows 11 24H2 and later for Arm machines"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121441",
+        "tag": "a",
+        "text": "Apple TV 1.5.0.152 for Windows"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Windows 10 22H2 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121373",
+        "tag": "a",
+        "text": "iOS 18.0.1 and iPadOS 18.0.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia 15.0.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sequoia"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "watchOS 11.0.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 6 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "visionOS 2.0.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Safari 18.0.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "03 Oct 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121250",
+        "tag": "a",
+        "text": "iOS 18 and iPadOS 18"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 3rd generation and later, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 7th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121238",
+        "tag": "a",
+        "text": "macOS Sequoia 15"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Mac Studio (2022 and later), iMac (2019 and later), Mac Pro (2019 and later), Mac Mini (2018 and later), MacBook Air (2020 and later), MacBook Pro (2018 and later), and iMac Pro (2017 and later)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121248",
+        "tag": "a",
+        "text": "tvOS 18"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121240",
+        "tag": "a",
+        "text": "watchOS 11"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 6 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121249",
+        "tag": "a",
+        "text": "visionOS 2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121241",
+        "tag": "a",
+        "text": "Safari 18"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121239",
+        "tag": "a",
+        "text": "Xcode 16"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma 14.5 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121246",
+        "tag": "a",
+        "text": "iOS 17.7 and iPadOS 17.7"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121247",
+        "tag": "a",
+        "text": "macOS Sonoma 14.7"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121234",
+        "tag": "a",
+        "text": "macOS Ventura 13.7"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "16 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/121328",
+        "tag": "a",
+        "text": "iTunes 12.13.3 for Windows"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Windows 10 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "12 Sep 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "watchOS 10.6.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Aug 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "tvOS 17.6.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "19 Aug 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 17.6.1 and iPadOS 17.6.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Aug 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 16.7.10 and iPadOS 16.7.10"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 8, iPhone 8 Plus, iPhone X, iPad 5th generation, iPad Pro 9.7-inch, and iPad Pro 12.9-inch 1st generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Aug 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma 14.6.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Aug 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura 13.6.9"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Aug 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120913",
+        "tag": "a",
+        "text": "Safari 17.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey and macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120909",
+        "tag": "a",
+        "text": "iOS 17.6 and iPadOS 17.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120908",
+        "tag": "a",
+        "text": "iOS 16.7.9 and iPadOS 16.7.9"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 8, iPhone 8 Plus, iPhone X, iPad 5th generation, iPad Pro 9.7-inch, and iPad Pro 12.9-inch 1st generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120911",
+        "tag": "a",
+        "text": "macOS Sonoma 14.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120912",
+        "tag": "a",
+        "text": "macOS Ventura 13.6.8"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120910",
+        "tag": "a",
+        "text": "macOS Monterey 12.7.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120916",
+        "tag": "a",
+        "text": "watchOS 10.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120914",
+        "tag": "a",
+        "text": "tvOS 17.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120915",
+        "tag": "a",
+        "text": "visionOS 1.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 15.8.3 and iPadOS 15.8.3"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 6s (all models), iPhone 7 (all models), iPhone SE (1st generation), iPad Air 2, iPad mini (4th generation), and iPod touch (7th generation)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "29 Jul 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120907",
+        "tag": "a",
+        "text": "AirPods Firmware Update 6A326, AirPods Firmware Update 6F8, and Beats Firmware Update 6F8"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "AirPods (2nd generation and later), AirPods Pro (all models), AirPods Max, Powerbeats Pro, and Beats Fit Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "25 Jun 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120906",
+        "tag": "a",
+        "text": "visionOS 1.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "10 Jun 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "tvOS 17.5.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "21 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 17.5.1 and iPadOS 17.5.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "20 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120896",
+        "tag": "a",
+        "text": "Safari 17.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey and macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120905",
+        "tag": "a",
+        "text": "iOS 17.5 and iPadOS 17.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 13-inch, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120898",
+        "tag": "a",
+        "text": "iOS 16.7.8 and iPadOS 16.7.8"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 8, iPhone 8 Plus, iPhone X, iPad 5th generation, iPad Pro 9.7-inch, and iPad Pro 12.9-inch 1st generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120903",
+        "tag": "a",
+        "text": "macOS Sonoma 14.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120900",
+        "tag": "a",
+        "text": "macOS Ventura 13.6.7"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120899",
+        "tag": "a",
+        "text": "macOS Monterey 12.7.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120902",
+        "tag": "a",
+        "text": "watchOS 10.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120901",
+        "tag": "a",
+        "text": "tvOS 17.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "13 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120897",
+        "tag": "a",
+        "text": "iTunes 12.13.2 for Windows"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Windows 10 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "08 May 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "visionOS 1.1.2"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "09 Apr 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120888",
+        "tag": "a",
+        "text": "Safari 17.4.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey and macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "25 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120889",
+        "tag": "a",
+        "text": "macOS Sonoma 14.4.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "25 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120891",
+        "tag": "a",
+        "text": "macOS Ventura 13.6.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "25 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120890",
+        "tag": "a",
+        "text": "iOS 17.4.1 and iPadOS 17.4.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "21 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120892",
+        "tag": "a",
+        "text": "iOS 16.7.7 and iPadOS 16.7.7"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 8, iPhone 8 Plus, iPhone X, iPad 5th generation, iPad Pro 9.7-inch, and iPad Pro 12.9-inch 1st generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "21 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120312",
+        "tag": "a",
+        "text": "visionOS 1.1.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "21 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120885",
+        "tag": "a",
+        "text": "GarageBand 10.4.11"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura and macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "12 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120894",
+        "tag": "a",
+        "text": "Safari 17.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey and macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120895",
+        "tag": "a",
+        "text": "macOS Sonoma 14.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120886",
+        "tag": "a",
+        "text": "macOS Ventura 13.6.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120884",
+        "tag": "a",
+        "text": "macOS Monterey 12.7.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120881",
+        "tag": "a",
+        "text": "watchOS 10.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120882",
+        "tag": "a",
+        "text": "tvOS 17.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120883",
+        "tag": "a",
+        "text": "visionOS 1.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "07 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120887",
+        "tag": "a",
+        "text": "Xcode 15.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma 14 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "05 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120893",
+        "tag": "a",
+        "text": "iOS 17.4 and iPadOS 17.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "05 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120880",
+        "tag": "a",
+        "text": "iOS 16.7.6 and iPadOS 16.7.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 8, iPhone 8 Plus, iPhone X, iPad 5th generation, iPad Pro 9.7-inch, and iPad Pro 12.9-inch 1st generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "05 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 15.8.2 and iPadOS 15.8.2"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 6s (all models), iPhone 7 (all models), iPhone SE (1st generation), iPad Air 2, iPad mini (4th generation), and iPod touch (7th generation)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "05 Mar 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "visionOS 1.0.3"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "12 Feb 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Safari 17.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey and macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "09 Feb 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iOS 17.3.1 and iPadOS 17.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "08 Feb 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma 14.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "08 Feb 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "watchOS 10.3.1"
+     },
+     {
+      "children": [
+       {
+        "class": "gb-paragraph",
+        "tag": "p",
+        "text": "This update has no published CVE entries."
+       }
+      ],
+      "class": "note gb-note",
+      "tag": "div"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "08 Feb 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/118479",
+        "tag": "a",
+        "text": "visionOS 1.0.2"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Vision Pro"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "31 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120339",
+        "tag": "a",
+        "text": "Safari 17.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey and macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120304",
+        "tag": "a",
+        "text": "iOS 17.3 and iPadOS 17.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone XS and later, iPad Pro 12.9-inch 2nd generation and later, iPad Pro 10.5-inch, iPad Pro 11-inch 1st generation and later, iPad Air 3rd generation and later, iPad 6th generation and later, and iPad mini 5th generation and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120310",
+        "tag": "a",
+        "text": "iOS 16.7.5 and iPadOS 16.7.5"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 8, iPhone 8 Plus, iPhone X, iPad 5th generation, iPad Pro 9.7-inch, and iPad Pro 12.9-inch 1st generation"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120308",
+        "tag": "a",
+        "text": "iOS 15.8.1 and iPadOS 15.8.1"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "iPhone 6s (all models), iPhone 7 (all models), iPhone SE (1st generation), iPad Air 2, iPad mini (4th generation), and iPod touch (7th generation)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120309",
+        "tag": "a",
+        "text": "macOS Sonoma 14.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Sonoma"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120307",
+        "tag": "a",
+        "text": "macOS Ventura 13.6.4"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Ventura"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120305",
+        "tag": "a",
+        "text": "macOS Monterey 12.7.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "macOS Monterey"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120306",
+        "tag": "a",
+        "text": "watchOS 10.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple Watch Series 4 and later"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120311",
+        "tag": "a",
+        "text": "tvOS 17.3"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Apple TV HD and Apple TV 4K (all models)"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "22 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "class": "gb-anchor",
+        "href": "/en-gb/120303",
+        "tag": "a",
+        "text": "Magic Keyboard Firmware Update 2.0.6"
+       }
+      ],
+      "class": "gb-paragraph",
+      "tag": "p"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "Magic Keyboard; Magic Keyboard (2021); Magic Keyboard with Numeric Keypad; Magic Keyboard with Touch ID; and Magic Keyboard with Touch ID and Numeric Keypad"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   },
+   {
+    "children": [
+     {
+      "class": "gb-paragraph",
+      "tag": "p",
+      "text": "09 Jan 2024"
+     }
+    ],
+    "class": "gb-table-cell tablecell-align-left",
+    "colspan": "1",
+    "rowspan": "1",
+    "tag": "td"
+   }
+  ],
+  "tag": "tr"
+ }
+]
