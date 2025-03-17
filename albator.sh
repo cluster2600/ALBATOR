@@ -51,11 +51,11 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         -g|--generate)
-            python3 generate_guidance.py "${@:2}"
+            ROOT_DIR="$PWD" python3 generate_guidance.py "${@:2}"
             exit 0
             ;;
         -l|--list_tags)
-            python3 generate_guidance.py -l
+            ROOT_DIR="$PWD" python3 generate_guidance.py -l
             exit 0
             ;;
         -k|--keyword)

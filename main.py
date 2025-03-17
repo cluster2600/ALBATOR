@@ -14,7 +14,7 @@ class BaselineGenerator:
     def __init__(self):
         """Initialize with parsed arguments and dynamic directory paths."""
         self.args = create_args()
-        self.root_dir = self.args.root_dir or os.getcwd()
+        self.root_dir = os.environ.get('ROOT_DIR') or self.args.root_dir or os.getcwd()
         self.includes_dir = os.path.join(self.root_dir, 'includes')
         self.build_dir = os.path.join(self.root_dir, 'build', 'baselines')
         self.original_wd = os.getcwd()

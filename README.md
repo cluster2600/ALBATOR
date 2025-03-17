@@ -68,6 +68,7 @@ The tool supports multiple interfaces—**command-line, interactive mode, and a 
   ```bash
   python main.py -k stig
   ```
+  (You can also set the ROOT_DIR environment variable to specify the root directory: `ROOT_DIR=/path/to/root python main.py -k stig`)
 - **Check Controls**:
   ```bash
   python main.py -c
