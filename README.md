@@ -18,13 +18,16 @@ Run the main script with options to harden specific areas or fetch security advi
 - `-s, --app-security`: Enable Gatekeeper and verify Hardened Runtime
 - `-c, --cve`: Fetch recent CVE advisories relevant to macOS
 - `-a, --apple`: Fetch Apple security updates for macOS Sequoia 15
+- `-r, --report`: Generate a security report
+- `-n, --ansible`: Run the Ansible playbook to automate hardening
+- `-t, --test`: Run automated security tests
 - `-h, --help`: Display this help message
 
 ### Example
-To fetch CVE advisories, Apple security updates, and enable the firewall:
+To fetch CVE advisories, Apple security updates, enable the firewall, generate a report, run Ansible, and run tests:
 
 ```bash
-./albator.sh --cve --apple --firewall
+./albator.sh --cve --apple --firewall --report --ansible --test
 ```
 
 ## Requirements
@@ -77,3 +80,26 @@ Open-source under the MIT License.
 - Built on **NIST macOS Security Guidelines (Revision 1.1, 2024)**.
 - Inspired by the **macOS Security and Privacy Guide** and **Derrick**: [https://github.com/supdevinci/derrick](https://github.com/supdevinci/derrick).
 - Developed by **Maxime at Cyberdyne Systems**.
+
+## Future Enhancements
+
+- **Centralized Configuration:** Consolidate configuration into a single file or set of files.
+- **Modular Rule Definitions:** Define security rules in a structured format (e.g., YAML or JSON).
+- **Automated Testing:** Implement automated tests to verify hardening settings.
+- **Reporting:** Generate reports summarizing the system's security posture.
+- **GUI Enhancements:** Improve the GUI mode (if relevant).
+- **Integration with Configuration Management Tools:** Integrate with tools like Ansible or Chef.
+- **More Granular Control:** Provide more granular control over hardening settings.
+- **Improved Error Handling:** Implement more robust error handling and logging.
+- **Regular Updates:** Keep the tool up-to-date with the latest security best practices and macOS updates.
+
+## Python-based Tool (Legacy)
+
+This project evolved from a Python-based tool, which provides functionalities for generating security baselines, applying fixes, and providing command-line, interactive, and GUI interfaces.
+
+### Key Python Scripts:
+
+- `main.py`: Core script with CLI, interactive, and GUI modes.
+- `arg_parser.py`: Command-line argument parsing.
+- `rule_handler.py`: Rule collection, control checking, baseline generation.
+- `utils.py`: Utility functions.

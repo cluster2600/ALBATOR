@@ -1,75 +1,5 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-# Help function to display usage
-show_help() {
-    echo "Usage: $0 [options]"
-    echo "Options:"
-    echo "  -f, --firewall      Enable and configure the firewall"
-    echo "  -p, --privacy       Adjust privacy settings"
-    echo "  -e, --encryption    Enable FileVault encryption"
-    echo "  -s, --app-security  Enable Gatekeeper and verify Hardened Runtime"
-    echo "  -c, --cve          Fetch recent CVE advisories"
-    echo "  -a, --apple        Fetch Apple security updates"
-    echo "  -g, --generate     Generate guidance (pass args to generate_guidance.py)"
-    echo "  -l, --list_tags    List tags from generate_guidance.py"
-    echo "  -k, --keyword      Search by keyword in generate_guidance.py"
-    echo "  -h, --help         Display this help message"
-    exit 1
-}
-
-# Check if any options were provided
-if [ $# -eq 0 ]; then
-    echo "No options provided. Use -h or --help for usage information."
-    exit 1
-fi
-
-# Parse command-line options
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        -f|--firewall)
-            ./firewall.sh
-            exit 0
-            ;;
-        -p|--privacy)
-            ./privacy.sh
-            exit 0
-            ;;
-        -e|--encryption)
-            ./encryption.sh
-            exit 0
-            ;;
-        -s|--app-security)
-            ./app_security.sh
-            exit 0
-            ;;
-        -c|--cve)
-            ./cve_fetch.sh
-            exit 0
-            ;;
-        -a|--apple)
-            ./apple_updates.sh
-            exit 0
-            ;;
-        -g|--generate)
-            ROOT_DIR="$PWD" python3 generate_guidance.py "${@:2}"
-            exit 0
-            ;;
-        -l|--list_tags)
-            ROOT_DIR="$PWD" python3 generate_guidance.py -l
-            exit 0
-            ;;
-        -k|--keyword)
-            python3 generate_guidance.py -k "${@:2}"
-            exit 0
-            ;;
-        -h|--help)
-            show_help
-            ;;
-        *)
-            echo "Unknown option: $1"
-            show_help
-=======
 # Display the new ASCII art for Albator
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -130,6 +60,9 @@ usage() {
     echo "  -s, --app-security Enable Gatekeeper and verify Hardened Runtime"
     echo "  -c, --cve          Fetch recent CVE advisories relevant to macOS"
     echo "  -a, --apple        Fetch Apple security updates for macOS Sequoia 15"
+    echo "  -r, --report         Generate a security report"
+    echo "  -n, --ansible        Run the Ansible playbook to automate hardening"
+    echo "  -t, --test           Run automated security tests"
     echo "  -h, --help         Display this help message"
     exit 1
 }
@@ -144,6 +77,9 @@ ENCRYPTION=false
 APP_SECURITY=false
 CVE=false
 APPLE=false
+REPORT=false
+ANSIBLE=false
+TEST=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -172,21 +108,30 @@ while [[ $# -gt 0 ]]; do
             APPLE=true
             shift
             ;;
+        -r|--report)
+            REPORT=true
+            shift
+            ;;
+        -n|--ansible)
+            ANSIBLE=true
+            shift
+            ;;
+        -t|--test)
+            TEST=true
+            shift
+            ;;
         -h|--help)
             usage
             ;;
         *)
             echo "Unknown option: $1"
             usage
->>>>>>> edd7c1348c8bd688ed4da3c14fc23a91ade5dfe4
             ;;
     esac
 done
-<<<<<<< HEAD
-=======
 
 # If no options are provided, show usage
-if [ "$FIREWALL" = false ] && [ "$PRIVACY" = false ] && [ "$ENCRYPTION" = false ] && [ "$APP_SECURITY" = false ] && [ "$CVE" = false ] && [ "$APPLE" = false ]; then
+if [ "$FIREWALL" = false ] && [ "$PRIVACY" = false ] && [ "$ENCRYPTION" = false ] && [ "$APP_SECURITY" = false ] && [ "$CVE" = false ] && [ "$APPLE" = false ] && [ "$REPORT" = false ] && [ "$ANSIBLE" = false ] && [ "$TEST" = false ]; then
     usage
 fi
 
@@ -221,5 +166,19 @@ if [ "$APPLE" = true ]; then
     bash ./apple_updates.sh
 fi
 
+if [ "$REPORT" = true ]; then
+    echo "Generating security report..."
+    bash ./reporting.sh
+fi
+
+if [ "$ANSIBLE" = true ]; then
+    echo "Running Ansible playbook..."
+    cd ansible && ansible-playbook albator.yml && cd ..
+fi
+
+if [ "$TEST" = true ]; then
+    echo "Running automated security tests..."
+    bash ./tests/test_security.sh
+fi
+
 echo "Operation complete!"
->>>>>>> edd7c1348c8bd688ed4da3c14fc23a91ade5dfe4
