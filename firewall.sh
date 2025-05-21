@@ -19,6 +19,17 @@ sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
 echo "Enabling stealth mode..."
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 
+# Enable logging
+echo "Enabling firewall logging..."
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
+
+# Verify firewall status
+echo "Verifying firewall status..."
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getblockall
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getloggingmode
+
 # Log any errors
 log_file="/var/log/firewall_setup.log"
 exec 2>>"$log_file" # Redirect stderr to log file

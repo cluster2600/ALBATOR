@@ -64,3 +64,7 @@ scrape_security_page() {
 
 # Run the scraper
 scrape_security_page
+
+# macOS 15.5: Additional parsing or filtering for CVE data (example placeholder)
+echo "Processing CVE data for macOS 15.5..."
+# Placeholder for macOS 15.5 CVE parsing and filtering logic

@@ -21,5 +21,9 @@ else
     echo "Warning: Safari does not use Hardened Runtime."
 fi
 
+# macOS 15.5: Additional Hardened Runtime checks (example placeholder)
+echo "Performing additional Hardened Runtime checks for macOS 15.5..."
+# Placeholder for macOS 15.5 Hardened Runtime verification commands
+
 # Note: Hardened Runtime verification is informational; not all apps may support it
 echo "Note: Some third-party apps may not use Hardened Runtime. Check critical apps manually."

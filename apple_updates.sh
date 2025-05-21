@@ -28,18 +28,18 @@ if [ -z "$response" ]; then
     exit 1
 fi
 
-# Parse updates for macOS Sequoia 15
-echo "Parsing updates for macOS Sequoia 15..."
+# Parse updates for macOS Sequoia 15 and 15.5 (added 15.5 support)
+echo "Parsing updates for macOS Sequoia 15 and 15.5..."
 if [ "$USE_PUP" = true ]; then
     # Use pup to extract update entries
     updates=$(echo "$response" | pup 'table tbody tr json{}' | jq -r '
         .[] | 
-        select(.children[] | .text | contains("macOS Sequoia 15")) | 
+        select(.children[] | .text | test("macOS Sequoia 15(\\.5)?")) | 
         "Date: \(.children[0].text)\nProduct: \(.children[1].text)\nLink: https://support.apple.com\(.children[1].children[0].href)\n---"
     ')
 else
-    # Fallback to grep/awk (less precise, matches table rows with "macOS Sequoia 15")
-    updates=$(echo "$response" | grep -A 2 "macOS Sequoia 15" | awk '
+    # Fallback to grep/awk (less precise, matches table rows with "macOS Sequoia 15" or "15.5")
+    updates=$(echo "$response" | grep -E -A 2 "macOS Sequoia 15(\.5)?" | awk '
         /<td>/ {
             gsub(/<[^>]+>/, "", $0)
             if (NR % 3 == 1) { date=$0 }
@@ -55,9 +55,9 @@ fi
 
 # Display results
 if [ -z "$updates" ]; then
-    echo "No recent macOS Sequoia 15 updates found."
+    echo "No recent macOS Sequoia 15 or 15.5 updates found."
 else
-    echo -e "Found macOS Sequoia 15 updates:\n"
+    echo -e "Found macOS Sequoia 15 and 15.5 updates:\n"
     echo "$updates"
 fi
 
