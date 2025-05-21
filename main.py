@@ -94,6 +94,20 @@ class BaselineGenerator:
             except Exception as e:
                 print(f"Unexpected error applying fix for '{rule.rule_id}': {str(e)}")
 
+    def enhanced_error_handling(self, func, *args, **kwargs):
+        """Wrapper to enhance error handling and logging for critical functions."""
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print(f"An error occurred in {func.__name__}: {str(e)}")
+            # Additional logging or recovery actions can be added here
+
+    def improved_user_guidance(self):
+        """Provide more detailed prompts and guidance in interactive and GUI modes."""
+        print("Welcome to Albator interactive mode.")
+        print("Use 'help' to list commands and 'exit' to quit.")
+        # Additional detailed guidance messages can be added here
+
     def generate_baseline(self, rules: List, mscp_data: dict, version_data: dict, keyword: str = None) -> None:
         """Generate and write the baseline file."""
         keyword = keyword or self.args.keyword
