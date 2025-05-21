@@ -1,8 +1,8 @@
-# Albator - macOS 15 Hardening Tool
+# Albator - macOS 15.5 Hardening Tool
 
 ![Albator](albator.png)
 
-A series of scripts to harden macOS 15 (Sequoia) for security and privacy, inspired by NIST guidelines. Suitable for power users and novices alike. This project evolved from the macOS Security Compliance Project, a Python-based tool, with the current focus on Bash scripts while preserving legacy features.
+A series of scripts to harden macOS 15.5 (Sequoia) for security and privacy, inspired by NIST guidelines. Suitable for power users and novices alike. This project evolved from the macOS Security Compliance Project, a Python-based tool, with the current focus on Bash scripts while preserving legacy features.
 
 ## Usage
 Run the main script with options to harden specific areas or fetch security advisories:
@@ -17,7 +17,7 @@ Run the main script with options to harden specific areas or fetch security advi
 - `-e, --encryption`: Enable encryption (FileVault)
 - `-s, --app-security`: Enable Gatekeeper and verify Hardened Runtime
 - `-c, --cve`: Fetch recent CVE advisories relevant to macOS
-- `-a, --apple`: Fetch Apple security updates for macOS Sequoia 15
+- `-a, --apple`: Fetch Apple security updates for macOS Sequoia 15.5
 - `-r, --report`: Generate a security report
 - `-n, --ansible`: Run the Ansible playbook to automate hardening
 - `-t, --test`: Run automated security tests
@@ -31,7 +31,7 @@ To fetch CVE advisories, Apple security updates, enable the firewall, generate a
 ```
 
 ## Requirements
-- macOS 15 (Sequoia)
+- macOS 15.5 (Sequoia)
 - Administrator privileges (sudo access)
 - `curl` and `jq` for fetching CVE advisories (`brew install jq`)
 - `pup` for parsing Apple security updates (`brew install pup`, optional but recommended)
@@ -44,7 +44,7 @@ To fetch CVE advisories, Apple security updates, enable the firewall, generate a
 - Enables FileVault encryption, requiring user interaction to set up a recovery key.
 - Enables Gatekeeper and verifies Hardened Runtime for applications.
 - Fetches recent CVE advisories relevant to macOS using `curl`, `jq`, and `pup`.
-- Fetches Apple security updates for macOS Sequoia 15 using `curl` and `pup` (or `grep`/`awk` as a fallback).
+- Fetches Apple security updates for macOS Sequoia 15.5 using `curl` and `pup` (or `grep`/`awk` as a fallback).
 - Disables unnecessary services (remote login, remote management, mDNS multicast)
 - CVE advisory fetching to keep users informed about potential vulnerabilities
 - Cross-referencing with Apple’s security updates for a comprehensive view of macOS vulnerabilities
@@ -143,3 +143,16 @@ flowchart TD
     M --> R
     M --> S
 ```
+
+## macOS 15.5 Updates
+
+Albator now supports macOS 15.5 (Sequoia) with the following new features and enhancements:
+
+- Disabled new telemetry services introduced in macOS 15.5 to enhance privacy.
+- Disabled SMB network sharing by default to reduce network attack surface.
+- Enhanced firewall logging and status verification for improved security monitoring.
+- Added placeholders for secure FileVault recovery key handling.
+- Included additional Hardened Runtime checks for application security.
+- Updated CVE and Apple security update fetching to support macOS 15.5 advisories.
+- Centralized configuration support for easier management of settings.
+- Unified CLI tool to seamlessly run legacy Python functions and new Bash scripts.
