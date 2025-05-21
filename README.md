@@ -93,13 +93,53 @@ Open-source under the MIT License.
 - **Improved Error Handling:** Implement more robust error handling and logging.
 - **Regular Updates:** Keep the tool up-to-date with the latest security best practices and macOS updates.
 
-## Python-based Tool (Legacy)
+## Architecture Overview
 
-This project evolved from a Python-based tool, which provides functionalities for generating security baselines, applying fixes, and providing command-line, interactive, and GUI interfaces.
+```mermaid
+flowchart TD
+    subgraph Bash Scripts
+        A[albator.sh - Main Entry Point]
+        B[firewall.sh - Firewall Configuration]
+        C[privacy.sh - Privacy Settings]
+        D[encryption.sh - FileVault Encryption]
+        E[app_security.sh - Gatekeeper & Hardened Runtime]
+        F[cve_fetch.sh - CVE Advisories]
+        G[apple_updates.sh - Apple Security Updates]
+        H[reporting.sh - Security Report Generation]
+        I[ansible/albator.yml - Ansible Playbook]
+        J[tests/test_security.sh - Automated Tests]
+    end
 
-### Key Python Scripts:
+    subgraph Python Legacy Tool
+        M[main.py - BaselineGenerator]
+        N[arg_parser.py - CLI Argument Parsing]
+        O[rule_handler.py - Rule Collection & Baseline Generation]
+        P[utils.py - Utility Functions]
+        Q[includes/mscp-data.yaml - Metadata & Authors]
+        R[includes/800-53_baselines.yaml - NIST Controls]
+        S[version.yaml - Version Information]
+        T[User Interaction Modes]
+        T -->|CLI| M
+        T -->|Interactive| M
+        T -->|GUI| M
+    end
 
-- `main.py`: Core script with CLI, interactive, and GUI modes.
-- `arg_parser.py`: Command-line argument parsing.
-- `rule_handler.py`: Rule collection, control checking, baseline generation.
-- `utils.py`: Utility functions.
+    User[User] --> A
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+    A --> G
+    A --> H
+    A --> I
+    A --> J
+
+    User -->|Legacy Tool| M
+    M --> N
+    M --> O
+    M --> P
+    M --> Q
+    M --> R
+    M --> S
+```
