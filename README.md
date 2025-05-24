@@ -5,13 +5,17 @@
 A series of scripts to harden macOS 15.5 (Sequoia) for security and privacy, inspired by NIST guidelines. Suitable for power users and novices alike. This project evolved from the macOS Security Compliance Project, a Python-based tool, with the current focus on Bash scripts while preserving legacy features.
 
 ## Usage
+
+Albator provides multiple interfaces for macOS hardening:
+
+### 1. Main Script (Legacy Interface)
 Run the main script with options to harden specific areas or fetch security advisories:
 
 ```bash
 ./albator.sh [options]
 ```
 
-### Options
+#### Options
 - `-f, --firewall`: Enable and configure firewall
 - `-p, --privacy`: Adjust privacy settings
 - `-e, --encryption`: Enable encryption (FileVault)
@@ -23,11 +27,88 @@ Run the main script with options to harden specific areas or fetch security advi
 - `-t, --test`: Run automated security tests
 - `-h, --help`: Display this help message
 
-### Example
-To fetch CVE advisories, Apple security updates, enable the firewall, generate a report, run Ansible, and run tests:
-
+#### Example
 ```bash
 ./albator.sh --cve --apple --firewall --report --ansible --test
+```
+
+### 2. Enhanced Individual Scripts
+Each hardening component now supports advanced options:
+
+#### Privacy Configuration
+```bash
+# Apply privacy settings
+./privacy.sh
+
+# Dry run (show what would be done)
+./privacy.sh --dry-run
+
+# Get help
+./privacy.sh --help
+```
+
+#### Firewall Configuration
+```bash
+# Configure firewall
+./firewall.sh
+
+# Dry run mode
+./firewall.sh --dry-run
+
+# Include functionality tests
+./firewall.sh --test
+```
+
+### 3. Comprehensive Testing
+```bash
+# Run all security tests
+./tests/test_security.sh
+
+# Dry run (no script execution)
+./tests/test_security.sh --dry-run
+
+# Verbose output
+./tests/test_security.sh --verbose
+
+# Python-based testing framework
+python3 tests/test_framework.py --verbose --include-scripts
+```
+
+### 4. Configuration Management
+```bash
+# Edit main configuration
+vim config/albator.yaml
+
+# Use different security profiles:
+# - basic: Essential security for general users
+# - advanced: Enhanced security for power users  
+# - enterprise: Maximum security for organizations
+```
+
+### 5. Rollback System
+```bash
+# List available rollback points
+python3 lib/rollback.py --list
+
+# Rollback to a specific point
+python3 lib/rollback.py --rollback <rollback_id>
+
+# Dry run rollback
+python3 lib/rollback.py --rollback <rollback_id> --dry-run
+
+# Clean up old rollback points
+python3 lib/rollback.py --cleanup 5
+```
+
+### 6. Unified CLI (Advanced)
+```bash
+# Legacy Python tools
+python3 albator_cli.py legacy list_tags
+python3 albator_cli.py legacy interactive
+
+# Individual hardening scripts
+python3 albator_cli.py privacy
+python3 albator_cli.py firewall
 ```
 
 ## Requirements

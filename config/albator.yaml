@@ -1,0 +1,122 @@
+# Albator Configuration File
+# This file defines the default settings and profiles for macOS hardening
+
+# Global Settings
+global:
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "/var/log/albator.log"
+  backup_settings: true
+  dry_run: false
+  progress_indicators: true
+
+# Security Profiles
+profiles:
+  basic:
+    description: "Basic security hardening for general users"
+    firewall:
+      enabled: true
+      stealth_mode: true
+      block_all_incoming: true
+      logging: true
+    privacy:
+      disable_telemetry: true
+      disable_siri_analytics: true
+      disable_safari_suggestions: true
+      disable_remote_login: true
+      disable_remote_management: true
+      disable_mdns: true
+      disable_smb: false
+    encryption:
+      filevault: false  # Requires user interaction
+    app_security:
+      gatekeeper: true
+      verify_hardened_runtime: true
+    updates:
+      fetch_cve: true
+      fetch_apple_updates: true
+
+  advanced:
+    description: "Advanced security hardening for power users"
+    firewall:
+      enabled: true
+      stealth_mode: true
+      block_all_incoming: true
+      logging: true
+    privacy:
+      disable_telemetry: true
+      disable_siri_analytics: true
+      disable_safari_suggestions: true
+      disable_remote_login: true
+      disable_remote_management: true
+      disable_mdns: true
+      disable_smb: true
+    encryption:
+      filevault: true
+    app_security:
+      gatekeeper: true
+      verify_hardened_runtime: true
+    updates:
+      fetch_cve: true
+      fetch_apple_updates: true
+
+  enterprise:
+    description: "Enterprise-grade security hardening"
+    firewall:
+      enabled: true
+      stealth_mode: true
+      block_all_incoming: true
+      logging: true
+      advanced_logging: true
+    privacy:
+      disable_telemetry: true
+      disable_siri_analytics: true
+      disable_safari_suggestions: true
+      disable_remote_login: true
+      disable_remote_management: true
+      disable_mdns: true
+      disable_smb: true
+      disable_bluetooth: true
+      disable_wifi: false  # May be needed for enterprise
+    encryption:
+      filevault: true
+      secure_recovery_key: true
+    app_security:
+      gatekeeper: true
+      verify_hardened_runtime: true
+      additional_checks: true
+    updates:
+      fetch_cve: true
+      fetch_apple_updates: true
+    compliance:
+      nist_800_53: true
+      audit_trail: true
+
+# macOS Version Specific Settings
+macos_versions:
+  "15.5":
+    new_telemetry_service: "com.apple.newTelemetryService"
+    smb_service: "com.apple.smbd"
+    additional_privacy_settings:
+      - "com.apple.newPrivacyService"
+
+# Verification Settings
+verification:
+  timeout: 30  # seconds
+  retry_count: 3
+  verify_after_apply: true
+
+# Rollback Settings
+rollback:
+  enabled: true
+  backup_location: "/tmp/albator_backup"
+  auto_rollback_on_failure: false
+
+# Dependencies
+dependencies:
+  required:
+    - "curl"
+    - "jq"
+  optional:
+    - "pup"
+    - "gh"
+  install_missing: false

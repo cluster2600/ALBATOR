@@ -1,0 +1,25 @@
+# Albator Web Interface Requirements
+# Install with: pip install -r requirements.txt
+
+# Core web framework
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+
+# WebSocket support
+python-socketio==5.8.0
+eventlet==0.33.3
+
+# Configuration and data handling
+PyYAML==6.0.1
+python-dotenv==1.0.0
+
+# Security and authentication (for future use)
+Flask-Login==0.6.3
+Flask-WTF==1.1.1
+WTForms==3.0.1
+
+# Development and debugging
+Werkzeug==2.3.7
+
+# Optional: For production deployment
+gunicorn==21.2.0

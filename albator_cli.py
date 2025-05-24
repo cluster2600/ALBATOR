@@ -7,6 +7,7 @@ import os
 from arg_parser import create_args
 from main import BaselineGenerator
 from rule_handler import collect_rules
+from utils import parse_authors
 
 CONFIG_PATH = "config.yaml"
 
