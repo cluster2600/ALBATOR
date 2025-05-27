@@ -71,6 +71,10 @@ azure-storage-blob>=12.17.0  # Azure
 google-cloud-storage>=2.10.0  # GCP
 cryptography>=41.0.0  # For data encryption
 
+# Security and Zero Trust dependencies
+psutil>=5.9.0  # System monitoring for behavioral analysis
+PyJWT>=2.8.0  # JWT token management
+
 # Optional: For production deployment
 gunicorn>=21.2.0
 
