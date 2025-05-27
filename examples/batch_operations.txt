@@ -1,0 +1,21 @@
+# Example Albator Batch Operations File
+# This file demonstrates batch command execution
+# Lines starting with # are comments and are ignored
+
+# First, check current profiles
+profile list
+
+# Create a custom profile for testing
+profile create test_profile --description "Test security profile" --security-level 75
+
+# Run compliance scan with the test profile
+compliance --framework nist_800_53 --profile test_profile --format json
+
+# Generate analytics dashboard
+dashboard --days 7
+
+# Show rollback points
+rollback list
+
+# Clean up - delete the test profile
+profile delete test_profile

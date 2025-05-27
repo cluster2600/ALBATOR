@@ -23,6 +23,7 @@ try:
     from analytics_dashboard import AnalyticsDashboard
     from fleet_manager import FleetManager
     from rollback import RollbackManager
+    from cli_enhancements import AlbatorCompleter, CommandHistory, BatchProcessor, PluginManager
 except ImportError as e:
     print(f"Warning: Could not import some modules: {e}")
     print("Some features may not be available.")
@@ -42,6 +43,11 @@ class AlbatorEnhanced:
             self.analytics_dashboard = AnalyticsDashboard()
             self.fleet_manager = FleetManager(config_path)
             self.rollback_manager = RollbackManager()
+            
+            # Initialize CLI enhancement components
+            self.command_history = CommandHistory() if 'CommandHistory' in globals() else None
+            self.batch_processor = BatchProcessor() if 'BatchProcessor' in globals() else None
+            self.plugin_manager = PluginManager() if 'PluginManager' in globals() else None
         except Exception as e:
             print(f"Warning: Could not initialize all managers: {e}")
             self.config_manager = None
@@ -49,6 +55,9 @@ class AlbatorEnhanced:
             self.analytics_dashboard = None
             self.fleet_manager = None
             self.rollback_manager = None
+            self.command_history = None
+            self.batch_processor = None
+            self.plugin_manager = None
     
     def run_hardening_script(self, script_name: str, profile: str = "basic", 
                            dry_run: bool = False, test: bool = False) -> bool:
@@ -505,6 +514,36 @@ Examples:
     rollback_cleanup = rollback_subparsers.add_parser("cleanup", help="Cleanup old rollbacks")
     rollback_cleanup.add_argument("--keep", type=int, default=5, help="Number to keep")
     
+    # Interactive shell command
+    shell_parser = subparsers.add_parser("shell", help="Launch interactive shell")
+    
+    # Batch processing command
+    batch_parser = subparsers.add_parser("batch", help="Execute batch operations")
+    batch_parser.add_argument("file", help="Batch file containing commands")
+    batch_parser.add_argument("--validate", action="store_true", help="Validate batch file only")
+    batch_parser.add_argument("--continue-on-error", action="store_true", 
+                             help="Continue execution even if a command fails")
+    
+    # Plugin management
+    plugin_parser = subparsers.add_parser("plugin", help="Manage plugins")
+    plugin_subparsers = plugin_parser.add_subparsers(dest="plugin_action")
+    
+    plugin_subparsers.add_parser("list", help="List installed plugins")
+    
+    plugin_install = plugin_subparsers.add_parser("install", help="Install a plugin")
+    plugin_install.add_argument("name", help="Plugin name")
+    plugin_install.add_argument("source", help="Plugin source URL or path")
+    plugin_install.add_argument("--version", default="latest", help="Plugin version")
+    
+    plugin_enable = plugin_subparsers.add_parser("enable", help="Enable a plugin")
+    plugin_enable.add_argument("name", help="Plugin name")
+    
+    plugin_disable = plugin_subparsers.add_parser("disable", help="Disable a plugin")
+    plugin_disable.add_argument("name", help="Plugin name")
+    
+    # Setup auto-completion command
+    subparsers.add_parser("setup-completion", help="Setup bash auto-completion")
+    
     return parser
 
 def main():
@@ -595,6 +634,94 @@ def main():
             )
         elif args.rollback_action == "cleanup":
             success = albator.manage_rollbacks("cleanup", keep=args.keep)
+    
+    elif args.command == "shell":
+        # Launch interactive shell
+        try:
+            from cli_enhancements import InteractiveShell
+            shell = InteractiveShell()
+            shell.cmdloop()
+            success = True
+        except ImportError:
+            print("❌ Interactive shell not available. Please ensure cli_enhancements module is installed.")
+            success = False
+        except KeyboardInterrupt:
+            print("\n✅ Exiting interactive shell.")
+            success = True
+    
+    elif args.command == "batch":
+        # Execute batch operations
+        if not albator.batch_processor:
+            print("❌ Batch processor not available")
+            success = False
+        else:
+            if args.validate:
+                success = albator.batch_processor.validate_batch_file(args.file)
+                if success:
+                    print("✅ Batch file is valid")
+                else:
+                    print("❌ Batch file validation failed")
+            else:
+                results = albator.batch_processor.execute_batch(
+                    args.file,
+                    continue_on_error=args.continue_on_error
+                )
+                successful = sum(1 for r in results if r['success'])
+                total = len(results)
+                print(f"\n📊 Batch Execution Summary: {successful}/{total} commands successful")
+                success = successful == total
+    
+    elif args.command == "plugin":
+        # Manage plugins
+        if not albator.plugin_manager:
+            print("❌ Plugin manager not available")
+            success = False
+        else:
+            if args.plugin_action == "list":
+                plugins = albator.plugin_manager.list_plugins()
+                if plugins:
+                    print("🔌 Installed Plugins:")
+                    for plugin in plugins:
+                        status = "✅ Enabled" if plugin['enabled'] else "❌ Disabled"
+                        print(f"  {plugin['name']} v{plugin['version']} - {status}")
+                else:
+                    print("No plugins installed")
+                success = True
+            elif args.plugin_action == "install":
+                success = albator.plugin_manager.install_plugin(
+                    args.name,
+                    args.source,
+                    args.version
+                )
+                if success:
+                    print(f"✅ Plugin '{args.name}' installed successfully")
+                else:
+                    print(f"❌ Failed to install plugin '{args.name}'")
+            elif args.plugin_action == "enable":
+                success = albator.plugin_manager.enable_plugin(args.name)
+                if success:
+                    print(f"✅ Plugin '{args.name}' enabled")
+                else:
+                    print(f"❌ Plugin '{args.name}' not found")
+            elif args.plugin_action == "disable":
+                success = albator.plugin_manager.disable_plugin(args.name)
+                if success:
+                    print(f"✅ Plugin '{args.name}' disabled")
+                else:
+                    print(f"❌ Plugin '{args.name}' not found")
+    
+    elif args.command == "setup-completion":
+        # Setup bash auto-completion
+        try:
+            from cli_enhancements import setup_cli_completion
+            setup_cli_completion()
+            success = True
+        except ImportError:
+            print("❌ CLI enhancements module not available")
+            success = False
+        except Exception as e:
+            print(f"❌ Failed to setup completion: {e}")
+            success = False
     
     # Exit with appropriate code
     sys.exit(0 if success else 1)
