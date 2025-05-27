@@ -790,4 +790,59 @@ def main():
     args = parser.parse_args()
     
     if not args.command:
-        parser.print_
+        parser.print_help()
+        return
+    
+    # Initialize analytics dashboard
+    dashboard = AnalyticsDashboard(args.db_path)
+    
+    if args.command == "dashboard":
+        print(f"Generating security dashboard...")
+        success = dashboard.generate_security_dashboard(
+            output_path=args.output,
+            system_id=args.system,
+            days=args.days
+        )
+        
+        if success:
+            print(f"Dashboard generated successfully: {args.output}")
+        else:
+            print("Failed to generate dashboard")
+    
+    elif args.command == "export":
+        print(f"Exporting analytics data...")
+        success = dashboard.export_analytics_data(
+            output_path=args.output,
+            format=args.format,
+            system_id=args.system,
+            days=args.days
+        )
+        
+        if success:
+            print(f"Data exported successfully: {args.output}")
+        else:
+            print("Failed to export data")
+    
+    elif args.command == "trends":
+        print("Analyzing compliance trends...")
+        trends = dashboard.get_compliance_trends(
+            system_id=args.system,
+            framework=args.framework,
+            days=args.days
+        )
+        
+        if trends:
+            print(f"\nCompliance Trends Analysis ({args.days} days):")
+            print("=" * 60)
+            
+            for trend in trends:
+                print(f"\n📊 {trend.metric_name.replace('_', ' ').title()}")
+                print(f"   Direction: {trend.trend_direction.upper()} ({trend.change_percentage:+.1f}%)")
+                print(f"   Current: {trend.current_value:.1f} | Previous: {trend.previous_value:.1f}")
+                print(f"   Strength: {trend.trend_strength:.2f}")
+                print(f"   💡 {trend.recommendation}")
+        else:
+            print("No trend data available. Generate more compliance reports to see trends.")
+
+if __name__ == "__main__":
+    main()

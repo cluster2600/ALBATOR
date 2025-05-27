@@ -746,10 +746,9 @@ def main():
         info = reporter.get_framework_info(args.framework)
         if info:
             print(f"Framework: {info['name']}")
-]}
-            print(f"Description: {info[\"description\"]}")
-            print(f"Version: {info[\"version\"]}")
-            print(f"Total Checks: {len(info[\"checks\"])}")
+            print(f"Description: {info['description']}")
+            print(f"Version: {info['version']}")
+            print(f"Total Checks: {len(info['checks'])}")
         else:
             print(f"Framework {args.framework} not found")
 

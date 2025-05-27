@@ -100,7 +100,31 @@ python3 lib/rollback.py --rollback <rollback_id> --dry-run
 python3 lib/rollback.py --cleanup 5
 ```
 
-### 6. Unified CLI (Advanced)
+### 6. Enhanced Unified CLI (Enterprise)
+```bash
+# Comprehensive hardening with profile-based execution
+python3 albator_enhanced.py harden --profile enterprise --dry-run
+
+# Generate security analytics dashboard
+python3 albator_enhanced.py dashboard --days 30
+
+# Manage security profiles
+python3 albator_enhanced.py profile list
+python3 albator_enhanced.py profile create custom_profile --security-level 85
+
+# Fleet management and bulk operations
+python3 albator_enhanced.py fleet list
+python3 albator_enhanced.py fleet deploy --profile advanced
+
+# Compliance scanning with multiple frameworks
+python3 albator_enhanced.py compliance --framework nist_800_53 --format html
+
+# Rollback management
+python3 albator_enhanced.py rollback list
+python3 albator_enhanced.py rollback create --description "Before major changes"
+```
+
+### 7. Legacy Unified CLI (Advanced)
 ```bash
 # Legacy Python tools
 python3 albator_cli.py legacy list_tags
@@ -116,8 +140,12 @@ python3 albator_cli.py firewall
 - Administrator privileges (sudo access)
 - `curl` and `jq` for fetching CVE advisories (`brew install jq`)
 - `pup` for parsing Apple security updates (`brew install pup`, optional but recommended)
+- Python 3.8+ for enhanced features
+- Additional Python packages: `pip3 install -r requirements.txt`
 
 ## Features
+
+### Core Security Features
 - Modular scripts for targeted hardening (firewall, privacy, encryption, app security)
 - NIST-inspired security standards
 - Configures various privacy settings, including disabling telemetry, Siri analytics, Safari search suggestions, remote login, remote management, and mDNS multicast advertisements.
@@ -128,7 +156,26 @@ python3 albator_cli.py firewall
 - Fetches Apple security updates for macOS Sequoia 15.5 using `curl` and `pup` (or `grep`/`awk` as a fallback).
 - Disables unnecessary services (remote login, remote management, mDNS multicast)
 - CVE advisory fetching to keep users informed about potential vulnerabilities
-- Cross-referencing with Apple’s security updates for a comprehensive view of macOS vulnerabilities
+- Cross-referencing with Apple's security updates for a comprehensive view of macOS vulnerabilities
+
+### Enterprise Features
+- **Fleet Management**: SSH-based management of multiple Mac systems with concurrent operations
+- **Bulk Operations**: Execute security hardening across dozens of systems simultaneously
+- **Compliance Reporting**: Generate detailed compliance reports for NIST 800-53, CIS macOS, ISO27001, and custom frameworks
+- **Analytics Dashboard**: Real-time security metrics tracking with trend analysis and visual dashboards
+- **Profile Management**: Create, manage, and deploy custom security profiles with different security levels
+- **Advanced Rollback**: Comprehensive rollback system with metadata tracking and restoration capabilities
+- **Web Interface**: Modern Flask-based GUI with real-time WebSocket communication
+- **Advanced Caching**: Intelligent data caching reduces network load and enables offline operation
+- **Real-time Monitoring**: Live progress tracking and status updates across all operations
+
+### Advanced Analytics
+- **Trend Analysis**: Monitor security posture changes over time with intelligent recommendations
+- **Compliance Scoring**: Automated calculation of compliance scores across multiple frameworks
+- **Risk Assessment**: Identify security gaps and prioritize remediation efforts
+- **Historical Reporting**: Track security improvements and compliance trends
+- **Multi-format Export**: Export data in CSV, JSON, Excel formats for external analysis
+- **Visual Dashboards**: Interactive charts and graphs for executive reporting
 
 ## Security Rules
 - **Disable Guest Account**
@@ -150,6 +197,8 @@ python3 albator_cli.py firewall
 - Some changes (e.g., FileVault) may require a system restart.
 - Always back up your system before applying hardening scripts.
 - CVE and Apple updates fetching require an internet connection.
+- Enterprise features require Python 3.8+ and additional dependencies.
+- Fleet management requires SSH access to target systems.
 
 ## Contributing
 Feel free to submit issues or pull requests to improve Albator, including enhancements to the Bash scripts or revival of Python features!
@@ -164,20 +213,27 @@ Open-source under the MIT License.
 
 ## Future Enhancements
 
-- **Centralized Configuration:** Consolidate configuration into a single file or set of files.
-- **Modular Rule Definitions:** Define security rules in a structured format (e.g., YAML or JSON).
-- **Automated Testing:** Implement automated tests to verify hardening settings.
-- **Reporting:** Generate reports summarizing the system's security posture.
-- **GUI Enhancements:** Improve the GUI mode (if relevant).
-- **Integration with Configuration Management Tools:** Integrate with tools like Ansible or Chef.
-- **More Granular Control:** Provide more granular control over hardening settings.
-- **Improved Error Handling:** Implement more robust error handling and logging.
-- **Regular Updates:** Keep the tool up-to-date with the latest security best practices and macOS updates.
+- **Machine Learning Integration**: Predictive security recommendations and anomaly detection
+- **Cloud Integration**: SaaS deployment option with multi-tenant architecture
+- **Cross-platform Support**: Extend to iOS and tvOS security hardening
+- **Advanced Threat Detection**: Integration with threat intelligence feeds
+- **Zero Trust Implementation**: Device trust verification and continuous authentication
+- **API Development**: REST and GraphQL interfaces for external integrations
+- **Kubernetes Operator**: Native Kubernetes deployment and management
 
 ## Architecture Overview
 
 ```mermaid
 flowchart TD
+    subgraph Enhanced CLI
+        AE[albator_enhanced.py - Unified Interface]
+        AE --> CM[Configuration Management]
+        AE --> FM[Fleet Management]
+        AE --> CR[Compliance Reporting]
+        AE --> AD[Analytics Dashboard]
+        AE --> RM[Rollback Management]
+    end
+
     subgraph Bash Scripts
         A[albator.sh - Main Entry Point]
         B[firewall.sh - Firewall Configuration]
@@ -191,6 +247,12 @@ flowchart TD
         J[tests/test_security.sh - Automated Tests]
     end
 
+    subgraph Web Interface
+        WA[web/app.py - Flask Application]
+        WT[web/templates/ - HTML Templates]
+        WA --> WT
+    end
+
     subgraph Python Legacy Tool
         M[main.py - BaselineGenerator]
         N[arg_parser.py - CLI Argument Parsing]
@@ -199,41 +261,34 @@ flowchart TD
         Q[includes/mscp-data.yaml - Metadata & Authors]
         R[includes/800-53_baselines.yaml - NIST Controls]
         S[version.yaml - Version Information]
-        T[User Interaction Modes]
-        T -->|CLI| M
-        T -->|Interactive| M
-        T -->|GUI| M
     end
 
-    User[User] --> A
-    A --> B
-    A --> C
-    A --> D
-    A --> E
-    A --> F
-    A --> G
-    A --> H
-    A --> I
-    A --> J
-
-    User -->|Legacy Tool| M
-    M --> N
-    M --> O
-    M --> P
-    M --> Q
-    M --> R
-    M --> S
+    User[User] --> AE
+    User --> WA
+    User --> A
+    User --> M
+    
+    AE --> A
+    AE --> B
+    AE --> C
+    AE --> D
+    AE --> E
+    AE --> F
+    AE --> G
+    AE --> H
+    AE --> I
+    AE --> J
 ```
 
 ## macOS 15.5 Updates
 
 Albator now supports macOS 15.5 (Sequoia) with the following new features and enhancements:
 
-- Disabled new telemetry services introduced in macOS 15.5 to enhance privacy.
-- Disabled SMB network sharing by default to reduce network attack surface.
-- Enhanced firewall logging and status verification for improved security monitoring.
-- Added placeholders for secure FileVault recovery key handling.
-- Included additional Hardened Runtime checks for application security.
-- Updated CVE and Apple security update fetching to support macOS 15.5 advisories.
-- Centralized configuration support for easier management of settings.
-- Unified CLI tool to seamlessly run legacy Python functions and new Bash scripts.
+- **Enhanced Privacy Controls**: Disabled new telemetry services introduced in macOS 15.5
+- **Network Security**: Disabled SMB network sharing by default to reduce attack surface
+- **Advanced Monitoring**: Enhanced firewall logging and status verification
+- **Secure Recovery**: Improved FileVault recovery key handling for macOS 15.5
+- **Application Security**: Additional Hardened Runtime checks for enhanced app security
+- **Intelligence Updates**: Updated CVE and Apple security update fetching for macOS 15.5
+- **Enterprise Integration**: Centralized configuration and unified CLI for enterprise deployment
+- **Modern Architecture**: Flask-based web interface with real-time monitoring capabilities

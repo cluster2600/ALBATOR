@@ -1,28 +1,89 @@
 # Albator - macOS 15 Hardening Tool Requirements
 # This file lists the dependencies required to run the Albator scripts.
-# Install these tools using Homebrew (brew) on macOS. Run 'brew install <tool>' for each.
 
-curl
-    # Purpose: Fetch data from GitHub Security Advisories API and Apple security updates page.
-    # Installation: brew install curl
-    # Note: Typically pre-installed on macOS, but verify with 'curl --version'.
+# =============================================================================
+# SYSTEM TOOLS (Install with Homebrew: brew install <tool>)
+# =============================================================================
 
-jq
-    # Purpose: Parse JSON responses from the GitHub Security Advisories API.
-    # Installation: brew install jq
-    # Note: Required for cve_fetch.sh. Install if 'jq --version' fails.
+# curl
+#    Purpose: Fetch data from GitHub Security Advisories API and Apple security updates page.
+#    Installation: brew install curl
+#    Note: Typically pre-installed on macOS, but verify with 'curl --version'.
 
-pup
-    # Purpose: Parse HTML content from Apple security updates page.
-    # Installation: brew install pup
-    # Note: Optional but recommended for apple_updates.sh. Falls back to grep/awk if not installed.
+# jq
+#    Purpose: Parse JSON responses from the GitHub Security Advisories API.
+#    Installation: brew install jq
+#    Note: Required for cve_fetch.sh. Install if 'jq --version' fails.
+
+# pup
+#    Purpose: Parse HTML content from Apple security updates page.
+#    Installation: brew install pup
+#    Note: Optional but recommended for apple_updates.sh. Falls back to grep/awk if not installed.
 
 # Optional: For enhanced GitHub API access
 # github-cli (gh)
-#    # Purpose: Alternative to curl for authenticated GitHub API requests (optional).
-#    # Installation: brew install gh
-#    # Note: Requires a GitHub Personal Access Token for rate limit increases.
+#    Purpose: Alternative to curl for authenticated GitHub API requests (optional).
+#    Installation: brew install gh
+#    Note: Requires a GitHub Personal Access Token for rate limit increases.
 
-# System Requirements
-# - macOS 15 (Sequoia)
+# =============================================================================
+# PYTHON PACKAGES (Install with pip: pip3 install -r requirements.txt)
+# =============================================================================
+
+# Core dependencies for enhanced features
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+
+# Data analysis and visualization
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+numpy>=1.24.0
+
+# Web interface dependencies
+Flask>=2.3.3
+Flask-SocketIO>=5.3.6
+python-socketio>=5.8.0
+eventlet>=0.33.3
+Flask-Login>=0.6.3
+Flask-WTF>=1.1.1
+WTForms>=3.0.1
+Werkzeug>=2.3.7
+
+# API Server dependencies
+Flask-CORS>=4.0.0
+PyJWT>=2.8.0
+
+# SSH and network operations for fleet management
+paramiko>=3.3.0
+requests>=2.31.0
+
+# Development and debugging
+Werkzeug>=2.3.7
+
+# Optional: For production deployment
+gunicorn>=21.2.0
+
+# =============================================================================
+# SYSTEM REQUIREMENTS
+# =============================================================================
+# - macOS 15.5 (Sequoia)
+# - Python 3.8 or higher
 # - Administrator privileges (sudo access) for hardening scripts
+# - Internet connection for CVE and Apple updates fetching
+# - SSH access for fleet management features
+
+# =============================================================================
+# INSTALLATION INSTRUCTIONS
+# =============================================================================
+# 1. Install system tools:
+#    brew install curl jq pup
+#
+# 2. Install Python packages:
+#    pip3 install -r requirements.txt
+#
+# 3. For web interface only:
+#    pip3 install -r web/requirements.txt
+#
+# 4. Verify installation:
+#    python3 albator_enhanced.py --help
