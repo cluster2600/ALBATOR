@@ -1,2 +1,3 @@
 platform: "macOS"
 os: "15 (Sequoia)"
+version: "0.9"
