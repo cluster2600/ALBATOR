@@ -1,0 +1,32 @@
+name: Create Pre-Release v0.9
+
+on:
+  push:
+    tags:
+      - 'v0.9-pre'
+
+jobs:
+  create-prerelease:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Create Pre-Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v0.9-pre
+          release_name: "🎉 Eureka - Albator v0.9 Pre-Release"
+          body: |
+            ## [🎉 Eureka] Release 0.9 (28/05/2025)
+            - Comprehensive release of Albator version 0.9
+            - Milestone achievement of enterprise-grade macOS security hardening framework
+            - Complete implementation of Phase 3 and Phase 4 features
+            - Unified CLI and integration platform
+            - Advanced security, compliance, and threat detection capabilities
+            - Enterprise-level profile and fleet management
+            - Machine learning-powered security intelligence
+          draft: false
+          prerelease: true
