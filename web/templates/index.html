@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albator - macOS Security Hardening</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-color: #34495e;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-enabled {
+            background-color: var(--success-color);
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+        }
+
+        .status-disabled {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+
+        .status-unknown {
+            background-color: var(--warning-color);
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #f7dc6f);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #ec7063);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background-color: #ecf0f1;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--success-color), #58d68d);
+        }
+
+        .operation-log {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .security-level-high {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .security-level-medium {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+
+        .security-level-basic {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .security-level-low {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>
+                Albator
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-desktop me-1"></i>
+                    <span id="macos-version">Loading...</span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- System Status Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            System Security Status
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="system-status">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading system status...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Profiles -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-shield me-2"></i>
+                            Security Profiles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="security-profiles">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading security profiles...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Operations -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs me-2"></i>
+                            Security Operations
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-secret fa-3x text-primary mb-3"></i>
+                                        <h6>Privacy Settings</h6>
+                                        <p class="text-muted small">Configure privacy and telemetry settings</p>
+                                        <button class="btn btn-primary btn-sm" onclick="runOperation('privacy')">
+                                            <i class="fas fa-play me-1"></i>Configure
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm ms-1" onclick="runOperation('privacy', true)">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-fire fa-3x text-danger mb-3"></i>
+                                        <h6>Firewall</h6>
+                                        <p class="text-muted small">Configure application firewall settings</p>
+                                        <button class="btn btn-primary btn-sm" onclick="runOperation('firewall')">
+                                            <i class="fas fa-play me-1"></i>Configure
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm ms-1" onclick="runOperation('firewall', true)">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-lock fa-3x text-success mb-3"></i>
+                                        <h6>Encryption</h6>
+                                        <p class="text-muted small">Configure FileVault disk encryption</p>
+                                        <button class="btn btn-primary btn-sm" onclick="runOperation('encryption')">
+                                            <i class="fas fa-play me-1"></i>Configure
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm ms-1" onclick="runOperation('encryption', true)">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-mobile-alt fa-3x text-warning mb-3"></i>
+                                        <h6>App Security</h6>
+                                        <p class="text-muted small">Configure Gatekeeper and app security</p>
+                                        <button class="btn btn-primary btn-sm" onclick="runOperation('app_security')">
+                                            <i class="fas fa-play me-1"></i>Configure
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm ms-1" onclick="runOperation('app_security', true)">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-bug fa-3x text-info mb-3"></i>
+                                        <h6>CVE Fetch</h6>
+                                        <p class="text-muted small">Fetch latest security advisories</p>
+                                        <button class="btn btn-primary btn-sm" onclick="runOperation('cve_fetch')">
+                                            <i class="fas fa-download me-1"></i>Fetch
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm ms-1" onclick="runOperation('cve_fetch', true)">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fab fa-apple fa-3x text-dark mb-3"></i>
+                                        <h6>Apple Updates</h6>
+                                        <p class="text-muted small">Check Apple security updates</p>
+                                        <button class="btn btn-primary btn-sm" onclick="runOperation('apple_updates')">
+                                            <i class="fas fa-sync me-1"></i>Check
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm ms-1" onclick="runOperation('apple_updates', true)">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operation Output -->
+        <div class="row mb-4" id="operation-section" style="display: none;">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-terminal me-2"></i>
+                            Operation Output
+                        </h5>
+                        <button class="btn btn-sm btn-outline-light" onclick="clearOperationOutput()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span id="operation-status">Ready</span>
+                                <span id="operation-duration"></span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%" id="operation-progress"></div>
+                            </div>
+                        </div>
+                        <div class="operation-log" id="operation-log">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-terminal fa-2x mb-2"></i>
+                                <p>Operation output will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rollback Points -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Rollback Points
+                        </h5>
+                        <button class="btn btn-sm btn-outline-light" onclick="loadRollbackPoints()">
+                            <i class="fas fa-sync me-1"></i>Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="rollback-points">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading rollback points...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script>
+        // Global variables
+        let socket;
+        let currentOperationId = null;
+        let operationStartTime = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSocket();
+            loadSystemStatus();
+            loadSecurityProfiles();
+            loadRollbackPoints();
+        });
+
+        // Initialize WebSocket connection
+        function initializeSocket() {
+            socket = io();
+            
+            socket.on('connect', function() {
+                console.log('Connected to server');
+                socket.emit('subscribe_operations');
+            });
+
+            socket.on('operation_update', function(data) {
+                if (data.operation_id === currentOperationId) {
+                    appendOperationOutput(data.output);
+                }
+            });
+
+            socket.on('operation_complete', function(data) {
+                if (data.operation_id === currentOperationId) {
+                    completeOperation(data);
+                }
+            });
+        }
+
+        // Load system status
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/system-status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySystemStatus(data.status);
+                    document.getElementById('macos-version').textContent = data.status.macos_version;
+                } else {
+                    showError('Failed to load system status: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading system status: ' + error.message);
+            }
+        }
+
+        // Display system status
+        function displaySystemStatus(status) {
+            const container = document.getElementById('system-status');
+            const components = status.components;
+            
+            container.innerHTML = `
+                <div class="col-md-3 mb-3">
+                    <div class="text-center">
+                        <span class="status-indicator ${components.firewall?.enabled ? 'status-enabled' : 'status-disabled'}"></span>
+                        <strong>Firewall</strong>
+                        <br><small class="text-muted">${components.firewall?.status || 'Unknown'}</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-center">
+                        <span class="status-indicator ${components.encryption?.enabled ? 'status-enabled' : 'status-disabled'}"></span>
+                        <strong>FileVault</strong>
+                        <br><small class="text-muted">${components.encryption?.status || 'Unknown'}</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-center">
+                        <span class="status-indicator ${components.gatekeeper?.enabled ? 'status-enabled' : 'status-disabled'}"></span>
+                        <strong>Gatekeeper</strong>
+                        <br><small class="text-muted">${components.gatekeeper?.status || 'Unknown'}</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-center">
+                        <span class="status-indicator ${components.sip?.enabled ? 'status-enabled' : 'status-disabled'}"></span>
+                        <strong>SIP</strong>
+                        <br><small class="text-muted">${components.sip?.status || 'Unknown'}</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load security profiles
+        async function loadSecurityProfiles() {
+            try {
+                const response = await fetch('/api/profiles');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySecurityProfiles(data.profiles);
+                } else {
+                    showError('Failed to load security profiles: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading security profiles: ' + error.message);
+            }
+        }
+
+        // Display security profiles
+        function displaySecurityProfiles(profiles) {
+            const container = document.getElementById('security-profiles');
+            
+            container.innerHTML = profiles.map(profile => `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">${profile.name}</h6>
+                            <p class="card-text small text-muted">${profile.description}</p>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">Security Level: 
+                                    <span class="security-level-${profile.security_level.toLowerCase()}">${profile.security_level}</span>
+                                </span>
+                            </div>
+                            <div class="small">
+                                ${Object.entries(profile.components).map(([comp, info]) => 
+                                    `<div>${comp}: ${info.coverage}</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Run security operation
+        async function runOperation(operation, dryRun = false) {
+            try {
+                const response = await fetch('/api/run-operation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        operation: operation,
+                        dry_run: dryRun
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    startOperation(data.operation_id, operation, dryRun);
+                } else {
+                    showError('Failed to start operation: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error starting operation: ' + error.message);
+            }
+        }
+
+        // Start operation tracking
+        function startOperation(operationId, operationType, dryRun) {
+            currentOperationId = operationId;
+            operationStartTime = Date.now();
+            
+            // Show operation section
+            document.getElementById('operation-section').style.display = 'block';
+            document.getElementById('operation-section').scrollIntoView({ behavior: 'smooth' });
+            
+            // Update status
+            document.getElementById('operation-status').innerHTML = `
+                <span class="badge bg-primary pulse">
+                    <i class="fas fa-spinner fa-spin me-1"></i>
+                    Running ${operationType} ${dryRun ? '(Preview)' : ''}
+                </span>
+            `;
+            
+            // Reset progress and log
+            document.getElementById('operation-progress').style.width = '10%';
+            document.getElementById('operation-log').innerHTML = `
+                <div class="text-info">
+                    <i class="fas fa-play me-2"></i>Starting ${operationType} operation...
+                </div>
+            `;
+            
+            // Start duration timer
+            updateOperationDuration();
+        }
+
+        // Update operation duration
+        function updateOperationDuration() {
+            if (currentOperationId && operationStartTime) {
+                const duration = Math.floor((Date.now() - operationStartTime) / 1000);
+                document.getElementById('operation-duration').textContent = `${duration}s`;
+                setTimeout(updateOperationDuration, 1000);
+            }
+        }
+
+        // Append operation output
+        function appendOperationOutput(output) {
+            const logContainer = document.getElementById('operation-log');
+            const outputDiv = document.createElement('div');
+            outputDiv.textContent = output;
+            logContainer.appendChild(outputDiv);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Update progress
+            const progress = document.getElementById('operation-progress');
+            const currentWidth = parseInt(progress.style.width) || 10;
+            if (currentWidth < 90) {
+                progress.style.width = Math.min(currentWidth + 5, 90) + '%';
+            }
+        }
+
+        // Complete operation
+        function completeOperation(data) {
+            currentOperationId = null;
+            
+            // Update status
+            const statusBadge = data.status === 'completed' ? 'bg-success' : 'bg-danger';
+            const statusIcon = data.status === 'completed' ? 'fa-check' : 'fa-times';
+            
+            document.getElementById('operation-status').innerHTML = `
+                <span class="badge ${statusBadge}">
+                    <i class="fas ${statusIcon} me-1"></i>
+                    ${data.status.charAt(0).toUpperCase() + data.status.slice(1)}
+                </span>
+            `;
+            
+            // Complete progress
+            document.getElementById('operation-progress').style.width = '100%';
+            
+            // Add completion message
+            const logContainer = document.getElementById('operation-log');
+            const completionDiv = document.createElement('div');
+            completionDiv.className = data.status === 'completed' ? 'text-success' : 'text-danger';
+            completionDiv.innerHTML = `
+                <i class="fas ${statusIcon} me-2"></i>
+                Operation ${data.status} in ${data.duration.toFixed(1)}s
+            `;
+            logContainer.appendChild(completionDiv);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Reload system status
+            setTimeout(() => {
+                loadSystemStatus();
+                loadRollbackPoints();
+            }, 2000);
+        }
+
+        // Clear operation output
+        function clearOperationOutput() {
+            document.getElementById('operation-section').style.display = 'none';
+            currentOperationId = null;
+            operationStartTime = null;
+        }
+
+        // Load rollback points
+        async function loadRollbackPoints() {
+            try {
+                const response = await fetch('/api/rollback-points');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayRollbackPoints(data.rollback_points);
+                } else {
+                    showError('Failed to load rollback points: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading rollback points: ' + error.message);
+            }
+        }
+
+        // Display rollback points
+        function displayRollbackPoints(points) {
+            const container = document.getElementById('rollback-points');
+            
+            if (points.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted">
+                        <i class="fas fa-history fa-2x mb-2"></i>
+                        <p>No rollback points available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = points.map(point => `
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="mb-1">${point.component}</h6>
+                                <p class="mb-1 text-muted small">${point.description}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    ${new Date(point.created_at).toLocaleString()}
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="performRollback('${point.rollback_id}', true)">
+                                    <i class="fas fa-eye me-1"></i>Preview
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="performRollback('${point.rollback_id}', false)">
+                                    <i class="fas fa-undo me-1"></i>Rollback
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Perform rollback
+        async function performRollback(rollbackId, dryRun) {
+            if (!dryRun && !confirm('Are you sure you want to rollback to this point? This will undo security changes.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/rollback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        rollback_id: rollbackId,
+                        dry_run: dryRun
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    if (!dryRun) {
+                        setTimeout(() => {
+                            loadSystemStatus();
+                            loadRollbackPoints();
+                        }, 2000);
+                    }
+                } else {
+                    showError('Rollback failed: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error performing rollback: ' + error.message);
+            }
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            showToast(message, 'success');
+        }
+
+        // Show error message
+        function showError(message) {
+            showToast(message, 'danger');
+        }
+
+        // Show toast notification
+        function showToast(message, type) {
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', function() {
+                toast.remove();
+            });
+        }
+
+        // Create toast container if it doesn't exist
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+    </script>
+</body>
+</html>

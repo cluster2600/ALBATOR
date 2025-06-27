@@ -1,0 +1,12 @@
+authors:
+  stig:
+    names:
+      - "Security Team"
+    preamble: "STIG Compliance Team"
+  recommended:
+    names:
+      - "General Security Team"
+    preamble: "Recommended Practices Group"
+titles:
+  stig: "macOS STIG Baseline"
+  recommended: "Recommended macOS Security Settings"
