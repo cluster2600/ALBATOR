@@ -1,0 +1,16 @@
+title: "Enable Firewall"
+id: "os_firewall_enable"
+severity: "medium"
+discussion: "Blocks unauthorized incoming connections, enhancing network security."
+check: "/usr/libexec/PlistBuddy -c 'Print :globalstate' /Library/Preferences/com.apple.alf.plist | /usr/bin/grep -q '1'"
+fix: "sudo /usr/libexec/PlistBuddy -c 'Set :globalstate 1' /Library/Preferences/com.apple.alf.plist; sudo /usr/libexec/PlistBuddy -c 'Set :loggingmode 1' /Library/Preferences/com.apple.alf.plist"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92812-8"]
+  800-53r5: ["SC-7"]
+  disa_stig: ["V-259755"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

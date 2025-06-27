@@ -1,0 +1,16 @@
+title: "Disable Root Account"
+id: "os_root_disable"
+severity: "high"
+discussion: "Disabling the root account prevents direct root access, reducing unauthorized modifications."
+check: "/usr/bin/dscl . -read /Users/root Password | /usr/bin/grep -q 'No such key' || /bin/echo 'Root enabled'"
+fix: "sudo /usr/bin/passwd -d root"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92808-6"]
+  800-53r5: ["AC-2"]
+  disa_stig: ["V-259751"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

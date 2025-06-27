@@ -1,0 +1,16 @@
+title: "Enable Lockdown Mode"
+id: "os_lockdown_enable"
+severity: "high"
+discussion: "Enhances security for high-risk users by restricting features against sophisticated attacks."
+check: "echo 'Lockdown Mode not checkable via script'"
+fix: "Manual Action Required: Enable in System Settings > Privacy & Security > Lockdown Mode"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92819-3"]
+  800-53r5: ["AC-3"]
+  disa_stig: ["V-259762"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "unknown"
+mobileconfig: "missing"

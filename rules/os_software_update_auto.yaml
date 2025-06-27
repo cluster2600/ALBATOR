@@ -1,0 +1,16 @@
+title: "Enable Automatic Software Updates"
+id: "os_software_update_auto"
+severity: "high"
+discussion: "Keeps the system updated with security patches, reducing vulnerability exposure."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled | /usr/bin/grep -q '1' && /usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload | /usr/bin/grep -q '1' && /usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticInstall | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true; sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true; sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticInstall -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92813-6"]
+  800-53r5: ["SI-2"]
+  disa_stig: ["V-259756"]
+  srg: ["SRG-OS-000191-GPOS-00080"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

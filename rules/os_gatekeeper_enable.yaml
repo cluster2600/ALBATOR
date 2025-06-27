@@ -1,0 +1,16 @@
+title: "Enable Gatekeeper"
+id: "os_gatekeeper_enable"
+severity: "medium"
+discussion: "Gatekeeper ensures only trusted applications are executed, reducing malware risks."
+check: "/usr/sbin/spctl --status | /usr/bin/grep -q 'assessments enabled'"
+fix: "sudo /usr/sbin/spctl --master-enable"
+references:
+  cci: ["CCI-001619"]
+  cce: ["CCE-92806-0"]
+  800-53r5: ["CM-5"]
+  disa_stig: ["V-259749"]
+  srg: ["SRG-OS-000433-GPOS-00192"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

@@ -1,0 +1,16 @@
+title: "Disable Wi-Fi Unless Needed"
+id: "os_wifi_disable"
+severity: "medium"
+discussion: "Disables Wi-Fi when not in use to reduce wireless attack surfaces."
+check: "/usr/sbin/networksetup -getairportpower en0 | /usr/bin/grep -q 'Off'"
+fix: "sudo /usr/sbin/networksetup -setairportpower en0 off"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92817-7"]
+  800-53r5: ["AC-18"]
+  disa_stig: ["V-259760"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

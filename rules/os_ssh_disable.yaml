@@ -1,0 +1,16 @@
+title: "Disable SSH"
+id: "os_ssh_disable"
+severity: "medium"
+discussion: "Prevents remote SSH access, reducing the risk of unauthorized logins."
+check: "/bin/launchctl list | /usr/bin/grep -q 'com.openssh.sshd' || /bin/echo 'SSH disabled'"
+fix: "sudo /bin/launchctl stop com.openssh.sshd; sudo /bin/launchctl unload -w /System/Library/LaunchDaemons/ssh.plist"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92814-4"]
+  800-53r5: ["AC-17"]
+  disa_stig: ["V-259757"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

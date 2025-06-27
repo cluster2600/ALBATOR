@@ -1,0 +1,16 @@
+title: "Disable Bluetooth Unless Needed"
+id: "os_bluetooth_disable"
+severity: "medium"
+discussion: "Bluetooth should be disabled unless explicitly required to reduce wireless attack surfaces."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.Bluetooth ControllerPowerState | /usr/bin/grep -q '0'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -int 0"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92807-8"]
+  800-53r5: ["AC-18"]
+  disa_stig: ["V-259750"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

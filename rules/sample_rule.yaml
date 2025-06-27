@@ -1,0 +1,16 @@
+title: "Disable Guest Account"
+id: "guest_account_disable"
+severity: "medium"
+discussion: "Disabling the guest account prevents unauthorized access."
+check: "Check if guest account is disabled"
+fix: "Disable guest account in System Preferences"
+references:
+  cci: ["CCI-000123"]
+  cce: ["CCE-12345"]
+  800-53r4: ["AC-2"]
+  disa_stig: ["V-12345"]
+  srg: ["SRG-OS-000123"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"
