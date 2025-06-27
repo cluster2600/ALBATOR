@@ -1,0 +1,16 @@
+title: "Disable Automatic Login"
+id: "os_auto_login_disable"
+severity: "medium"
+discussion: "Disabling automatic login prevents unauthorized access at startup."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser 2>/dev/null || /bin/echo 'Not set'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser -string ''"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92809-4"]
+  800-53r5: ["AC-2"]
+  disa_stig: ["V-259752"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

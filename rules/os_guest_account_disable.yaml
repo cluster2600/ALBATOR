@@ -1,0 +1,16 @@
+title: "Disable Guest Account"
+id: "os_guest_account_disable"
+severity: "medium"
+discussion: "The Guest account allows users to access the system without a password, which could be exploited. It must be disabled."
+check: "/usr/bin/pwpolicy -getaccountpolicies | /usr/bin/grep -A 1 '<key>policyCategoryAuthentication</key>' | /usr/bin/tail -1 | /usr/bin/cut -d '>' -f 2 | /usr/bin/cut -d '<' -f 1 | /usr/bin/grep -qv 'Guest'"
+fix: "sudo /usr/bin/pwpolicy -clearaccountpolicies; sudo /usr/bin/sysadminctl -guestAccount off"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92804-5"]
+  800-53r5: ["AC-2"]
+  disa_stig: ["V-259747"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

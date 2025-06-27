@@ -1,0 +1,16 @@
+title: "Enable System Integrity Protection"
+id: "os_sip_enable"
+severity: "high"
+discussion: "System Integrity Protection (SIP) restricts the root user and protects system files and processes."
+check: "/usr/bin/csrutil status | /usr/bin/grep -q 'enabled'"
+fix: "Manual Action Required: Boot into Recovery Mode and run: /usr/bin/csrutil enable"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92805-2"]
+  800-53r5: ["SI-7"]
+  disa_stig: ["V-259748"]
+  srg: ["SRG-OS-000259-GPOS-00100"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

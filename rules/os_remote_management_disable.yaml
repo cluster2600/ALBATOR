@@ -1,0 +1,16 @@
+title: "Disable Remote Management"
+id: "os_remote_management_disable"
+severity: "medium"
+discussion: "Disables remote desktop access, minimizing remote attack vectors."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple RemoteDesktopEnabled | /usr/bin/grep -q '0' || /bin/echo 'Not disabled'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple RemoteDesktopEnabled -bool NO"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92815-1"]
+  800-53r5: ["AC-17"]
+  disa_stig: ["V-259758"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"

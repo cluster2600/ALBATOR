@@ -1,0 +1,16 @@
+title: "Disable Siri"
+id: "os_siri_disable"
+severity: "low"
+discussion: "Disabling Siri reduces privacy risks by preventing voice assistant usage."
+check: "/usr/bin/defaults read com.apple.Siri ShowSiriUI | /usr/bin/grep -q '0'"
+fix: "/usr/bin/defaults write com.apple.Siri ShowSiriUI -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92821-9"]
+  800-53r5: ["SI-12"]
+  disa_stig: ["V-259764"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "privacy"]
+result: "pass"
+mobileconfig: "missing"

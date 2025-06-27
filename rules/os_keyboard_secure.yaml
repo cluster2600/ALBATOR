@@ -1,0 +1,16 @@
+title: "Set Secure Keyboard Settings"
+id: "os_keyboard_secure"
+severity: "low"
+discussion: "Disables press-and-hold for accented characters, mitigating keylogging risks."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.HIToolbox ApplePressAndHoldEnabled | /usr/bin/grep -q '0'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.HIToolbox ApplePressAndHoldEnabled -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92816-9"]
+  800-53r5: ["SI-4"]
+  disa_stig: ["V-259759"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security"]
+result: "pass"
+mobileconfig: "missing"
