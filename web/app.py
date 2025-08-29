@@ -23,7 +23,8 @@ from config_manager import ConfigurationManager
 from rollback import RollbackManager
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'albator-web-interface-secret-key'
+# Use environment variable for secret key, fallback to generated key
+app.config['SECRET_KEY'] = os.environ.get('ALBATOR_SECRET_KEY', os.urandom(24).hex())
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Global instances

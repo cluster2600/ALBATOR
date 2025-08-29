@@ -249,7 +249,6 @@ main() {
         show_error "This script requires sudo privileges"
         exit 1
     fi
-    fi
     
     # Run configuration
     local config_errors=0

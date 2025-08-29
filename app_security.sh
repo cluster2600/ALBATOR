@@ -27,33 +27,8 @@ log() {
     echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
 }
 
-# Progress indicator
-show_progress() {
-    local message=$1
-    echo -e "${BLUE}[INFO]${NC} $message"
-    log "INFO" "$message"
-}
-
-# Success indicator
-show_success() {
-    local message=$1
-    echo -e "${GREEN}[SUCCESS]${NC} $message"
-    log "SUCCESS" "$message"
-}
-
-# Error indicator
-show_error() {
-    local message=$1
-    echo -e "${RED}[ERROR]${NC} $message" >&2
-    log "ERROR" "$message"
-}
-
-# Warning indicator
-show_warning() {
-    local message=$1
-    echo -e "${YELLOW}[WARNING]${NC} $message"
-    log "WARNING" "$message"
-}
+# Source common utilities
+source "$(dirname "$0")"/utils.sh
 
 # Function to backup current app security settings
 backup_app_security_settings() {
