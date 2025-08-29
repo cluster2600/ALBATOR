@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/debug/Albator_Swift.build/master.swiftdeps"
+  },
+  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/main.swift": {
+    "dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/debug/Albator_Swift.build/main.d",
+    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/debug/Albator_Swift.build/main.swift.o",
+    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/debug/Albator_Swift.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/debug/Albator_Swift.build/main.swiftdeps",
+    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/debug/Albator_Swift.build/main.dia"
+  }
+}
