@@ -25,42 +25,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Logging function
-log() {
-    local level=$1
-    shift
-    local message="$*"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
-}
-
-# Progress indicator
-show_progress() {
-    local message=$1
-    echo -e "${BLUE}[INFO]${NC} $message"
-    log "INFO" "$message"
-}
-
-# Success indicator
-show_success() {
-    local message=$1
-    echo -e "${GREEN}[SUCCESS]${NC} $message"
-    log "SUCCESS" "$message"
-}
-
-# Error indicator
-show_error() {
-    local message=$1
-    echo -e "${RED}[ERROR]${NC} $message" >&2
-    log "ERROR" "$message"
-}
-
-# Warning indicator
-show_warning() {
-    local message=$1
-    echo -e "${YELLOW}[WARNING]${NC} $message"
-    log "WARNING" "$message"
-}
+# Source common utilities
+source "$(dirname "$0")"/utils.sh
 
 # Function to check required tools
 check_requirements() {
