@@ -1,0 +1,416 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4B3C5D7E2A1F2E4500123456 /* AlbatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D7D2A1F2E4500123456 /* AlbatorApp.swift */; };
+		4B3C5D802A1F2E4500123456 /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D7F2A1F2E4500123456 /* MainWindowView.swift */; };
+		4B3C5D822A1F2E4500123456 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D812A1F2E4500123456 /* SettingsView.swift */; };
+		4B3C5D842A1F2E4500123456 /* SecurityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D832A1F2E4500123456 /* SecurityEngine.swift */; };
+		4B3C5D862A1F2E4500123456 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D852A1F2E4500123456 /* ConfigurationManager.swift */; };
+		4B3C5D882A1F2E4500123456 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D872A1F2E4500123456 /* NotificationManager.swift */; };
+		4B3C5D8A2A1F2E4500123456 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D892A1F2E4500123456 /* Logger.swift */; };
+		4B3C5D8C2A1F2E4500123456 /* SystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D8B2A1F2E4500123456 /* SystemMonitor.swift */; };
+		4B3C5D8E2A1F2E4500123456 /* SecurityEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D8D2A1F2E4500123456 /* SecurityEventHandler.swift */; };
+		4B3C5D902A1F2E4500123456 /* BackgroundTaskScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D8F2A1F2E4500123456 /* BackgroundTaskScheduler.swift */; };
+		4B3C5D922A1F2E4500123456 /* ReportGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D912A1F2E4500123456 /* ReportGenerator.swift */; };
+		4B3C5D942A1F2E4500123456 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D932A1F2E4500123456 /* CoreDataManager.swift */; };
+		4B3C5D962A1F2E4500123456 /* DataMigrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D952A1F2E4500123456 /* DataMigrationManager.swift */; };
+		4B3C5D982A1F2E4500123456 /* UserInterfaceStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3C5D972A1F2E4500123456 /* UserInterfaceStateManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4B3C5D7A2A1F2E4500123456 /* Albator-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Albator-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B3C5D7D2A1F2E4500123456 /* AlbatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbatorApp.swift; sourceTree = "<group>"; };
+		4B3C5D7F2A1F2E4500123456 /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
+		4B3C5D812A1F2E4500123456 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		4B3C5D832A1F2E4500123456 /* SecurityEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityEngine.swift; sourceTree = "<group>"; };
+		4B3C5D852A1F2E4500123456 /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
+		4B3C5D872A1F2E4500123456 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		4B3C5D892A1F2E4500123456 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		4B3C5D8B2A1F2E4500123456 /* SystemMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitor.swift; sourceTree = "<group>"; };
+		4B3C5D8D2A1F2E4500123456 /* SecurityEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityEventHandler.swift; sourceTree = "<group>"; };
+		4B3C5D8F2A1F2E4500123456 /* BackgroundTaskScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTaskScheduler.swift; sourceTree = "<group>"; };
+		4B3C5D912A1F2E4500123456 /* ReportGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportGenerator.swift; sourceTree = "<group>"; };
+		4B3C5D932A1F2E4500123456 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		4B3C5D952A1F2E4500123456 /* DataMigrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataMigrationManager.swift; sourceTree = "<group>"; };
+		4B3C5D972A1F2E4500123456 /* UserInterfaceStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInterfaceStateManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4B3C5D772A1F2E4500123456 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4B3C5D742A1F2E4500123456 = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D7B2A1F2E4500123456 /* Albator-Swift */,
+				4B3C5D7A2A1F2E4500123456 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4B3C5D7A2A1F2E4500123456 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D7A2A1F2E4500123456 /* Albator-Swift.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4B3C5D7B2A1F2E4500123456 /* Albator-Swift */ = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D7C2A1F2E4500123456 /* Views */,
+				4B3C5D822A1F2E4500123456 /* Models */,
+				4B3C5D842A1F2E4500123456 /* Services */,
+				4B3C5D992A1F2E4500123456 /* Utilities */,
+				4B3C5D7D2A1F2E4500123456 /* AlbatorApp.swift */,
+			);
+			path = "Albator-Swift";
+			sourceTree = "<group>";
+		};
+		4B3C5D7C2A1F2E4500123456 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D7F2A1F2E4500123456 /* MainWindowView.swift */,
+				4B3C5D812A1F2E4500123456 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4B3C5D822A1F2E4500123456 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D832A1F2E4500123456 /* SecurityEngine.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4B3C5D842A1F2E4500123456 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D852A1F2E4500123456 /* ConfigurationManager.swift */,
+				4B3C5D872A1F2E4500123456 /* NotificationManager.swift */,
+				4B3C5D8B2A1F2E4500123456 /* SystemMonitor.swift */,
+				4B3C5D8D2A1F2E4500123456 /* SecurityEventHandler.swift */,
+				4B3C5D8F2A1F2E4500123456 /* BackgroundTaskScheduler.swift */,
+				4B3C5D912A1F2E4500123456 /* ReportGenerator.swift */,
+				4B3C5D932A1F2E4500123456 /* CoreDataManager.swift */,
+				4B3C5D952A1F2E4500123456 /* DataMigrationManager.swift */,
+				4B3C5D972A1F2E4500123456 /* UserInterfaceStateManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		4B3C5D992A1F2E4500123456 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				4B3C5D892A1F2E4500123456 /* Logger.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4B3C5D792A1F2E4500123456 /* Albator-Swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B3C5D9D2A1F2E4500123456 /* Build configuration list for PBXNativeTarget "Albator-Swift" */;
+			buildPhases = (
+				4B3C5D762A1F2E4500123456 /* Sources */,
+				4B3C5D772A1F2E4500123456 /* Frameworks */,
+				4B3C5D782A1F2E4500123456 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Albator-Swift";
+			productName = "Albator-Swift";
+			productReference = 4B3C5D7A2A1F2E4500123456 /* Albator-Swift.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4B3C5D752A1F2E4500123456 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4B3C5D792A1F2E4500123456 = {
+						CreatedOnToolsVersion = 14.3;
+					};
+				};
+			};
+			buildConfigurationList = 4B3C5D9C2A1F2E4500123456 /* Build configuration list for PBXProject "Albator-Swift" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4B3C5D742A1F2E4500123456;
+			productRefGroup = 4B3C5D7A2A1F2E4500123456 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4B3C5D792A1F2E4500123456 /* Albator-Swift */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4B3C5D782A1F2E4500123456 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4B3C5D762A1F2E4500123456 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B3C5D7E2A1F2E4500123456 /* AlbatorApp.swift in Sources */,
+				4B3C5D802A1F2E4500123456 /* MainWindowView.swift in Sources */,
+				4B3C5D822A1F2E4500123456 /* SettingsView.swift in Sources */,
+				4B3C5D842A1F2E4500123456 /* SecurityEngine.swift in Sources */,
+				4B3C5D862A1F2E4500123456 /* ConfigurationManager.swift in Sources */,
+				4B3C5D882A1F2E4500123456 /* NotificationManager.swift in Sources */,
+				4B3C5D8A2A1F2E4500123456 /* Logger.swift in Sources */,
+				4B3C5D8C2A1F2E4500123456 /* SystemMonitor.swift in Sources */,
+				4B3C5D8E2A1F2E4500123456 /* SecurityEventHandler.swift in Sources */,
+				4B3C5D902A1F2E4500123456 /* BackgroundTaskScheduler.swift in Sources */,
+				4B3C5D922A1F2E4500123456 /* ReportGenerator.swift in Sources */,
+				4B3C5D942A1F2E4500123456 /* CoreDataManager.swift in Sources */,
+				4B3C5D962A1F2E4500123456 /* DataMigrationManager.swift in Sources */,
+				4B3C5D982A1F2E4500123456 /* UserInterfaceStateManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4B3C5D9A2A1F2E4500123456 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4B3C5D9B2A1F2E4500123456 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		4B3C5D9E2A1F2E4500123456 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Albator-Swift/Albator-Swift.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Albator-Swift/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Albator;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSMainStoryboardFile = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.albator.security;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4B3C5D9F2A1F2E4500123456 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Albator-Swift/Albator-Swift.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Albator-Swift/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Albator;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSMainStoryboardFile = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.albator.security;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4B3C5D9C2A1F2E4500123456 /* Build configuration list for PBXProject "Albator-Swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B3C5D9A2A1F2E4500123456 /* Debug */,
+				4B3C5D9B2A1F2E4500123456 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B3C5D9D2A1F2E4500123456 /* Build configuration list for PBXNativeTarget "Albator-Swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B3C5D9E2A1F2E4500123456 /* Debug */,
+				4B3C5D9F2A1F2E4500123456 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4B3C5D752A1F2E4500123456 /* Project object */;
+}
