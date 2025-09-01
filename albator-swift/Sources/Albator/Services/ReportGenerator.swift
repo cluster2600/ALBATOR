@@ -99,16 +99,40 @@ class ReportGenerator {
             let data = try encoder.encode(report)
             let filename = "security_report_\(Int(Date().timeIntervalSince1970)).json"
 
-            guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            // Try to save to Documents directory first, fallback to Desktop
+            var fileURL: URL?
+
+            if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                fileURL = documentsDirectory.appendingPathComponent(filename)
+            } else if let desktopDirectory = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first {
+                fileURL = desktopDirectory.appendingPathComponent(filename)
+            }
+
+            guard let finalURL = fileURL else {
+                Logger.shared.error("Could not find suitable directory to save report")
                 return
             }
 
-            let fileURL = documentsDirectory.appendingPathComponent(filename)
-            try data.write(to: fileURL)
+            try data.write(to: finalURL)
 
-            Logger.shared.info("Security report saved to: \(fileURL.path)")
+            Logger.shared.info("Security report saved to: \(finalURL.path)")
+
+            // Show success notification with file path
+            NotificationManager.shared.showImmediateNotification(
+                title: "Report Generated",
+                body: "Security report saved to \(finalURL.lastPathComponent)",
+                type: .info
+            )
+
         } catch {
             Logger.shared.error("Failed to save security report: \(error.localizedDescription)")
+
+            // Show error notification
+            NotificationManager.shared.showImmediateNotification(
+                title: "Report Generation Failed",
+                body: "Could not save security report: \(error.localizedDescription)",
+                type: .criticalAlert
+            )
         }
     }
 }
