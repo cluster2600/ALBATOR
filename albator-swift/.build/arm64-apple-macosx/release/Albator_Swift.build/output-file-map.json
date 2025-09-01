@@ -4,88 +4,10 @@
     "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/Albator_Swift.o",
     "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/master.swiftdeps"
   },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/AlbatorApp.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/AlbatorApp.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/AlbatorApp~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/AlbatorApp.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/AlbatorApp.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Models/SecurityEngine.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEngine.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEngine~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEngine.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEngine.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/BackgroundTaskScheduler.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/BackgroundTaskScheduler.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/BackgroundTaskScheduler~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/BackgroundTaskScheduler.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/BackgroundTaskScheduler.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/ConfigurationManager.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ConfigurationManager.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ConfigurationManager~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ConfigurationManager.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ConfigurationManager.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/CoreDataManager.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/CoreDataManager.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/CoreDataManager~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/CoreDataManager.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/CoreDataManager.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/DataMigrationManager.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/DataMigrationManager.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/DataMigrationManager~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/DataMigrationManager.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/DataMigrationManager.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/NotificationManager.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/NotificationManager.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/NotificationManager~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/NotificationManager.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/NotificationManager.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/ReportGenerator.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ReportGenerator.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ReportGenerator~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ReportGenerator.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/ReportGenerator.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/SecurityEventHandler.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEventHandler.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEventHandler~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEventHandler.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SecurityEventHandler.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/SystemMonitor.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SystemMonitor.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SystemMonitor~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SystemMonitor.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SystemMonitor.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Services/UserInterfaceStateManager.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/UserInterfaceStateManager.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/UserInterfaceStateManager~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/UserInterfaceStateManager.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/UserInterfaceStateManager.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Utilities/Logger.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/Logger.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/Logger~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/Logger.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/Logger.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Views/MainWindowView.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/MainWindowView.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/MainWindowView~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/MainWindowView.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/MainWindowView.dia"
-  },
-  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/Views/SettingsView.swift": {
-    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SettingsView.swift.o",
-    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SettingsView~partial.swiftmodule",
-    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SettingsView.swiftdeps",
-    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/SettingsView.dia"
+  "/Users/L110889/projects/ALBATOR/albator-swift/Sources/Albator/main.swift": {
+    "object": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/main.swift.o",
+    "swiftmodule": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/main.swiftdeps",
+    "diagnostics": "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/Albator_Swift.build/main.dia"
   }
 }
