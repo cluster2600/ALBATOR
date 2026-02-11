@@ -4,7 +4,6 @@ import sys
 import yaml
 import os
 
-from arg_parser import create_args
 from main import BaselineGenerator
 from rule_handler import collect_rules
 from utils import parse_authors
@@ -28,6 +27,61 @@ def run_bash_script(script_name, args=None):
     except subprocess.CalledProcessError as e:
         print(f"Error running {script_name}: {e.stderr}", file=sys.stderr)
         sys.exit(e.returncode)
+
+def run_legacy_command(args: argparse.Namespace) -> None:
+    """Execute legacy Python tool actions."""
+    legacy_args = argparse.Namespace(
+        controls=False,
+        keyword=args.keyword,
+        list_tags=False,
+        tailor=False,
+        root_dir=None,
+        interactive=False,
+        gui=False
+    )
+    generator = BaselineGenerator(args=legacy_args)
+    try:
+        generator.setup_directories()
+        all_rules = collect_rules(generator.root_dir)
+        mscp_data = generator.load_yaml_file(os.path.join(generator.includes_dir, 'mscp-data.yaml'))
+        version_data = generator.load_yaml_file(os.path.join(generator.root_dir, "VERSION.yaml"))
+
+        if args.action == "list_tags":
+            generator.list_available_tags(all_rules)
+        elif args.action == "check_controls":
+            generator.check_controls(all_rules)
+        elif args.action == "interactive":
+            generator.interactive_mode(all_rules, mscp_data, version_data)
+        elif args.action == "gui":
+            generator.gui_mode(all_rules, mscp_data, version_data)
+        elif args.action in ["generate", "tailor", "apply"]:
+            if not args.keyword:
+                print("Error: --keyword is required for this action.")
+                sys.exit(1)
+            rules = generator.get_matching_rules(all_rules, args.keyword)
+            if not rules:
+                print(f"No rules found for keyword '{args.keyword}'.")
+                sys.exit(1)
+            benchmark = generator._resolve_benchmark(args.keyword)
+            if args.action == "generate":
+                generator._generate_standard_baseline(
+                    rules, benchmark, parse_authors(mscp_data['authors'].get(args.keyword, {})),
+                    mscp_data['titles'].get(args.keyword, args.keyword), version_data, args.keyword
+                )
+            elif args.action == "tailor":
+                generator.args.tailor = True
+                generator._generate_tailored_baseline(
+                    rules, benchmark, parse_authors(mscp_data['authors'].get(args.keyword, {})),
+                    mscp_data['titles'].get(args.keyword, args.keyword), version_data, args.keyword
+                )
+                generator.args.tailor = False
+            elif args.action == "apply":
+                generator.apply_fixes(rules, args.keyword)
+    except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    finally:
+        os.chdir(generator.original_wd)
 
 def main():
     config = load_config()
@@ -57,39 +111,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "legacy":
-        generator = BaselineGenerator()
-        all_rules = collect_rules()
-        mscp_data = generator.load_yaml_file(os.path.join(generator.includes_dir, 'mscp-data.yaml'))
-        version_data = generator.load_yaml_file(os.path.join(generator.root_dir, "VERSION.yaml"))
-
-        if args.action == "list_tags":
-            generator.list_available_tags(all_rules)
-        elif args.action == "check_controls":
-            generator.check_controls(all_rules)
-        elif args.action == "interactive":
-            generator.interactive_mode(all_rules, mscp_data, version_data)
-        elif args.action == "gui":
-            generator.gui_mode(all_rules, mscp_data, version_data)
-        elif args.action in ["generate", "tailor", "apply"]:
-            if not args.keyword:
-                print("Error: --keyword is required for this action.")
-                sys.exit(1)
-            rules = generator.get_matching_rules(all_rules, args.keyword)
-            if not rules:
-                print(f"No rules found for keyword '{args.keyword}'.")
-                sys.exit(1)
-            if args.action == "generate":
-                generator._generate_standard_baseline(rules, args.keyword, 
-                    parse_authors(mscp_data['authors'].get(args.keyword, {})), 
-                    mscp_data['titles'].get(args.keyword, args.keyword), version_data, args.keyword)
-            elif args.action == "tailor":
-                generator.args.tailor = True
-                generator._generate_tailored_baseline(rules, args.keyword, 
-                    parse_authors(mscp_data['authors'].get(args.keyword, {})), 
-                    mscp_data['titles'].get(args.keyword, args.keyword), version_data, args.keyword)
-                generator.args.tailor = False
-            elif args.action == "apply":
-                generator.apply_fixes(rules, args.keyword)
+        run_legacy_command(args)
     else:
         script = bash_scripts.get(args.command)
         if script:

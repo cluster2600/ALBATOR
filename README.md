@@ -72,7 +72,12 @@ Each hardening component now supports advanced options:
 
 # Python-based testing framework
 python3 tests/test_framework.py --verbose --include-scripts
+
+# Core unit tests for CLI/rule handling/security helpers
+python3 -m unittest tests/test_core_behaviors.py -v
 ```
+
+GitHub Actions now runs the core behavior suite on every push and pull request via `.github/workflows/core-tests.yml`.
 
 ### 4. Configuration Management
 ```bash
@@ -241,6 +246,8 @@ python3 albator_cli.py firewall
 - CVE and Apple updates fetching require an internet connection.
 - Enterprise features require Python 3.8+ and additional dependencies.
 - Fleet management requires SSH access to target systems.
+- Fix commands are executed without `shell=True`; commands containing shell control characters (`;`, `|`, `&`, `<`, `>`, `` ` ``, `$`) are rejected for safety.
+- If a fix requires elevated privileges, run Albator itself with `sudo` instead of embedding `sudo` in fix definitions.
 
 ## Contributing
 Feel free to submit issues or pull requests to improve Albator, including enhancements to the Bash scripts or revival of Python features!
