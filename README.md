@@ -151,6 +151,11 @@ python3 albator_cli.py legacy interactive
 # Individual hardening scripts
 python3 albator_cli.py privacy
 python3 albator_cli.py firewall
+
+# Preflight checks
+python3 albator_cli.py preflight
+python3 albator_cli.py preflight --json
+python3 albator_cli.py preflight --require-sudo --require-rules
 ```
 
 ## Requirements
@@ -248,6 +253,8 @@ python3 albator_cli.py firewall
 - Fleet management requires SSH access to target systems.
 - Fix commands are executed without `shell=True`; commands containing shell control characters (`;`, `|`, `&`, `<`, `>`, `` ` ``, `$`) are rejected for safety.
 - If a fix requires elevated privileges, run Albator itself with `sudo` instead of embedding `sudo` in fix definitions.
+- `albator_cli.py` automatically runs preflight checks before mutating commands (`privacy`, `firewall`, `encryption`, `app_security`, and legacy `apply`/`generate`/`tailor`).
+- Python test report output now includes a preflight summary section with required failures and warnings.
 
 ## Contributing
 Feel free to submit issues or pull requests to improve Albator, including enhancements to the Bash scripts or revival of Python features!
