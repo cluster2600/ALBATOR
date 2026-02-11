@@ -1,0 +1,17 @@
+id: "system_settings_test_rule"
+title: "Test rule"
+severity: "medium"
+discussion: "Fixture discussion"
+check: "/usr/bin/true"
+fix: "/usr/bin/true"
+references:
+  disa_stig: ["None"]
+  cci: ["CCI-000001"]
+  cce: ["CCE-000001-0"]
+  800-53r4: ["AC-1"]
+  srg: ["SRG-OS-000001"]
+odv: "missing"
+tags: ["stig"]
+result: "pass"
+mobileconfig: false
+macOS: "15"

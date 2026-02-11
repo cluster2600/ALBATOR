@@ -1,4 +1,5 @@
 import os
+import shlex
 import yaml
 import subprocess
 import tkinter as tk
@@ -11,13 +12,19 @@ from utils import parse_authors, append_authors, available_tags, sanitised_input
 class BaselineGenerator:
     """Generates security baselines, applies fixes, and provides interfaces for macOS tuning."""
 
-    def __init__(self):
+    def __init__(self, args=None):
         """Initialize with parsed arguments and dynamic directory paths."""
-        self.args = create_args()
+        self.args = args or create_args()
         self.root_dir = os.environ.get('ROOT_DIR') or self.args.root_dir or os.getcwd()
         self.includes_dir = os.path.join(self.root_dir, 'includes')
         self.build_dir = os.path.join(self.root_dir, 'build', 'baselines')
         self.original_wd = os.getcwd()
+
+    @staticmethod
+    def _resolve_benchmark(keyword: str) -> str:
+        """Map keyword tags to benchmark parent values consistently across all interfaces."""
+        established_benchmarks = {'stig', 'cis_lvl1', 'cis_lvl2'}
+        return keyword if keyword in established_benchmarks else "recommended"
 
     def setup_directories(self) -> None:
         """Set up working directory and create build directory if needed."""
@@ -61,6 +68,48 @@ class BaselineGenerator:
         """Filter rules based on the provided keyword."""
         return [rule for rule in all_rules if keyword in rule.rule_tags or keyword == "all_rules"]
 
+    @staticmethod
+    def _parse_fix_command(fix_cmd: str) -> List[str]:
+        """Parse fix command safely for subprocess execution without a shell."""
+        disallowed_tokens = (';', '|', '&', '>', '<', '`', '$', '\n', '\r')
+        if any(token in fix_cmd for token in disallowed_tokens):
+            raise ValueError("Fix command contains unsupported shell control characters.")
+
+        try:
+            cmd = shlex.split(fix_cmd)
+        except ValueError as e:
+            raise ValueError(f"Invalid fix command syntax: {e}") from e
+
+        if not cmd:
+            raise ValueError("Fix command is empty after parsing.")
+        return cmd
+
+    @staticmethod
+    def _requires_root(raw_cmd: str, parsed_cmd: List[str]) -> bool:
+        """Determine whether a command requires root privileges."""
+        privileged_bins = ('/usr/bin/pwpolicy', '/usr/sbin/spctl', '/usr/bin/defaults')
+        return (
+            parsed_cmd[0] == 'sudo'
+            or 'sudo' in raw_cmd.lower()
+            or any(path in raw_cmd for path in privileged_bins)
+        )
+
+    def _run_fix_command(self, fix_cmd: str) -> subprocess.CompletedProcess:
+        """Run a validated fix command without shell=True."""
+        cmd = self._parse_fix_command(fix_cmd)
+        requires_root = self._requires_root(fix_cmd, cmd)
+
+        # Users should run Albator with sudo rather than embedding sudo in rule fixes.
+        if cmd[0] == 'sudo':
+            cmd = cmd[1:]
+        if not cmd:
+            raise ValueError("Fix command cannot be only 'sudo'.")
+
+        if requires_root and os.geteuid() != 0:
+            raise PermissionError("Fix requires root privileges. Re-run Albator with sudo.")
+
+        return subprocess.run(cmd, check=True, capture_output=True, text=True)
+
     def apply_fixes(self, rules: List, keyword: str) -> None:
         """Apply fix commands for rules matching the keyword."""
         print(f"Applying fixes for rules with tag '{keyword}'...")
@@ -78,17 +127,13 @@ class BaselineGenerator:
                 print(f"Skipping fix for '{rule.rule_id}'")
                 continue
 
-            if 'sudo' in fix_cmd.lower() or any(cmd in fix_cmd for cmd in ['/usr/bin/pwpolicy', '/usr/sbin/spctl', '/usr/bin/defaults']):
-                if os.geteuid() != 0:
-                    print(f"Error: Fix for '{rule.rule_id}' requires root privileges. Please run with sudo.")
-                    continue
-                cmd = fix_cmd
-            else:
-                cmd = fix_cmd
-
             try:
-                result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
+                result = self._run_fix_command(fix_cmd)
                 print(f"Successfully applied fix for '{rule.rule_id}': {result.stdout}")
+            except ValueError as e:
+                print(f"Rejected fix for '{rule.rule_id}': {str(e)}")
+            except PermissionError as e:
+                print(f"Error: Fix for '{rule.rule_id}' requires root privileges. {str(e)}")
             except subprocess.CalledProcessError as e:
                 print(f"Failed to apply fix for '{rule.rule_id}': {e.stderr}")
             except Exception as e:
@@ -111,8 +156,7 @@ class BaselineGenerator:
     def generate_baseline(self, rules: List, mscp_data: dict, version_data: dict, keyword: str = None) -> None:
         """Generate and write the baseline file."""
         keyword = keyword or self.args.keyword
-        established_benchmarks = ['stig', 'cis_lvl1', 'cis_lvl2']
-        benchmark = keyword if any(bm in keyword for bm in established_benchmarks) else "recommended"
+        benchmark = self._resolve_benchmark(keyword)
         
         authors = (parse_authors(mscp_data['authors'][keyword]) 
                   if keyword in mscp_data['authors'] 
@@ -184,7 +228,8 @@ class BaselineGenerator:
                 tag = command.split(' ', 1)[1]
                 rules = self.get_matching_rules(all_rules, tag)
                 if rules:
-                    self._generate_standard_baseline(rules, tag, parse_authors(mscp_data['authors'].get(tag, {})), 
+                    benchmark = self._resolve_benchmark(tag)
+                    self._generate_standard_baseline(rules, benchmark, parse_authors(mscp_data['authors'].get(tag, {})), 
                                                     f"{mscp_data['titles'].get(tag, tag)}", version_data, tag)
                 else:
                     print(f"No rules found for tag '{tag}'. Available tags:")
@@ -194,7 +239,8 @@ class BaselineGenerator:
                 rules = self.get_matching_rules(all_rules, tag)
                 if rules:
                     self.args.tailor = True
-                    self._generate_tailored_baseline(rules, tag, parse_authors(mscp_data['authors'].get(tag, {})), 
+                    benchmark = self._resolve_benchmark(tag)
+                    self._generate_tailored_baseline(rules, benchmark, parse_authors(mscp_data['authors'].get(tag, {})), 
                                                     f"{mscp_data['titles'].get(tag, tag)}", version_data, tag)
                     self.args.tailor = False
                 else:
@@ -248,13 +294,12 @@ class BaselineGenerator:
                 if tag:
                     rules = self.get_matching_rules(all_rules, tag)
                     if rules:
+                        benchmark = self._resolve_benchmark(tag)
+                        self._generate_standard_baseline(
+                            rules, benchmark, parse_authors(mscp_data['authors'].get(tag, {})),
+                            mscp_data['titles'].get(tag, tag), version_data, tag
+                        )
                         filepath = os.path.join(self.build_dir, f"{tag}.yaml")
-                        with open(filepath, 'w') as f:
-                            f.write(output_baseline(
-                                rules, version_data, "", tag,
-                                parse_authors(mscp_data['authors'].get(tag, {})),
-                                mscp_data['titles'].get(tag, tag)
-                            ))
                         messagebox.showinfo("Success", f"Baseline written to {filepath}")
                     else:
                         messagebox.showerror("Error", f"No rules found for tag '{tag}'")
@@ -283,10 +328,11 @@ class BaselineGenerator:
                             if messagebox.askyesno("Include Rule", f"Include '{rule.rule_id}'?\n{rule.rule_discussion}"):
                                 tailored_rules.append(rule)
                         filepath = os.path.join(self.build_dir, f"{filename}.yaml")
+                        benchmark = self._resolve_benchmark(tag)
                         with open(filepath, 'w') as f:
                             f.write(output_baseline(
                                 tailored_rules, version_data, f"{filename.upper()} (from {tag.upper()})",
-                                tag, authors, mscp_data['titles'].get(tag, tag)
+                                benchmark, authors, mscp_data['titles'].get(tag, tag)
                             ))
                         messagebox.showinfo("Success", f"Tailored baseline written to {filepath}")
                     else:
@@ -302,8 +348,12 @@ class BaselineGenerator:
                             if fix and fix != "missing":
                                 if messagebox.askyesno("Apply Fix", f"Run fix for '{rule.rule_id}'?\n{fix}"):
                                     try:
-                                        result = subprocess.run(fix, shell=True, check=True, capture_output=True, text=True)
+                                        result = self._run_fix_command(fix)
                                         messagebox.showinfo("Success", f"Applied fix: {result.stdout}")
+                                    except ValueError as e:
+                                        messagebox.showerror("Rejected", f"Fix rejected: {str(e)}")
+                                    except PermissionError as e:
+                                        messagebox.showerror("Permission Error", str(e))
                                     except subprocess.CalledProcessError as e:
                                         messagebox.showerror("Error", f"Fix failed: {e.stderr}")
                     else:
@@ -317,7 +367,7 @@ class BaselineGenerator:
         """Execute the main logic based on arguments."""
         try:
             self.setup_directories()
-            all_rules = collect_rules()
+            all_rules = collect_rules(self.root_dir)
 
             if self.args.list_tags:
                 self.list_available_tags(all_rules)

@@ -7,9 +7,17 @@ from utils import sanitised_input, MacSecurityRule
 class RuleHandler:
     """Manages security rule collection, processing, and baseline generation."""
 
-    BASE_PATH = "../"  # Relative to MACOS_HARDENING/
-    RULES_DIR = os.path.join(BASE_PATH, "rules")
-    CUSTOM_RULES_DIR = os.path.join(BASE_PATH, "custom/rules")
+    BASE_PATH = ""
+    RULES_DIR = ""
+    CUSTOM_RULES_DIR = ""
+
+    @classmethod
+    def configure_paths(cls, root_dir: Optional[str] = None) -> None:
+        """Configure rule directories based on a provided root directory."""
+        base_path = os.path.abspath(root_dir or os.environ.get("ROOT_DIR") or os.getcwd())
+        cls.BASE_PATH = base_path
+        cls.RULES_DIR = os.path.join(base_path, "rules")
+        cls.CUSTOM_RULES_DIR = os.path.join(base_path, "custom", "rules")
 
     @staticmethod
     def _load_yaml_file(filepath: str) -> Dict[str, Any]:
@@ -52,8 +60,9 @@ class RuleHandler:
         return resulting_yaml
 
     @classmethod
-    def collect_rules(cls) -> List[MacSecurityRule]:
+    def collect_rules(cls, root_dir: Optional[str] = None) -> List[MacSecurityRule]:
         """Collect and process all security rules from rules directories."""
+        cls.configure_paths(root_dir)
         all_rules = []
         required_keys = ['mobileconfig', 'macOS', 'severity', 'title', 'check', 'fix', 
                         'odv', 'tags', 'id', 'references', 'result', 'discussion']
@@ -61,6 +70,12 @@ class RuleHandler:
 
         rule_files = sorted(glob.glob(os.path.join(cls.RULES_DIR, "**/*.yaml"), recursive=True) + 
                           glob.glob(os.path.join(cls.CUSTOM_RULES_DIR, "**/*.yaml"), recursive=True))
+        if not rule_files:
+            raise RuntimeError(
+                "No rule files found. Expected YAML rules under "
+                f"'{cls.RULES_DIR}' or '{cls.CUSTOM_RULES_DIR}'. "
+                "Set --root-dir or ROOT_DIR to the project containing rules."
+            )
 
         for rule_file in rule_files:
             rule_yaml = cls.get_rule_yaml(rule_file)
@@ -253,8 +268,8 @@ class RuleHandler:
             os.remove(filepath)
 
 # Legacy function compatibility
-def collect_rules() -> List[MacSecurityRule]:
-    return RuleHandler.collect_rules()
+def collect_rules(root_dir: Optional[str] = None) -> List[MacSecurityRule]:
+    return RuleHandler.collect_rules(root_dir=root_dir)
 
 def get_controls(all_rules: List[MacSecurityRule]) -> List[str]:
     return RuleHandler.get_controls(all_rules)
