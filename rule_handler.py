@@ -101,7 +101,8 @@ class RuleHandler:
                 rule_yaml['tags'],
                 rule_yaml['result'],
                 rule_yaml['mobileconfig'],
-                rule_yaml.get('mobileconfig_info', "missing")
+                rule_yaml.get('mobileconfig_info', "missing"),
+                rule_yaml.get('macOS', "missing")
             ))
 
         return all_rules

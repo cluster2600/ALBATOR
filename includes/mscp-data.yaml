@@ -7,6 +7,11 @@ authors:
     names:
       - "General Security Team"
     preamble: "Recommended Practices Group"
+  macos_26_3:
+    names:
+      - "Albator Platform Team"
+    preamble: "macOS 26.3 Profile Maintainers"
 titles:
   stig: "macOS STIG Baseline"
   recommended: "Recommended macOS Security Settings"
+  macos_26_3: "macOS 26.3 Security Baseline"

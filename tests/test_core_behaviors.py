@@ -32,6 +32,7 @@ class TestBenchmarkResolution(unittest.TestCase):
         self.assertEqual(BaselineGenerator._resolve_benchmark("stig"), "stig")
         self.assertEqual(BaselineGenerator._resolve_benchmark("cis_lvl1"), "cis_lvl1")
         self.assertEqual(BaselineGenerator._resolve_benchmark("cis_lvl2"), "cis_lvl2")
+        self.assertEqual(BaselineGenerator._resolve_benchmark("macos_26_3"), "macos_26_3")
 
     def test_resolve_unknown_benchmark(self):
         self.assertEqual(BaselineGenerator._resolve_benchmark("security"), "recommended")
@@ -66,6 +67,29 @@ class TestRulePathHandling(unittest.TestCase):
             with self.assertRaises(RuntimeError) as ctx:
                 RuleHandler.collect_rules(root_dir=tmp)
         self.assertIn("No rule files found", str(ctx.exception))
+
+
+class TestVersionAwareRuleSelection(unittest.TestCase):
+    def test_filters_incompatible_rules_for_detected_major(self):
+        generator = BaselineGenerator(args=make_args())
+        rules = [
+            SimpleNamespace(rule_tags=["stig"], rule_macos="26.3", rule_id="r26"),
+            SimpleNamespace(rule_tags=["stig"], rule_macos="15", rule_id="r15"),
+            SimpleNamespace(rule_tags=["stig"], rule_macos="missing", rule_id="r_any"),
+        ]
+        with patch.object(generator, "_get_target_macos_major", return_value=26):
+            matched = generator.get_matching_rules(rules, "stig")
+        self.assertEqual([r.rule_id for r in matched], ["r26", "r_any"])
+
+    def test_does_not_filter_when_target_unknown(self):
+        generator = BaselineGenerator(args=make_args())
+        rules = [
+            SimpleNamespace(rule_tags=["stig"], rule_macos="15", rule_id="r15"),
+            SimpleNamespace(rule_tags=["stig"], rule_macos="26", rule_id="r26"),
+        ]
+        with patch.object(generator, "_get_target_macos_major", return_value=None):
+            matched = generator.get_matching_rules(rules, "stig")
+        self.assertEqual(len(matched), 2)
 
 
 class TestLegacyCliDispatch(unittest.TestCase):
@@ -149,6 +173,28 @@ class TestPreflight(unittest.TestCase):
             summary = run_preflight(require_sudo=False, require_rules=False)
         pup_check = [c for c in summary["checks"] if c["name"] == "tool_pup"][0]
         self.assertEqual(pup_check["status"], "WARN")
+
+    def test_preflight_macos_26_3_signature_checks(self):
+        def fake_which(tool):
+            return f"/usr/bin/{tool}"
+
+        def fake_run(cmd, capture_output=True, text=True, check=False):
+            exe = cmd[0]
+            if exe.endswith("socketfilterfw"):
+                return SimpleNamespace(returncode=0, stdout="Firewall is enabled.\n", stderr="")
+            if exe == "spctl":
+                return SimpleNamespace(returncode=0, stdout="assessments enabled\n", stderr="")
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        with patch("preflight.platform.system", return_value="Darwin"), \
+             patch("preflight.platform.mac_ver", return_value=("26.3", ("", "", ""), "")), \
+             patch("preflight.shutil.which", side_effect=fake_which), \
+             patch("preflight.subprocess.run", side_effect=fake_run):
+            summary = run_preflight(require_sudo=False, require_rules=False)
+
+        names = {c["name"] for c in summary["checks"]}
+        self.assertIn("macos_26_3_firewall_signature", names)
+        self.assertIn("macos_26_3_gatekeeper_signature", names)
 
 
 if __name__ == "__main__":
