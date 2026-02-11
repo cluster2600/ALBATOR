@@ -5,6 +5,7 @@ import yaml
 import os
 
 from main import BaselineGenerator
+from preflight import format_preflight_report, preflight_to_json, run_preflight
 from rule_handler import collect_rules
 from utils import parse_authors
 
@@ -83,6 +84,24 @@ def run_legacy_command(args: argparse.Namespace) -> None:
     finally:
         os.chdir(generator.original_wd)
 
+def maybe_run_preflight(command: str, args: argparse.Namespace) -> None:
+    """Run preflight automatically before mutating actions."""
+    mutating_script_commands = {"privacy", "firewall", "encryption", "app_security"}
+    mutating_legacy_actions = {"apply", "generate", "tailor"}
+
+    if command in mutating_script_commands:
+        summary = run_preflight(require_sudo=True, require_rules=False)
+    elif command == "legacy" and getattr(args, "action", None) in mutating_legacy_actions:
+        summary = run_preflight(require_sudo=args.action == "apply", require_rules=True)
+    else:
+        return
+
+    print(format_preflight_report(summary))
+    if not summary["passed"]:
+        print("Aborting because preflight failed required checks.", file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     config = load_config()
 
@@ -95,6 +114,11 @@ def main():
     parser_legacy = subparsers.add_parser("legacy", help="Run legacy Python tool commands")
     parser_legacy.add_argument("action", choices=["list_tags", "check_controls", "interactive", "gui", "generate", "tailor", "apply"])
     parser_legacy.add_argument("-k", "--keyword", help="Keyword tag for generate, tailor, apply actions")
+
+    parser_preflight = subparsers.add_parser("preflight", help="Run environment/dependency checks")
+    parser_preflight.add_argument("--json", action="store_true", help="Emit preflight output as JSON")
+    parser_preflight.add_argument("--require-sudo", action="store_true", help="Treat sudo/root as required")
+    parser_preflight.add_argument("--require-rules", action="store_true", help="Require local rule YAML files")
 
     # Bash script commands
     bash_scripts = {
@@ -109,6 +133,16 @@ def main():
         subparsers.add_parser(name, help=f"Run {name} hardening script")
 
     args = parser.parse_args()
+
+    if args.command == "preflight":
+        summary = run_preflight(require_sudo=args.require_sudo, require_rules=args.require_rules)
+        if args.json:
+            print(preflight_to_json(summary))
+        else:
+            print(format_preflight_report(summary))
+        sys.exit(0 if summary["passed"] else 1)
+
+    maybe_run_preflight(args.command, args)
 
     if args.command == "legacy":
         run_legacy_command(args)

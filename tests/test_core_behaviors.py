@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import albator_cli
 from main import BaselineGenerator
+from preflight import run_preflight
 from rule_handler import RuleHandler
 
 
@@ -92,6 +93,23 @@ class TestLegacyCliDispatch(unittest.TestCase):
         fake_generator._generate_standard_baseline.assert_called_once()
 
 
+class TestPreflightAutoGate(unittest.TestCase):
+    def test_mutating_command_aborts_on_failed_preflight(self):
+        args = argparse.Namespace(action=None)
+        with patch("albator_cli.run_preflight", return_value={"passed": False}), \
+             patch("albator_cli.format_preflight_report", return_value="x"), \
+             patch("albator_cli.sys.exit", side_effect=SystemExit) as mock_exit:
+            with self.assertRaises(SystemExit):
+                albator_cli.maybe_run_preflight("firewall", args)
+        mock_exit.assert_called_once_with(1)
+
+    def test_non_mutating_command_skips_preflight(self):
+        args = argparse.Namespace(action="list_tags")
+        with patch("albator_cli.run_preflight") as mock_pf:
+            albator_cli.maybe_run_preflight("legacy", args)
+        mock_pf.assert_not_called()
+
+
 class TestLegacyCliIntegration(unittest.TestCase):
     def test_legacy_list_tags_with_fixture_project(self):
         repo_root = pathlib.Path(__file__).resolve().parents[1]
@@ -111,6 +129,26 @@ class TestLegacyCliIntegration(unittest.TestCase):
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertIn("all_rules", result.stdout)
         self.assertIn("stig", result.stdout)
+
+
+class TestPreflight(unittest.TestCase):
+    def test_preflight_fails_when_required_tool_missing(self):
+        with patch("preflight.shutil.which", side_effect=lambda t: None if t == "jq" else f"/usr/bin/{t}"):
+            summary = run_preflight(require_sudo=False, require_rules=False)
+        self.assertFalse(summary["passed"])
+        failing = [c for c in summary["checks"] if c["name"] == "tool_jq"][0]
+        self.assertEqual(failing["status"], "FAIL")
+
+    def test_preflight_warns_when_optional_tool_missing(self):
+        def fake_which(tool):
+            if tool in ("curl", "jq"):
+                return f"/usr/bin/{tool}"
+            return None
+
+        with patch("preflight.shutil.which", side_effect=fake_which):
+            summary = run_preflight(require_sudo=False, require_rules=False)
+        pup_check = [c for c in summary["checks"] if c["name"] == "tool_pup"][0]
+        self.assertEqual(pup_check["status"], "WARN")
 
 
 if __name__ == "__main__":

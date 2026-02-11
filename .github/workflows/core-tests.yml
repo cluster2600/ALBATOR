@@ -6,8 +6,32 @@ on:
   pull_request:
 
 jobs:
+  lint-static:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Shell lint (error severity)
+        run: |
+          find . -type f -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 shellcheck -S error
+
+      - name: Python static compile check
+        run: |
+          python -m py_compile albator_cli.py main.py rule_handler.py preflight.py tests/test_core_behaviors.py
+
   core-tests:
     runs-on: ubuntu-latest
+    needs: lint-static
     steps:
       - name: Checkout
         uses: actions/checkout@v4

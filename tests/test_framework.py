@@ -12,6 +12,7 @@ import json
 import time
 from typing import Dict, List, Any, Tuple, Optional
 from pathlib import Path
+from preflight import run_preflight
 
 # Add lib directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
@@ -239,6 +240,7 @@ class AlbatorTestFramework:
         log_operation_start("run_all_tests")
         
         self.results.clear()
+        preflight_summary = run_preflight(require_sudo=False, require_rules=False)
         
         # System integrity tests
         self.logger.info("Running system integrity tests...")
@@ -284,6 +286,7 @@ class AlbatorTestFramework:
             "passed": passed_tests,
             "failed": failed_tests,
             "success_rate": (passed_tests / total_tests * 100) if total_tests > 0 else 0,
+            "preflight": preflight_summary,
             "results": [
                 {
                     "test_name": r.test_name,
@@ -319,6 +322,12 @@ class AlbatorTestFramework:
         print(f"Passed: {summary['passed']}")
         print(f"Failed: {summary['failed']}")
         print(f"Success Rate: {summary['success_rate']:.1f}%")
+        print(
+            "Preflight: "
+            f"{'PASS' if summary['preflight']['passed'] else 'FAIL'} "
+            f"(required failures: {summary['preflight']['failed_required_count']}, "
+            f"warnings: {summary['preflight']['warning_count']})"
+        )
         print(f"{'='*60}")
         
         # Print failed tests
