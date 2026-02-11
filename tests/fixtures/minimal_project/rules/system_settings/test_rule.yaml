@@ -14,4 +14,4 @@ odv: "missing"
 tags: ["stig"]
 result: "pass"
 mobileconfig: false
-macOS: "15"
+macOS: "15,26"

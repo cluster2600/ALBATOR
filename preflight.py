@@ -44,6 +44,15 @@ def _check_macos_target() -> PreflightCheck:
     return PreflightCheck("os_target", STATUS_WARN, f"Non-macOS environment detected ({system})", False)
 
 
+def _run_capture(cmd: List[str]) -> tuple[bool, str]:
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        output = (result.stdout or "") + (result.stderr or "")
+        return result.returncode == 0, output.strip()
+    except Exception as e:
+        return False, str(e)
+
+
 def _check_tool(tool: str, required: bool) -> PreflightCheck:
     path = shutil.which(tool)
     if path:
@@ -104,6 +113,48 @@ def _check_rule_dirs(root_dir: str, require_rules: bool) -> PreflightCheck:
     return PreflightCheck("rule_files", status, msg, require_rules)
 
 
+def _check_macos_26_3_profile(root_dir: str) -> PreflightCheck:
+    profile_path = os.path.join(root_dir, "config", "profiles", "macos_26_3.yaml")
+    if os.path.isfile(profile_path) and os.access(profile_path, os.R_OK):
+        return PreflightCheck("macos_26_3_profile", STATUS_PASS, f"Profile present: {profile_path}", False)
+    return PreflightCheck("macos_26_3_profile", STATUS_WARN, "macOS 26.3 profile pack not found", False)
+
+
+def _check_macos_26_3_signatures() -> List[PreflightCheck]:
+    checks: List[PreflightCheck] = []
+    if platform.system() != "Darwin":
+        return checks
+
+    version = platform.mac_ver()[0] or ""
+    if not version.startswith("26.3"):
+        checks.append(
+            PreflightCheck("macos_26_3_mode", STATUS_WARN, f"26.3-specific checks skipped on {version or 'unknown'}", False)
+        )
+        return checks
+
+    ok_fw, fw_output = _run_capture(["/usr/libexec/ApplicationFirewall/socketfilterfw", "--getglobalstate"])
+    if ok_fw and ("enabled" in fw_output.lower() or "disabled" in fw_output.lower()):
+        checks.append(
+            PreflightCheck("macos_26_3_firewall_signature", STATUS_PASS, "Firewall status output signature looks compatible", False)
+        )
+    else:
+        checks.append(
+            PreflightCheck("macos_26_3_firewall_signature", STATUS_WARN, f"Unexpected firewall status output: {fw_output}", False)
+        )
+
+    ok_spctl, spctl_output = _run_capture(["spctl", "--status"])
+    if ok_spctl and "assessment" in spctl_output.lower():
+        checks.append(
+            PreflightCheck("macos_26_3_gatekeeper_signature", STATUS_PASS, "Gatekeeper output signature looks compatible", False)
+        )
+    else:
+        checks.append(
+            PreflightCheck("macos_26_3_gatekeeper_signature", STATUS_WARN, f"Unexpected Gatekeeper output: {spctl_output}", False)
+        )
+
+    return checks
+
+
 def run_preflight(root_dir: Optional[str] = None, require_sudo: bool = False, require_rules: bool = False) -> dict:
     """Run preflight checks and return structured summary."""
     resolved_root = os.path.abspath(root_dir or os.environ.get("ROOT_DIR") or os.getcwd())
@@ -117,7 +168,9 @@ def run_preflight(root_dir: Optional[str] = None, require_sudo: bool = False, re
         _check_sudo_or_root(require_sudo=require_sudo),
         _check_config_file(root_dir=resolved_root),
         _check_rule_dirs(root_dir=resolved_root, require_rules=require_rules),
+        _check_macos_26_3_profile(root_dir=resolved_root),
     ]
+    checks.extend(_check_macos_26_3_signatures())
 
     failed_required = [c for c in checks if c.status == STATUS_FAIL and c.required]
     warning_count = len([c for c in checks if c.status == STATUS_WARN])

@@ -147,6 +147,7 @@ python3 albator_enhanced.py setup-completion
 # Legacy Python tools
 python3 albator_cli.py legacy list_tags
 python3 albator_cli.py legacy interactive
+python3 albator_cli.py legacy generate -k macos_26_3
 
 # Individual hardening scripts
 python3 albator_cli.py privacy
@@ -255,6 +256,8 @@ python3 albator_cli.py preflight --require-sudo --require-rules
 - If a fix requires elevated privileges, run Albator itself with `sudo` instead of embedding `sudo` in fix definitions.
 - `albator_cli.py` automatically runs preflight checks before mutating commands (`privacy`, `firewall`, `encryption`, `app_security`, and legacy `apply`/`generate`/`tailor`).
 - Python test report output now includes a preflight summary section with required failures and warnings.
+- Baseline generation now applies version-aware rule filtering using detected macOS major version.
+- A profile pack for macOS 26.3 is available at `config/profiles/macos_26_3.yaml`.
 
 ## Contributing
 Feel free to submit issues or pull requests to improve Albator, including enhancements to the Bash scripts or revival of Python features!

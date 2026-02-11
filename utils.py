@@ -8,7 +8,7 @@ class MacSecurityRule:
                  check: str, fix: str, cci: List[str], cce: List[str], 
                  nist_controls: List[str], disa_stig: List[str], srg: List[str], 
                  odv: Any, tags: List[str], result_value: Any, 
-                 mobileconfig: Any, mobileconfig_info: Any) -> None:
+                 mobileconfig: Any, mobileconfig_info: Any, macos_version: Any = "missing") -> None:
         """Initialize a security rule."""
         self.rule_title = title
         self.rule_id = rule_id
@@ -26,6 +26,7 @@ class MacSecurityRule:
         self.rule_result_value = result_value
         self.rule_mobileconfig = mobileconfig
         self.rule_mobileconfig_info = mobileconfig_info
+        self.rule_macos = macos_version
 
     def create_asciidoc(self, adoc_rule_template: Template) -> str:
         """Generate AsciiDoc representation of the rule."""

@@ -1,0 +1,13 @@
+profile:
+  name: macos_26_3
+  display_name: "macOS 26.3 Hardened Profile"
+  description: "Baseline profile pack tuned for macOS 26.3 behavior and command output compatibility."
+  min_macos: "26.3"
+  controls:
+    - firewall
+    - privacy
+    - encryption
+    - app_security
+  notes:
+    - "Use with version-aware rule filtering enabled in BaselineGenerator."
+    - "Preflight validates 26.3-specific firewall and Gatekeeper output signatures."

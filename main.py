@@ -1,4 +1,5 @@
 import os
+import re
 import shlex
 import yaml
 import subprocess
@@ -23,8 +24,47 @@ class BaselineGenerator:
     @staticmethod
     def _resolve_benchmark(keyword: str) -> str:
         """Map keyword tags to benchmark parent values consistently across all interfaces."""
-        established_benchmarks = {'stig', 'cis_lvl1', 'cis_lvl2'}
+        established_benchmarks = {'stig', 'cis_lvl1', 'cis_lvl2', 'macos_26_3'}
         return keyword if keyword in established_benchmarks else "recommended"
+
+    @staticmethod
+    def _parse_major_version(version_string: str) -> Optional[int]:
+        """Extract major version from a version string like 26.3 or 15."""
+        if not version_string:
+            return None
+        match = re.search(r"(\d+)", str(version_string))
+        if not match:
+            return None
+        return int(match.group(1))
+
+    def _get_target_macos_major(self) -> Optional[int]:
+        """Determine current/target macOS major version for rule compatibility filtering."""
+        env_override = os.environ.get("ALBATOR_MACOS_VERSION")
+        if env_override:
+            return self._parse_major_version(env_override)
+        try:
+            result = subprocess.run(
+                ["sw_vers", "-productVersion"], capture_output=True, text=True, check=False
+            )
+            if result.returncode == 0:
+                return self._parse_major_version(result.stdout.strip())
+        except Exception:
+            return None
+        return None
+
+    def _is_rule_version_compatible(self, rule, target_major: Optional[int]) -> bool:
+        """Check whether a rule applies to the detected macOS major version."""
+        if target_major is None:
+            return True
+        raw = getattr(rule, "rule_macos", "missing")
+        if raw in (None, "", "missing"):
+            return True
+
+        tokens = raw if isinstance(raw, list) else re.split(r"[,\s]+", str(raw))
+        majors = {m for token in tokens for m in [self._parse_major_version(token)] if m is not None}
+        if not majors:
+            return True
+        return target_major in majors
 
     def setup_directories(self) -> None:
         """Set up working directory and create build directory if needed."""
@@ -66,7 +106,15 @@ class BaselineGenerator:
 
     def get_matching_rules(self, all_rules: List, keyword: str) -> List:
         """Filter rules based on the provided keyword."""
-        return [rule for rule in all_rules if keyword in rule.rule_tags or keyword == "all_rules"]
+        matching = [rule for rule in all_rules if keyword in rule.rule_tags or keyword == "all_rules"]
+        target_major = self._get_target_macos_major()
+        compatible = [rule for rule in matching if self._is_rule_version_compatible(rule, target_major)]
+        skipped_count = len(matching) - len(compatible)
+        if skipped_count > 0 and target_major is not None:
+            print(
+                f"Info: skipped {skipped_count} rule(s) not compatible with detected macOS major {target_major}."
+            )
+        return compatible
 
     @staticmethod
     def _parse_fix_command(fix_cmd: str) -> List[str]:
