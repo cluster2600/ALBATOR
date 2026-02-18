@@ -24,12 +24,29 @@ log() {
     local level=$1
     shift
     local message="$*"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
 }
 
 # Source common utilities
 source "$(dirname "$0")"/utils.sh
+
+# Dependency check
+check_dependencies() {
+    local missing=()
+    for cmd in spctl codesign xattr; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            missing+=("$cmd")
+        fi
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "ERROR: Missing required tools: ${missing[*]}" >&2
+        echo "These are macOS system tools. Please ensure you are running on macOS." >&2
+        exit 1
+    fi
+}
+check_dependencies
 
 # Function to backup current app security settings
 backup_app_security_settings() {

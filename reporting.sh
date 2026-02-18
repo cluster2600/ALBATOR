@@ -26,6 +26,22 @@ NC='\033[0m'
 # Source common utilities
 source "$(dirname "$0")"/utils.sh
 
+# Dependency check
+check_dependencies() {
+    local missing=()
+    for cmd in jq; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            missing+=("$cmd")
+        fi
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "ERROR: Missing required tools: ${missing[*]}" >&2
+        echo "Install with: brew install ${missing[*]}" >&2
+        exit 1
+    fi
+}
+check_dependencies
+
 # Function to setup report directory
 setup_report_dir() {
     if [[ ! -d "$REPORT_DIR" ]]; then
