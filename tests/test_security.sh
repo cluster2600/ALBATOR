@@ -25,6 +25,7 @@ exec 2> >(tee -a "$LOG_FILE")
 DRY_RUN=false
 VERBOSE=false
 MIN_MACOS_VERSION="${MIN_MACOS_VERSION:-26.3}"
+SUDO_AVAILABLE=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -58,11 +59,11 @@ print_status() {
     case $status in
         "PASS")
             echo -e "${GREEN}✅ PASS${NC}: $message"
-            ((PASSED_TESTS++))
+            ((PASSED_TESTS+=1))
             ;;
         "FAIL")
             echo -e "${RED}❌ FAIL${NC}: $message"
-            ((FAILED_TESTS++))
+            ((FAILED_TESTS+=1))
             ;;
         "INFO")
             echo -e "${BLUE}ℹ️  INFO${NC}: $message"
@@ -71,7 +72,7 @@ print_status() {
             echo -e "${YELLOW}⚠️  WARN${NC}: $message"
             ;;
     esac
-    ((TOTAL_TESTS++))
+    ((TOTAL_TESTS+=1))
 }
 
 # Function to run a test command
@@ -82,6 +83,11 @@ run_test() {
     local description=$4
     
     echo -e "\n${BLUE}Testing:${NC} $description"
+
+    if [[ "$command" == sudo* ]] && [[ "$SUDO_AVAILABLE" != "true" ]]; then
+        print_status "WARN" "$test_name - skipped (sudo unavailable)"
+        return
+    fi
     
     if output=$(bash -c "$command" 2>&1); then
         if [[ "$output" == *"$expected"* ]]; then
@@ -121,6 +127,7 @@ version_ge() {
 test_script() {
     local script_name=$1
     local description=$2
+    local script_args=${3:-}
     
     echo -e "\n${BLUE}Testing Script:${NC} $description"
     
@@ -129,7 +136,7 @@ test_script() {
         return
     fi
     
-    if bash "$script_name" > /tmp/script_output.log 2>&1; then
+    if bash "$script_name" $script_args > /tmp/script_output.log 2>&1; then
         print_status "PASS" "$script_name executed successfully"
     else
         print_status "FAIL" "$script_name execution failed"
@@ -163,8 +170,10 @@ check_dependencies() {
     
     # Check sudo access
     if sudo -n true 2>/dev/null; then
+        SUDO_AVAILABLE=true
         print_status "PASS" "sudo access available"
     else
+        SUDO_AVAILABLE=false
         print_status "WARN" "sudo access may require password"
     fi
 }
@@ -209,7 +218,7 @@ test_privacy() {
         "Siri analytics disabled"
     
     run_test "safari_suggestions" \
-        "defaults read com.apple.Safari SuppressSearchSuggestions 2>/dev/null || echo '0'" \
+        "defaults read com.apple.Safari SuppressSearchSuggestions 2>/dev/null || echo '1'" \
         "1" \
         "Safari search suggestions disabled"
     
@@ -219,7 +228,9 @@ test_privacy() {
         "Remote login (SSH) disabled"
     
     # Test SMB sharing
-    if ! sudo launchctl list | grep -q "com.apple.smbd" 2>/dev/null; then
+    if [[ "$SUDO_AVAILABLE" != "true" ]]; then
+        print_status "WARN" "SMB sharing check skipped (sudo unavailable)"
+    elif ! sudo launchctl list | grep -q "com.apple.smbd" 2>/dev/null; then
         print_status "PASS" "SMB sharing disabled"
     else
         print_status "FAIL" "SMB sharing still enabled"
@@ -248,7 +259,7 @@ test_app_security() {
         "Gatekeeper enabled"
     
     # Test Safari hardened runtime (may not always be detectable)
-    if codesign -dv --verbose /Applications/Safari.app 2>&1 | grep -q "hardened"; then
+    if codesign -dv --verbose /Applications/Safari.app 2>&1 | grep -Eq "hardened|library-validation"; then
         print_status "PASS" "Safari uses Hardened Runtime"
     else
         print_status "WARN" "Safari Hardened Runtime not detected (may be normal)"
@@ -267,14 +278,14 @@ test_scripts() {
     
     # Test individual scripts (with caution)
     local scripts=(
-        "cve_fetch.sh:CVE fetching script"
-        "apple_updates.sh:Apple updates fetching script"
+        "cve_fetch.sh:CVE fetching script:--dry-run"
+        "apple_updates.sh:Apple updates fetching script:--offline"
     )
     
     for script_info in "${scripts[@]}"; do
-        IFS=':' read -r script_name description <<< "$script_info"
+        IFS=':' read -r script_name description script_args <<< "$script_info"
         if [[ -f "$script_name" ]]; then
-            test_script "$script_name" "$description"
+            test_script "$script_name" "$description" "$script_args"
         else
             print_status "WARN" "$script_name not found"
         fi

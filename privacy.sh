@@ -307,7 +307,11 @@ main() {
     
     # Run verification
     local verify_errors=0
-    verify_settings || verify_errors=$?
+    if [[ "$DRY_RUN" == "true" ]]; then
+        show_warning "Skipping verification in dry-run mode"
+    else
+        verify_settings || verify_errors=$?
+    fi
     
     # Summary
     local total_errors=$((config_errors + verify_errors))

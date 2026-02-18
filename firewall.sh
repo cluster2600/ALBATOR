@@ -13,6 +13,7 @@ SCRIPT_NAME="firewall.sh"
 LOG_FILE="/tmp/albator_firewall.log"
 BACKUP_DIR="/tmp/albator_backup/firewall"
 DRY_RUN=${DRY_RUN:-false}
+ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO=${ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO:-false}
 FIREWALL_CMD="${FIREWALL_CMD:-/usr/libexec/ApplicationFirewall/socketfilterfw}"
 
 # Function to backup current firewall settings
@@ -264,8 +265,12 @@ main() {
     
     # Check for sudo privileges
     if ! sudo -n true 2>/dev/null; then
-        show_error "This script requires sudo privileges"
-        exit 1
+        if [[ "$DRY_RUN" == "true" && "$ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO" == "true" ]]; then
+            show_warning "Proceeding in dry-run test mode without sudo"
+        else
+            show_error "This script requires sudo privileges"
+            exit 1
+        fi
     fi
     
     # Run configuration
@@ -274,7 +279,11 @@ main() {
     
     # Run verification
     local verify_errors=0
-    verify_firewall_settings || verify_errors=$?
+    if [[ "$DRY_RUN" == "true" ]]; then
+        show_warning "Skipping verification in dry-run mode"
+    else
+        verify_firewall_settings || verify_errors=$?
+    fi
     
     # Display summary
     display_firewall_summary

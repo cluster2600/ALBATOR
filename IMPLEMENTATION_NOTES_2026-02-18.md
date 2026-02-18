@@ -135,3 +135,14 @@ python3 tests/test_framework.py --include-mutating --output /tmp/albator_mutatin
   - localhost restriction fallback when token is unset
   - stricter session cookie settings
 - Added `DEPRECATIONS.md` and deprecation warning output for legacy/alias command paths.
+
+## 14. Validation Reliability Fixes (Issues #13-#17)
+
+- `tests/test_framework.py` now:
+  - gates privileged checks on non-interactive sudo availability
+  - marks unsupported privileged checks as skipped (reported, not failed)
+  - supports robust matcher variants for FileVault and Safari security output
+  - runs mutating validation scripts with deterministic args (`--dry-run` / `--offline`)
+- Core scripts `privacy.sh`, `firewall.sh`, `encryption.sh`, `app_security.sh` now support dry-run validation without mandatory sudo when `ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO=true`.
+- `tests/test_security.sh` counter arithmetic was corrected to avoid premature exit under `set -e`.
+- `cve_fetch.sh` parsing and summary generation paths were hardened for `set -euo pipefail`.

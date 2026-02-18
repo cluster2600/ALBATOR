@@ -25,6 +25,8 @@ All notable changes to this project are documented in this file.
 - Added unified `--json-output` support across CLI commands, including shell-script wrappers and doctor output.
 - Updated hardening scripts to use configured macOS baseline messaging and dry-run plan artifact recording.
 - Hardened web API session settings and added token/localhost API access controls.
+- Updated validation framework and shell test behavior to be environment-aware (sudo-gated checks skip/defer instead of hard-fail).
+- Updated mutating validation mode to deterministic script args (`--dry-run` / `--offline`) and non-mutating safety.
 
 ### Fixed
 - Fixed CLI passthrough behavior so wrapped script flags are forwarded correctly.
@@ -36,6 +38,9 @@ All notable changes to this project are documented in this file.
 - Added and enforced minimum macOS preflight policy (`26.3`) with background security update checks.
 - Hardened `web/app.py` status probes to avoid interactive `sudo` and surface elevation hints.
 - Removed `eval` usage from script/test command execution paths.
+- Fixed `tests/test_security.sh` early exit caused by arithmetic + `set -e`.
+- Fixed `cve_fetch.sh` dry-run/offline summary parsing failures under `set -euo pipefail`.
+- Fixed brittle FileVault/Safari validation matchers for modern macOS command output variants.
 
 ## [v3.0.1] - 2026-02-18
 

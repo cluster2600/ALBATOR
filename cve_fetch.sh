@@ -298,7 +298,7 @@ Summary: \(.summary // "No summary")
 Published: \(.published_at // "Unknown")
 URL: \(.html_url // "N/A")
 ---"
-    ' "$cache_file" 2>/dev/null)
+    ' "$cache_file" 2>/dev/null || true)
     
     if [[ -n "$macos_advisories" ]]; then
         echo ""
@@ -341,7 +341,7 @@ parse_apple_security_updates() {
                 "Title: \(.children[0].children[0].text)
 Link: https://support.apple.com\(.children[0].children[0].href)
 ---"
-            ' 2>/dev/null)
+            ' 2>/dev/null || true)
         
         if [[ -n "$macos_updates" ]]; then
             echo ""
@@ -356,7 +356,7 @@ Link: https://support.apple.com\(.children[0].children[0].href)
         show_progress "Using fallback parsing for Apple security updates..."
         
         local macos_lines
-        macos_lines=$(grep -i "macOS\|Mac OS" "$cache_file" | head -10)
+        macos_lines=$(grep -i "macOS\|Mac OS" "$cache_file" | head -10 || true)
         
         if [[ -n "$macos_lines" ]]; then
             echo ""
@@ -391,7 +391,7 @@ Description: \(.descriptions[0].value // "No description")
 CVSS Score: \(.metrics.cvssMetricV31[0].cvssData.baseScore // "N/A")
 Severity: \(.metrics.cvssMetricV31[0].cvssData.baseSeverity // "N/A")
 ---"
-    ' "$cache_file" 2>/dev/null)
+    ' "$cache_file" 2>/dev/null || true)
     
     if [[ -n "$nvd_cves" ]]; then
         echo ""
@@ -416,16 +416,19 @@ generate_summary_report() {
     local nvd_count=0
     
     if [[ -f "$CACHE_DIR/github_advisories.json" ]]; then
-        github_count=$(jq length "$CACHE_DIR/github_advisories.json" 2>/dev/null || echo 0)
+        github_count=$(jq 'length' "$CACHE_DIR/github_advisories.json" 2>/dev/null || true)
     fi
+    github_count=${github_count:-0}
     
     if [[ -f "$CACHE_DIR/apple_security.html" ]]; then
-        apple_count=$(grep -c -i "macOS\|Mac OS" "$CACHE_DIR/apple_security.html" 2>/dev/null || echo 0)
+        apple_count=$(awk 'BEGIN{IGNORECASE=1} /macOS|Mac OS/ {c++} END {print c+0}' "$CACHE_DIR/apple_security.html" 2>/dev/null)
     fi
+    apple_count=${apple_count:-0}
     
     if [[ -f "$CACHE_DIR/nvd_cves.json" ]]; then
-        nvd_count=$(jq '.vulnerabilities | length' "$CACHE_DIR/nvd_cves.json" 2>/dev/null || echo 0)
+        nvd_count=$(jq '.vulnerabilities | length' "$CACHE_DIR/nvd_cves.json" 2>/dev/null || true)
     fi
+    nvd_count=${nvd_count:-0}
     
     # Create summary
     local summary=$(cat <<EOF

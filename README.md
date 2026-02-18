@@ -80,6 +80,7 @@ Python integration-style checks:
 
 ```bash
 python3 tests/test_framework.py --verbose --include-mutating
+python3 tests/test_framework.py --verbose --include-privileged
 ```
 
 Core unit tests:
@@ -149,6 +150,7 @@ flowchart TD
 - Set `ALBATOR_LOG_FORMAT=json` for structured shell-script log lines.
 - Dry-run executions now generate plan artifacts in `${ALBATOR_STATE_DIR:-/tmp/albator_state}`.
 - API endpoints in `web/app.py` require `X-Albator-Token` when `ALBATOR_API_TOKEN` is set.
+- Set `ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO=true` to allow deterministic dry-run script validation without non-interactive sudo.
 
 ## Optional/Experimental Components
 

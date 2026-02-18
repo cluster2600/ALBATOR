@@ -10,6 +10,11 @@ This document describes how to validate Albator safely on macOS 26.3 and what ea
 - #10: CLI wrapper error diagnostics now include both stderr and stdout.
 - #11: `apple_updates.sh --offline` now degrades gracefully without cache (strict mode optional via `STRICT_OFFLINE=true`).
 - #12: `privacy.sh` backup path now sanitizes domain/key components.
+- #13: `tests/test_framework.py --include-privileged` now skips privileged checks when non-interactive sudo is unavailable.
+- #14: FileVault/Safari matcher logic in `tests/test_framework.py` now handles modern macOS output variants.
+- #15: `tests/test_framework.py --include-mutating` now runs deterministic script validation (`--dry-run` / `--offline`).
+- #16: `tests/test_security.sh` no longer exits early due arithmetic + `set -e` interaction.
+- #17: `cve_fetch.sh` parsing/summary paths hardened for `set -euo pipefail` in dry-run/offline validation.
 
 ## Safe Validation Commands
 
@@ -76,6 +81,8 @@ Expected:
 - failing checks are reported explicitly
 - mutating script execution tests run only when explicitly requested
 - mocked smoke harness validates script dry-run behavior without requiring host macOS internals
+- privileged checks are marked skipped (not failed) when non-interactive sudo is unavailable
+- mutating mode uses deterministic script args to avoid host mutation and flaky network requirements
 
 ### 6. Enhanced and web optional health checks
 ```bash
@@ -101,6 +108,7 @@ preflight:
 - `ALBATOR_LOG_FORMAT`: set to `json` for structured script logs
 - `ALBATOR_API_TOKEN`: when set, required as `X-Albator-Token` for `/api/*` endpoints
 - `ALBATOR_COOKIE_SECURE`: set `true` to enforce secure-only session cookie in web mode
+- `ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO`: allows dry-run test execution of privileged scripts in validation harness
 
 ## Interpretation Guidance
 - A failing mutating command without sudo is expected when preflight enforces privilege checks.
