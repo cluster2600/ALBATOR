@@ -157,6 +157,7 @@ python3 albator_cli.py firewall
 python3 albator_cli.py preflight
 python3 albator_cli.py preflight --json
 python3 albator_cli.py preflight --require-sudo --require-rules
+python3 albator_cli.py preflight --min-macos-version 26.3 --enforce-min-version
 ```
 
 ## Requirements
@@ -258,6 +259,8 @@ python3 albator_cli.py preflight --require-sudo --require-rules
 - Python test report output now includes a preflight summary section with required failures and warnings.
 - Baseline generation now applies version-aware rule filtering using detected macOS major version.
 - A profile pack for macOS 26.3 is available at `config/profiles/macos_26_3.yaml`.
+- Minimum macOS enforcement is configurable in `config/albator.yaml` under `preflight.min_macos_version` and `preflight.enforce_min_version`.
+- Preflight now checks background security update settings (`ConfigDataInstall` and `CriticalUpdateInstall`) on macOS.
 
 ## Contributing
 Feel free to submit issues or pull requests to improve Albator, including enhancements to the Bash scripts or revival of Python features!

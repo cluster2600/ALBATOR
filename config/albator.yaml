@@ -111,6 +111,11 @@ rollback:
   backup_location: "/tmp/albator_backup"
   auto_rollback_on_failure: false
 
+# Preflight Policy
+preflight:
+  min_macos_version: "26.3"
+  enforce_min_version: true
+
 # Dependencies
 dependencies:
   required:

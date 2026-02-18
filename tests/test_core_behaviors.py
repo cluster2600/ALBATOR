@@ -120,17 +120,19 @@ class TestLegacyCliDispatch(unittest.TestCase):
 class TestPreflightAutoGate(unittest.TestCase):
     def test_mutating_command_aborts_on_failed_preflight(self):
         args = argparse.Namespace(action=None)
+        cfg = {"preflight": {"min_macos_version": "26.3", "enforce_min_version": True}}
         with patch("albator_cli.run_preflight", return_value={"passed": False}), \
              patch("albator_cli.format_preflight_report", return_value="x"), \
              patch("albator_cli.sys.exit", side_effect=SystemExit) as mock_exit:
             with self.assertRaises(SystemExit):
-                albator_cli.maybe_run_preflight("firewall", args)
+                albator_cli.maybe_run_preflight("firewall", args, cfg)
         mock_exit.assert_called_once_with(1)
 
     def test_non_mutating_command_skips_preflight(self):
         args = argparse.Namespace(action="list_tags")
+        cfg = {"preflight": {"min_macos_version": "26.3", "enforce_min_version": True}}
         with patch("albator_cli.run_preflight") as mock_pf:
-            albator_cli.maybe_run_preflight("legacy", args)
+            albator_cli.maybe_run_preflight("legacy", args, cfg)
         mock_pf.assert_not_called()
 
 
@@ -173,6 +175,14 @@ class TestPreflight(unittest.TestCase):
             summary = run_preflight(require_sudo=False, require_rules=False)
         pup_check = [c for c in summary["checks"] if c["name"] == "tool_pup"][0]
         self.assertEqual(pup_check["status"], "WARN")
+
+    def test_preflight_enforces_min_macos_version(self):
+        with patch("preflight.platform.system", return_value="Darwin"), \
+             patch("preflight.platform.mac_ver", return_value=("26.2", ("", "", ""), "")):
+            summary = run_preflight(min_macos_version="26.3", enforce_min_version=True)
+        min_check = [c for c in summary["checks"] if c["name"] == "min_macos_version"][0]
+        self.assertEqual(min_check["status"], "FAIL")
+        self.assertFalse(summary["passed"])
 
     def test_preflight_macos_26_3_signature_checks(self):
         def fake_which(tool):

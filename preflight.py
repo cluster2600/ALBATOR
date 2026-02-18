@@ -44,6 +44,40 @@ def _check_macos_target() -> PreflightCheck:
     return PreflightCheck("os_target", STATUS_WARN, f"Non-macOS environment detected ({system})", False)
 
 
+def _check_min_macos_version(min_macos_version: str, enforce: bool) -> PreflightCheck:
+    if platform.system() != "Darwin":
+        return PreflightCheck("min_macos_version", STATUS_WARN, "Cannot enforce minimum macOS version on non-Darwin host", False)
+
+    current_raw = platform.mac_ver()[0] or "unknown"
+    current = _parse_version_tuple(current_raw)
+    minimum = _parse_version_tuple(min_macos_version)
+    if current is None or minimum is None:
+        return PreflightCheck(
+            "min_macos_version",
+            STATUS_WARN,
+            f"Unable to parse versions (current={current_raw}, min={min_macos_version})",
+            False,
+        )
+
+    width = max(len(current), len(minimum))
+    current_norm = _normalize_version_len(current, width)
+    min_norm = _normalize_version_len(minimum, width)
+    if current_norm >= min_norm:
+        return PreflightCheck(
+            "min_macos_version",
+            STATUS_PASS,
+            f"Current macOS {current_raw} meets minimum {min_macos_version}",
+            enforce,
+        )
+
+    return PreflightCheck(
+        "min_macos_version",
+        STATUS_FAIL if enforce else STATUS_WARN,
+        f"Current macOS {current_raw} is below minimum {min_macos_version}",
+        enforce,
+    )
+
+
 def _run_capture(cmd: List[str]) -> tuple[bool, str]:
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
@@ -51,6 +85,21 @@ def _run_capture(cmd: List[str]) -> tuple[bool, str]:
         return result.returncode == 0, output.strip()
     except Exception as e:
         return False, str(e)
+
+
+def _parse_version_tuple(value: str) -> Optional[tuple]:
+    if not value:
+        return None
+    try:
+        return tuple(int(part) for part in value.split("."))
+    except ValueError:
+        return None
+
+
+def _normalize_version_len(version: tuple, width: int) -> tuple:
+    if len(version) >= width:
+        return version[:width]
+    return version + (0,) * (width - len(version))
 
 
 def _check_tool(tool: str, required: bool) -> PreflightCheck:
@@ -113,6 +162,67 @@ def _check_rule_dirs(root_dir: str, require_rules: bool) -> PreflightCheck:
     return PreflightCheck("rule_files", status, msg, require_rules)
 
 
+def _read_defaults_key(plist_path: str, key: str) -> Optional[str]:
+    ok, output = _run_capture(["defaults", "read", plist_path, key])
+    if not ok:
+        return None
+    stripped = output.strip()
+    if not stripped:
+        return None
+    return stripped.splitlines()[-1]
+
+
+def _check_background_security_improvements() -> List[PreflightCheck]:
+    checks: List[PreflightCheck] = []
+    if platform.system() != "Darwin":
+        checks.append(
+            PreflightCheck("background_security_improvements", STATUS_WARN, "Skipped on non-macOS host", False)
+        )
+        return checks
+
+    software_update_plist = "/Library/Preferences/com.apple.SoftwareUpdate"
+    config_data = _read_defaults_key(software_update_plist, "ConfigDataInstall")
+    critical_data = _read_defaults_key(software_update_plist, "CriticalUpdateInstall")
+
+    if config_data == "1":
+        checks.append(
+            PreflightCheck(
+                "background_security_improvements",
+                STATUS_PASS,
+                "Automatic background security data installation is enabled",
+                False,
+            )
+        )
+    elif config_data is None:
+        checks.append(
+            PreflightCheck("background_security_improvements", STATUS_WARN, "Unable to read ConfigDataInstall setting", False)
+        )
+    else:
+        checks.append(
+            PreflightCheck("background_security_improvements", STATUS_WARN, f"ConfigDataInstall is {config_data} (expected 1)", False)
+        )
+
+    if critical_data == "1":
+        checks.append(
+            PreflightCheck(
+                "security_data_updates",
+                STATUS_PASS,
+                "Install system data files and security updates is enabled",
+                False,
+            )
+        )
+    elif critical_data is None:
+        checks.append(
+            PreflightCheck("security_data_updates", STATUS_WARN, "Unable to read CriticalUpdateInstall setting", False)
+        )
+    else:
+        checks.append(
+            PreflightCheck("security_data_updates", STATUS_WARN, f"CriticalUpdateInstall is {critical_data} (expected 1)", False)
+        )
+
+    return checks
+
+
 def _check_macos_26_3_profile(root_dir: str) -> PreflightCheck:
     profile_path = os.path.join(root_dir, "config", "profiles", "macos_26_3.yaml")
     if os.path.isfile(profile_path) and os.access(profile_path, os.R_OK):
@@ -155,13 +265,20 @@ def _check_macos_26_3_signatures() -> List[PreflightCheck]:
     return checks
 
 
-def run_preflight(root_dir: Optional[str] = None, require_sudo: bool = False, require_rules: bool = False) -> dict:
+def run_preflight(
+    root_dir: Optional[str] = None,
+    require_sudo: bool = False,
+    require_rules: bool = False,
+    min_macos_version: str = "26.3",
+    enforce_min_version: bool = False,
+) -> dict:
     """Run preflight checks and return structured summary."""
     resolved_root = os.path.abspath(root_dir or os.environ.get("ROOT_DIR") or os.getcwd())
 
     checks = [
         _check_python_version(),
         _check_macos_target(),
+        _check_min_macos_version(min_macos_version=min_macos_version, enforce=enforce_min_version),
         _check_tool("curl", required=True),
         _check_tool("jq", required=True),
         _check_tool("pup", required=False),
@@ -170,6 +287,7 @@ def run_preflight(root_dir: Optional[str] = None, require_sudo: bool = False, re
         _check_rule_dirs(root_dir=resolved_root, require_rules=require_rules),
         _check_macos_26_3_profile(root_dir=resolved_root),
     ]
+    checks.extend(_check_background_security_improvements())
     checks.extend(_check_macos_26_3_signatures())
 
     failed_required = [c for c in checks if c.status == STATUS_FAIL and c.required]
@@ -179,6 +297,8 @@ def run_preflight(root_dir: Optional[str] = None, require_sudo: bool = False, re
         "root_dir": resolved_root,
         "require_sudo": require_sudo,
         "require_rules": require_rules,
+        "min_macos_version": min_macos_version,
+        "enforce_min_version": enforce_min_version,
         "checks": [asdict(c) for c in checks],
         "passed": len(failed_required) == 0,
         "failed_required_count": len(failed_required),
