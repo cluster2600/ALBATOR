@@ -158,6 +158,6 @@ echo
 echo "📖 Documentation:"
 echo "   • README.md - Complete usage guide"
 echo "   • CHANGELOG.md - Recent improvements"
-echo "   • NEXT_IMPROVEMENTS.md - Future roadmap"
+echo "   • VALIDATION_AND_TESTING.md - Validation and testing guide"
 echo
 echo "🛡️  Albator Enhanced is ready for enterprise security hardening!"

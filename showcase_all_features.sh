@@ -155,7 +155,7 @@ echo
 echo -e "${YELLOW}📖 Documentation:${NC}"
 echo "   • README.md               - Complete usage guide"
 echo "   • CHANGELOG.md            - All improvements documented"
-echo "   • IMPLEMENTATION_SUMMARY.md - Implementation overview"
-echo "   • NEXT_IMPROVEMENTS.md    - Future roadmap"
+echo "   • VALIDATION_AND_TESTING.md - Validation and testing guide"
+echo "   • CHANGELOG.md              - Release history"
 echo
 echo -e "${BLUE}🛡️  Start securing your Mac fleet today!${NC}"
