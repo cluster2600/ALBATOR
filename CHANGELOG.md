@@ -16,6 +16,7 @@ All notable changes to this project are documented in this file.
 - Added `DEPRECATIONS.md` with migration guidance.
 - Added release artifact workflow with checksum generation and optional cosign signing.
 - Added `albator-swift/Tests/AlbatorTests/SystemSecurityProbeTests.swift` for Swift baseline/probe validation.
+- Added `albator-swift/build_release_binaries.sh` for deterministic macOS binary packaging with checksums.
 
 ### Changed
 - Rewrote `README.md` to align documentation with the current repository scope and command behavior.
@@ -31,6 +32,8 @@ All notable changes to this project are documented in this file.
 - Refactored `albator-swift` package into shared `AlbatorCore` with split CLI/GUI targets.
 - Updated `albator-swift` build/demo/report scripts and README to match real SwiftPM artifacts.
 - Upgraded `albator-swift` dashboard/report pipeline to include macOS 26.3 baseline + security-data status checks.
+- Expanded release pipeline (`.github/workflows/release-artifacts.yml`) to publish GitHub Releases with macOS x86_64 + arm64 Swift binaries and source archive checksums.
+- Updated root and Swift README files with end-to-end tag-based binary publishing instructions.
 
 ### Fixed
 - Fixed CLI passthrough behavior so wrapped script flags are forwarded correctly.

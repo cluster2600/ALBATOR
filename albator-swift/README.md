@@ -35,6 +35,37 @@ Artifacts:
 - `.build/release/Albator-SwiftGUI`
 - `dist/` + zip package
 
+## GitHub Binary Release
+
+This repository publishes macOS binary archives on Git tags like `v3.0.2`.
+
+Produced artifacts:
+- `albator-swift-vX.Y.Z-macos-x86_64.tar.gz`
+- `albator-swift-vX.Y.Z-macos-arm64.tar.gz`
+- checksum files (`.sha256`) for each archive
+- source archive (`albator-vX.Y.Z.tar.gz`) + checksum
+
+Create a release:
+
+```bash
+git tag v3.0.2
+git push origin v3.0.2
+```
+
+GitHub Actions workflow `.github/workflows/release-artifacts.yml` will:
+- build Swift binaries on `macos-13` (x86_64) and `macos-14` (arm64)
+- package binaries with build metadata
+- generate SHA-256 checksums
+- create/update the GitHub Release for that tag and upload files
+
+Local dry run of release packaging:
+
+```bash
+cd albator-swift
+./build_release_binaries.sh v3.0.2 ./release
+ls -1 ./release
+```
+
 ## Test
 
 ```bash

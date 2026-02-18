@@ -169,3 +169,17 @@ Validation run results (post-fix):
 - `cd albator-swift && ./simple_cli_demo.sh` ✅
 - `cd albator-swift && ./demo_cli.sh` ✅
 - `cd albator-swift && ./test_reporting.sh` ✅
+
+## 16. GitHub Binary Release Publishing
+
+- Added deterministic Swift release packaging script:
+  - `albator-swift/build_release_binaries.sh`
+- Expanded `.github/workflows/release-artifacts.yml` to:
+  - build `Albator-Swift` + `Albator-SwiftGUI` on `macos-13` (`x86_64`) and `macos-14` (`arm64`)
+  - package binaries as architecture-specific `.tar.gz` bundles
+  - generate SHA-256 checksums for each package
+  - upload source archive + checksum
+  - publish all release files to the GitHub Release tied to the pushed `v*` tag
+- Updated:
+  - `README.md` with release publishing summary
+  - `albator-swift/README.md` with exact tag workflow and local dry-run packaging commands
