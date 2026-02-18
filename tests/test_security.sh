@@ -24,6 +24,7 @@ exec 2> >(tee -a "$LOG_FILE")
 # Dry run flag
 DRY_RUN=false
 VERBOSE=false
+MIN_MACOS_VERSION="${MIN_MACOS_VERSION:-26.3}"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -99,6 +100,23 @@ run_test() {
     fi
 }
 
+# Version comparison helper: returns 0 when $1 >= $2
+version_ge() {
+    awk -v current="$1" -v minimum="$2" '
+        BEGIN {
+            split(current, c, ".");
+            split(minimum, m, ".");
+            n = (length(c) > length(m) ? length(c) : length(m));
+            for (i = 1; i <= n; i++) {
+                cv = c[i] + 0;
+                mv = m[i] + 0;
+                if (cv > mv) { print 1; exit }
+                if (cv < mv) { print 0; exit }
+            }
+            print 1;
+        }'
+}
+
 # Function to test script execution
 test_script() {
     local script_name=$1
@@ -123,8 +141,14 @@ test_script() {
 check_dependencies() {
     echo -e "\n${BLUE}=== DEPENDENCY CHECKS ===${NC}"
     
-    # Check macOS version
-    run_test "macos_version" "sw_vers -productVersion" "15" "macOS 15.x (Sequoia)"
+    # Check macOS version against configured minimum
+    local current_macos
+    current_macos=$(sw_vers -productVersion)
+    if [[ "$(version_ge "$current_macos" "$MIN_MACOS_VERSION")" == "1" ]]; then
+        print_status "PASS" "macos_version >= ${MIN_MACOS_VERSION} (current: ${current_macos})"
+    else
+        print_status "FAIL" "macos_version < ${MIN_MACOS_VERSION} (current: ${current_macos})"
+    fi
     
     # Check required tools
     run_test "curl_available" "which curl" "/curl" "curl command availability"

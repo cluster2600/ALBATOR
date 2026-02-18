@@ -14,6 +14,7 @@ CACHE_EXPIRY=21600  # 6 hours in seconds
 DRY_RUN=${DRY_RUN:-false}
 OFFLINE_MODE=${OFFLINE_MODE:-false}
 VERBOSE=${VERBOSE:-false}
+STRICT_OFFLINE=${STRICT_OFFLINE:-false}
 
 # Apple Security Updates URL
 APPLE_URL="https://support.apple.com/en-us/HT201222"
@@ -322,8 +323,21 @@ main() {
             updates_json=$(read_cache)
             show_success "Using cached data"
         else
-            show_error "No valid cache available in offline mode"
-            exit 1
+            show_warning "No valid cache available in offline mode"
+            if [[ "$STRICT_OFFLINE" == "true" ]]; then
+                show_error "STRICT_OFFLINE enabled, exiting."
+                exit 1
+            fi
+            updates_json=$(jq -n --arg url "$APPLE_URL" --arg ts "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" '{
+                updates: [],
+                metadata: {
+                    source: "Apple Security Updates",
+                    url: $url,
+                    fetched_at: $ts,
+                    mode: "offline_no_cache"
+                }
+            }')
+            show_warning "Continuing with empty offline dataset"
         fi
     else
         # Check cache first

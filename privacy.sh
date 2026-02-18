@@ -18,7 +18,11 @@ DRY_RUN=${DRY_RUN:-false}
 backup_setting() {
     local domain=$1
     local key=$2
-    local backup_file="$BACKUP_DIR/${domain}_${key}.backup"
+    local safe_domain
+    local safe_key
+    safe_domain=$(echo "$domain" | sed 's#^/##; s#[^A-Za-z0-9._-]#_#g')
+    safe_key=$(echo "$key" | sed 's#[^A-Za-z0-9._-]#_#g')
+    local backup_file="$BACKUP_DIR/${safe_domain}_${safe_key}.backup"
     
     mkdir -p "$BACKUP_DIR"
     

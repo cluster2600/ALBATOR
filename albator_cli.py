@@ -35,7 +35,10 @@ def run_bash_script(script_name, args=None):
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         print(result.stdout)
     except subprocess.CalledProcessError as e:
-        print(f"Error running {script_name}: {e.stderr}", file=sys.stderr)
+        stdout = (e.stdout or "").strip()
+        stderr = (e.stderr or "").strip()
+        details = "\n".join(part for part in [stderr, stdout] if part) or "(no output)"
+        print(f"Error running {script_name}:\n{details}", file=sys.stderr)
         sys.exit(e.returncode)
 
 def run_legacy_command(args: argparse.Namespace) -> None:
@@ -154,8 +157,11 @@ def main():
     for name in bash_scripts:
         subparsers.add_parser(name, help=f"Run {name} hardening script")
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
     policy = _preflight_policy(config)
+
+    if args.command in {"legacy", "preflight"} and unknown:
+        parser.error(f"unrecognized arguments: {' '.join(unknown)}")
 
     if args.command == "preflight":
         summary = run_preflight(
@@ -177,7 +183,7 @@ def main():
     else:
         script = bash_scripts.get(args.command)
         if script:
-            run_bash_script(script)
+            run_bash_script(script, unknown)
         else:
             print(f"Unknown command: {args.command}")
             sys.exit(1)

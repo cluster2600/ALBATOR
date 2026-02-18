@@ -152,6 +152,8 @@ python3 albator_cli.py legacy generate -k macos_26_3
 # Individual hardening scripts
 python3 albator_cli.py privacy
 python3 albator_cli.py firewall
+python3 albator_cli.py cve_fetch --dry-run
+python3 albator_cli.py apple_updates --offline --verbose
 
 # Preflight checks
 python3 albator_cli.py preflight
@@ -261,6 +263,13 @@ python3 albator_cli.py preflight --min-macos-version 26.3 --enforce-min-version
 - A profile pack for macOS 26.3 is available at `config/profiles/macos_26_3.yaml`.
 - Minimum macOS enforcement is configurable in `config/albator.yaml` under `preflight.min_macos_version` and `preflight.enforce_min_version`.
 - Preflight now checks background security update settings (`ConfigDataInstall` and `CriticalUpdateInstall`) on macOS.
+- Unified CLI now forwards script flags to wrapped bash scripts (example: `python3 albator_cli.py cve_fetch --dry-run`).
+- `apple_updates.sh --offline` now degrades gracefully when cache is missing (set `STRICT_OFFLINE=true` to restore strict failure behavior).
+- `tests/test_security.sh` minimum version policy is configurable via `MIN_MACOS_VERSION` (default `26.3`).
+
+## Validation
+For a full validation matrix and command set, see:
+- `VALIDATION_AND_TESTING.md`
 
 ## Contributing
 Feel free to submit issues or pull requests to improve Albator, including enhancements to the Bash scripts or revival of Python features!

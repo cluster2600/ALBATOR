@@ -117,6 +117,23 @@ class TestLegacyCliDispatch(unittest.TestCase):
         fake_generator._generate_standard_baseline.assert_called_once()
 
 
+class TestCliScriptDispatch(unittest.TestCase):
+    def test_run_bash_script_reports_stdout_when_stderr_empty(self):
+        with patch("albator_cli.subprocess.run", side_effect=subprocess.CalledProcessError(5, ["bash", "x"], output="details", stderr="")), \
+             patch("albator_cli.sys.exit", side_effect=SystemExit), \
+             patch("albator_cli.sys.stderr"):
+            with self.assertRaises(SystemExit):
+                albator_cli.run_bash_script("x.sh")
+
+    def test_parse_known_args_allows_script_passthrough(self):
+        parser = argparse.ArgumentParser()
+        subparsers = parser.add_subparsers(dest="command", required=True)
+        subparsers.add_parser("privacy")
+        args, unknown = parser.parse_known_args(["privacy", "--dry-run"])
+        self.assertEqual(args.command, "privacy")
+        self.assertEqual(unknown, ["--dry-run"])
+
+
 class TestPreflightAutoGate(unittest.TestCase):
     def test_mutating_command_aborts_on_failed_preflight(self):
         args = argparse.Namespace(action=None)

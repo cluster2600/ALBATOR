@@ -10,13 +10,39 @@ import subprocess
 import yaml
 import json
 import time
+import logging
 from typing import Dict, List, Any, Tuple, Optional
 from pathlib import Path
+
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 from preflight import run_preflight
 
-# Add lib directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
-from logger import get_logger, log_operation_start, log_operation_success, log_operation_failure
+try:
+    # Add lib directory to path for imports when available in legacy layouts.
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
+    from logger import get_logger, log_operation_start, log_operation_success, log_operation_failure
+except Exception:
+    def get_logger(name: str):
+        logger = logging.getLogger(name)
+        if not logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        return logger
+
+    def log_operation_start(name: str):
+        logging.getLogger("test_framework").info("START: %s", name)
+
+    def log_operation_success(name: str, details: Any = None):
+        logging.getLogger("test_framework").info("SUCCESS: %s %s", name, details or "")
+
+    def log_operation_failure(name: str, message: str, details: Any = None):
+        logging.getLogger("test_framework").error("FAIL: %s %s %s", name, message, details or "")
 
 class TestResult:
     """Represents the result of a test"""
@@ -205,10 +231,12 @@ class AlbatorTestFramework:
                 f"dependency_{dep}"
             ))
         
-        # Test macOS version
+        # Test macOS version against configured minimum policy.
+        min_version = str(self.config.get('preflight', {}).get('min_macos_version', '26.3'))
+        expected_major = min_version.split('.')[0]
         tests.append(self.verify_setting(
             "sw_vers -productVersion",
-            "15",  # Should be macOS 15.x
+            expected_major,
             "macos_version"
         ))
         
