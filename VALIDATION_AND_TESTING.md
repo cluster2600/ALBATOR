@@ -39,6 +39,7 @@ Checks include:
 - rules/config presence
 - background security improvements settings
 - macOS 26.3 output signatures
+- config schema validation and script permission checks (`doctor`)
 
 ### 3. Unified CLI wrapper passthrough
 ```bash
@@ -73,6 +74,15 @@ Expected:
 - failing checks are reported explicitly
 - mutating script execution tests run only when explicitly requested
 
+### 6. Enhanced and web optional health checks
+```bash
+python3 albator_enhanced.py --help
+python3 -c "import web.app as w; print(w.OPTIONAL_BACKEND_AVAILABLE, w.SOCKETIO_AVAILABLE)"
+```
+Expected:
+- enhanced CLI still starts even when optional `lib/*` modules are missing
+- web module imports with fallback backend mode when optional modules are absent
+
 ## Configuration Knobs Used In Validation
 
 ### `config/albator.yaml`
@@ -85,6 +95,7 @@ preflight:
 ### Environment variables
 - `MIN_MACOS_VERSION`: minimum version for `tests/test_security.sh` (default: `26.3`)
 - `STRICT_OFFLINE`: when `true`, `apple_updates.sh --offline` exits if cache is missing
+- `ALBATOR_LOG_FORMAT`: set to `json` for structured script logs
 
 ## Interpretation Guidance
 - A failing mutating command without sudo is expected when preflight enforces privilege checks.

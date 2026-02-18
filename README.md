@@ -8,13 +8,13 @@ Albator is a macOS hardening toolkit that combines shell-based security scripts 
 
 - Core hardening scripts: `privacy.sh`, `firewall.sh`, `encryption.sh`, `app_security.sh`
 - Security intelligence scripts: `cve_fetch.sh`, `apple_updates.sh`
-- Legacy orchestrator: `albator.sh` (strictly checks for macOS 15.x)
+- Legacy orchestrator: `albator.sh` (now enforces configurable min macOS policy from `config/albator.yaml`)
 - Unified Python CLI: `albator_cli.py` with preflight and script passthrough
 - Validation assets: `tests/test_security.sh`, `tests/test_framework.py`, `tests/test_core_behaviors.py`
 
 ## Version Notes
 
-- The legacy entrypoint `albator.sh` is pinned to macOS 15.x by design.
+- The legacy entrypoint `albator.sh` now reads `preflight.min_macos_version` and `preflight.enforce_min_version`.
 - Current preflight policy defaults to a minimum macOS version of `26.3` via config and test defaults.
 - If you use modern flows, run `albator_cli.py preflight` first and follow its output.
 
@@ -109,7 +109,7 @@ Relevant preflight keys in `config/albator.yaml`:
 ```mermaid
 flowchart TD
     U["User"] --> C["albator_cli.py (recommended entrypoint)"]
-    U --> L["albator.sh (legacy, macOS 15.x check)"]
+    U --> L["albator.sh (legacy orchestrator, configurable version policy)"]
 
     C --> P["preflight.py"]
     C --> S1["privacy.sh"]
@@ -155,6 +155,7 @@ flowchart TD
 - Security policy and disclosure process: `SECURITY.md`
 - Validation/testing reference: `VALIDATION_AND_TESTING.md`
 - Core-vs-optional component map: `CORE_VS_OPTIONAL.md`
+- Full implementation notes (2026-02-18 pass): `IMPLEMENTATION_NOTES_2026-02-18.md`
 - Change history: `CHANGELOG.md`
 
 ## Contributing

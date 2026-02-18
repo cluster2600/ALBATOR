@@ -7,10 +7,17 @@ All notable changes to this project are documented in this file.
 ### Added
 - Added `SECURITY.md` with vulnerability disclosure policy and supported versions.
 - Added refreshed architecture diagram in `README.md`.
+- Added consolidated `doctor` diagnostics command to `albator_cli.py`.
+- Added `config/profiles/core_only.yaml` for minimal supported release scope.
+- Added CI optional-health smoke checks for enhanced/web paths.
+- Added `IMPLEMENTATION_NOTES_2026-02-18.md` documenting all current improvements.
 
 ### Changed
 - Rewrote `README.md` to align documentation with the current repository scope and command behavior.
 - Pruned redundant markdown files and updated script/documentation references.
+- Updated `tests/test_framework.py` to separate non-mutating default checks from privileged/mutating modes.
+- Updated `albator.sh` to use configurable minimum macOS policy from `config/albator.yaml`.
+- Updated shell script runtime behavior with structured logging support and explicit status signaling.
 
 ### Fixed
 - Fixed CLI passthrough behavior so wrapped script flags are forwarded correctly.
@@ -20,6 +27,7 @@ All notable changes to this project are documented in this file.
 - Fixed `apple_updates.sh --offline` behavior to degrade gracefully when cache is absent (with optional strict mode).
 - Fixed test/version policy wiring in `tests/test_security.sh` via configurable `MIN_MACOS_VERSION`.
 - Added and enforced minimum macOS preflight policy (`26.3`) with background security update checks.
+- Hardened `web/app.py` status probes to avoid interactive `sudo` and surface elevation hints.
 
 ## [v3.0.1] - 2026-02-18
 
