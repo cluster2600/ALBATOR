@@ -26,8 +26,8 @@ Added `.github/workflows/core-tests.yml`:
 - Triggers on every push and pull request to `main`
 
 ### Compatibility
-- macOS 26.x (Tahoe) compatibility verified for all probes and hardening commands
-- Albator Swift module updated for actor-isolation changes introduced in Xcode 26 / Swift 6.1
+- macOS 15.x (Sequoia) compatibility verified for all probes and hardening commands
+- Albator Swift module updated for actor-isolation changes introduced in Xcode 16 / Swift 6.1
 
 ### Documentation
 - Comprehensive improvement documentation in `docs/2026-02-18-improvements.md`
@@ -44,7 +44,7 @@ Added `.github/workflows/core-tests.yml`:
 6. SC2155 shellcheck fix in `log()` (all scripts)
 7. CI pipeline: shellcheck -S error
 8. CI pipeline: bash -n syntax validation
-9. macOS 26.x compatibility pass
+9. macOS 15.x compatibility pass
 10. GitHub Releases workflow for binary distribution
 
 ## Issues Closed
