@@ -1,43 +1,42 @@
 # Changelog
 
-## [🎉 Eureka] Release 0.9 (28/05/2025)
-- Comprehensive release of Albator version 0.9
-- Milestone achievement of enterprise-grade macOS security hardening framework
-- Complete implementation of Phase 3 and Phase 4 features
-- Unified CLI and integration platform
-- Advanced security, compliance, and threat detection capabilities
-- Enterprise-level profile and fleet management
-- Machine learning-powered security intelligence
+All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
-### eureka
-- **PROJECT DOCUMENTATION UPDATED**: Updated NEXT_IMPROVEMENTS.md and README.md to reflect completed features
-  - **NEXT_IMPROVEMENTS.md**: Marked all completed Phase 3 and Phase 4 features as done
-    - Marked completed: Enterprise Compliance features (NIST 800-53, CIS, SOC 2)
-    - Marked completed: Advanced Testing and Validation features
-    - Marked completed: API Development (REST, GraphQL, webhooks)
-    - Marked completed: Zero Trust and Threat Detection systems
-    - Marked completed: Machine Learning Integration
-    - Marked completed: Executive Dashboards and Analytics
-    - Marked completed: Cloud Integration and SaaS features
-    - Marked completed: CLI Enhancements (auto-completion, shell, batch, plugins)
-    - Marked completed: GUI Development (web interface)
-    - Marked completed: Configuration Management Integrations (Ansible, Chef, Terraform, K8s)
-  - **README.md**: Comprehensive update with all new enterprise features
-    - Added Advanced Security Features section detailing Zero Trust and Threat Detection
-    - Added Testing and Validation section with automated testing capabilities
-    - Added Cloud and SaaS Features section with multi-tenant architecture details
-    - Updated Enterprise Features with API Server, GraphQL, and Config Management
-    - Enhanced CLI usage examples with new commands (shell, batch, plugin, setup-completion)
-    - Documented Machine Learning predictions and Executive Dashboard capabilities
-  - **Remaining Items**: Only a few items remain incomplete:
-    - Dynamic configuration updates at runtime
-    - Centralized logging aggregation
-    - Policy enforcement engine
-    - CI/CD integration testing
-    - Real-time security monitoring
-    - Puppet module creation
-    - Automated ML policy optimization
+### Added
+- Added `SECURITY.md` with vulnerability disclosure policy and supported versions.
+- Added refreshed architecture diagram in `README.md`.
 
-[Rest of the previous CHANGELOG.md content continues...]
+### Changed
+- Rewrote `README.md` to align documentation with the current repository scope and command behavior.
+- Pruned redundant markdown files and updated script/documentation references.
+
+### Fixed
+- Fixed CLI passthrough behavior so wrapped script flags are forwarded correctly.
+- Improved CLI error diagnostics to include captured subprocess output.
+- Fixed `tests/test_framework.py` import-path resilience for local runs.
+- Fixed `privacy.sh` backup-path handling for absolute preference domains.
+- Fixed `apple_updates.sh --offline` behavior to degrade gracefully when cache is absent (with optional strict mode).
+- Fixed test/version policy wiring in `tests/test_security.sh` via configurable `MIN_MACOS_VERSION`.
+- Added and enforced minimum macOS preflight policy (`26.3`) with background security update checks.
+
+## [v3.0.1] - 2026-02-18
+
+### Added
+- Added preflight command and automatic preflight gating for mutating operations.
+- Added CI checks for lint/static checks and core behavior tests.
+- Added macOS 26.3 profile pack and version-aware baseline filtering support.
+
+### Fixed
+- Hardened fix execution safety and expanded behavior tests.
+
+## [v0.9] - 2025-05-28
+
+### Added
+- Initial broad project release combining Bash hardening scripts and Python tooling.
+- Early unified CLI and advanced feature scaffolding.
+
+---
+
+For security-specific reporting and handling guidelines, see `SECURITY.md`.
