@@ -75,7 +75,7 @@ graph TD
     F --> F2[test_security.sh]
     F --> F3[test_framework.py]
     
-    G --> G1[albator_config.yaml]
+    G --> G1[config/albator.yaml]
     G --> G2[rules/]
     G --> G3[includes/]
     

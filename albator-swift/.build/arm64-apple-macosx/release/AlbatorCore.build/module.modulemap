@@ -1,4 +1,0 @@
-module AlbatorCore {
-    header "/Users/L110889/projects/ALBATOR/albator-swift/.build/arm64-apple-macosx/release/AlbatorCore.build/AlbatorCore-Swift.h"
-    requires objc
-}

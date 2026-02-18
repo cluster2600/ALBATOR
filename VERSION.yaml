@@ -1,0 +1,5 @@
+platform: "macOS"
+os: "26.3"
+version: "3.0.1"
+last_updated: "2026-02-18"
+status: "active"

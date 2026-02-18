@@ -72,6 +72,9 @@ secrets.yaml
 *.app/
 *.ipa
 *.xcarchive
+albator-swift/.build/
+albator-swift/*.zip
+albator-swift/dist/
 
 # Dependency directories
 node_modules/
