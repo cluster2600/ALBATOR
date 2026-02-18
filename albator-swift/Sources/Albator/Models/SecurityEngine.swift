@@ -45,6 +45,7 @@ public struct SecurityActivity: Identifiable, Codable {
     }
 }
 
+@MainActor
 public final class SecurityEngine: ObservableObject {
     public static let shared = SecurityEngine()
 
@@ -72,7 +73,10 @@ public final class SecurityEngine: ObservableObject {
         Timer.publish(every: 60, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                Task { await self?.refreshFromSystemProbe(reason: "periodic") }
+                Task { [weak self] in
+                    guard let self else { return }
+                    await self.refreshFromSystemProbe(reason: "periodic")
+                }
             }
             .store(in: &cancellables)
     }

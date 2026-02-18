@@ -175,8 +175,8 @@ Validation run results (post-fix):
 - Added deterministic Swift release packaging script:
   - `albator-swift/build_release_binaries.sh`
 - Expanded `.github/workflows/release-artifacts.yml` to:
-  - build `Albator-Swift` + `Albator-SwiftGUI` on `macos-13` (`x86_64`) and `macos-14` (`arm64`)
-  - package binaries as architecture-specific `.tar.gz` bundles
+  - build `Albator-Swift` + `Albator-SwiftGUI` on `macos-14` (`arm64`)
+  - package binaries as release `.tar.gz` bundles
   - generate SHA-256 checksums for each package
   - upload source archive + checksum
   - publish all release files to the GitHub Release tied to the pushed `v*` tag

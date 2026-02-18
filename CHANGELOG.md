@@ -32,7 +32,7 @@ All notable changes to this project are documented in this file.
 - Refactored `albator-swift` package into shared `AlbatorCore` with split CLI/GUI targets.
 - Updated `albator-swift` build/demo/report scripts and README to match real SwiftPM artifacts.
 - Upgraded `albator-swift` dashboard/report pipeline to include macOS 26.3 baseline + security-data status checks.
-- Expanded release pipeline (`.github/workflows/release-artifacts.yml`) to publish GitHub Releases with macOS x86_64 + arm64 Swift binaries and source archive checksums.
+- Expanded release pipeline (`.github/workflows/release-artifacts.yml`) to publish GitHub Releases with macOS arm64 Swift binaries and source archive checksums.
 - Updated root and Swift README files with end-to-end tag-based binary publishing instructions.
 
 ### Fixed

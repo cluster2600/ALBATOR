@@ -38,6 +38,7 @@ struct AlbatorApp: App {
 }
 
 // MARK: - App Delegate
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         Logger.shared.info("Albator Swift application launched")

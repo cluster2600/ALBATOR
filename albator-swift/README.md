@@ -40,7 +40,6 @@ Artifacts:
 This repository publishes macOS binary archives on Git tags like `v3.0.2`.
 
 Produced artifacts:
-- `albator-swift-vX.Y.Z-macos-x86_64.tar.gz`
 - `albator-swift-vX.Y.Z-macos-arm64.tar.gz`
 - checksum files (`.sha256`) for each archive
 - source archive (`albator-vX.Y.Z.tar.gz`) + checksum
@@ -53,7 +52,7 @@ git push origin v3.0.2
 ```
 
 GitHub Actions workflow `.github/workflows/release-artifacts.yml` will:
-- build Swift binaries on `macos-13` (x86_64) and `macos-14` (arm64)
+- build Swift binaries on `macos-14` (arm64)
 - package binaries with build metadata
 - generate SHA-256 checksums
 - create/update the GitHub Release for that tag and upload files

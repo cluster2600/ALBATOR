@@ -112,7 +112,6 @@ Relevant preflight keys in `config/albator.yaml`:
 Albator now includes automated tag-based release publishing with macOS Swift binaries.
 
 When a tag matching `v*` is pushed (example: `v3.0.2`), workflow `.github/workflows/release-artifacts.yml` builds and publishes:
-- `albator-swift-vX.Y.Z-macos-x86_64.tar.gz`
 - `albator-swift-vX.Y.Z-macos-arm64.tar.gz`
 - `*.sha256` checksum files for each artifact
 - source archive `albator-vX.Y.Z.tar.gz` + checksum

@@ -22,9 +22,12 @@ public final class ReportGenerator {
 
     private func createReport() async -> SecurityReport {
         let snapshot = await SecurityEngine.shared.refreshFromSystemProbe(reason: "report")
+        let engineState = await MainActor.run {
+            (SecurityEngine.shared.recentActivity, SecurityEngine.shared.riskScore)
+        }
         let systemInfo = gatherSystemInformation(using: snapshot)
-        let securityStatus = gatherSecurityStatus(using: snapshot)
-        let recentActivity = SecurityEngine.shared.recentActivity
+        let securityStatus = gatherSecurityStatus(using: snapshot, overallRiskScore: engineState.1)
+        let recentActivity = engineState.0
 
         return SecurityReport(
             generatedAt: Date(),
@@ -52,7 +55,7 @@ public final class ReportGenerator {
         )
     }
 
-    private func gatherSecurityStatus(using snapshot: SystemSecuritySnapshot) -> SecurityStatusReport {
+    private func gatherSecurityStatus(using snapshot: SystemSecuritySnapshot, overallRiskScore: Double) -> SecurityStatusReport {
         let remoteLogin = commandOutput(["/usr/sbin/systemsetup", "-getremotelogin"]) ?? "unknown"
         let bluetoothSharing = commandOutput(["/usr/bin/defaults", "read", "com.apple.Bluetooth", "PrefKeyServicesEnabled"]) ?? "unknown"
 
@@ -63,7 +66,7 @@ public final class ReportGenerator {
             sipEnabled: snapshot.sipStatus == .secure,
             remoteLoginDisabled: remoteLogin.lowercased().contains("off"),
             bluetoothSharingDisabled: bluetoothSharing == "0",
-            overallRiskScore: SecurityEngine.shared.riskScore,
+            overallRiskScore: overallRiskScore,
             baselineVersion: snapshot.minimumBaselineVersion,
             currentMacOSVersion: snapshot.macosVersion,
             baselineCompliant: snapshot.baselineStatus == .secure,
