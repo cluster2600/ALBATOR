@@ -1,0 +1,29 @@
+profile:
+  name: core_only
+  display_name: "Core-Only Release Profile"
+  description: "Minimal supported profile that excludes optional enhanced/web dependency stacks."
+  scope:
+    includes:
+      - albator_cli.py
+      - preflight.py
+      - main.py
+      - rule_handler.py
+      - utils.py
+      - privacy.sh
+      - firewall.sh
+      - encryption.sh
+      - app_security.sh
+      - cve_fetch.sh
+      - apple_updates.sh
+      - reporting.sh
+      - rules/
+      - includes/
+      - config/albator.yaml
+      - VERSION.yaml
+    excludes:
+      - albator_enhanced.py advanced module integrations
+      - web/ advanced integrations requiring lib/*
+      - albator-swift/ runtime guarantees
+  support_boundary:
+    guaranteed: true
+    note: "Use this profile for predictable deployments and CI baselines."

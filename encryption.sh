@@ -112,6 +112,7 @@ enable_filevault() {
     # Check if already enabled
     if check_filevault_status; then
         show_success "FileVault is already enabled"
+        record_noop "FileVault already enabled"
         return 0
     fi
     
@@ -128,8 +129,10 @@ enable_filevault() {
     # Try different methods based on macOS version and configuration
     if sudo fdesetup enable -user "$(whoami)" 2>>"$LOG_FILE"; then
         show_success "FileVault enable command executed successfully"
+        record_rollback_change "filevault" "enabled via user-specific command"
     elif sudo fdesetup enable 2>>"$LOG_FILE"; then
         show_success "FileVault enable command executed successfully (fallback method)"
+        record_rollback_change "filevault" "enabled via fallback command"
     else
         show_error "Failed to enable FileVault"
         ((errors++))
@@ -159,6 +162,7 @@ configure_recovery_key() {
     
     if [[ "$recovery_key_info" == *"recovery key"* ]]; then
         show_success "Recovery key is configured"
+        record_noop "Recovery key already configured"
         
         # macOS 15.5: Enhanced recovery key security
         show_progress "Applying macOS 15.5 recovery key security enhancements..."
@@ -297,6 +301,7 @@ main() {
     # Initialize logging
     mkdir -p "$(dirname "$LOG_FILE")"
     log "INFO" "Starting encryption configuration script"
+    init_script_state
     
     # Check if running on macOS 15.x
     local macos_version
@@ -342,12 +347,12 @@ main() {
     if [[ $total_errors -eq 0 ]]; then
         show_success "Encryption configuration completed successfully!"
         log "INFO" "Encryption configuration completed successfully"
-        exit 0
+        exit_with_status 0
     else
         show_error "Encryption configuration completed with $total_errors errors"
         show_error "Check log file: $LOG_FILE"
         log "ERROR" "Encryption configuration completed with $total_errors errors"
-        exit 1
+        exit_with_status "$total_errors"
     fi
 }
 

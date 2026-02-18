@@ -11,12 +11,83 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Logging function
+_json_escape() {
+    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+}
+
 log() {
     local level=$1
     shift
     local message="$*"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] [$level] $message" | tee -a "$LOG_FILE"
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    local logfile="${LOG_FILE:-/tmp/albator.log}"
+    local format="${ALBATOR_LOG_FORMAT:-text}"
+
+    if [[ "$format" == "json" ]]; then
+        local payload
+        payload="{\"timestamp\":\"$timestamp\",\"level\":\"$(_json_escape "$level")\",\"script\":\"$(_json_escape "${SCRIPT_NAME:-unknown}")\",\"message\":\"$(_json_escape "$message")\"}"
+        echo "$payload" | tee -a "$logfile"
+    else
+        echo "[$timestamp] [$level] $message" | tee -a "$logfile"
+    fi
+}
+
+init_script_state() {
+    ALBATOR_CHANGES=0
+    ALBATOR_NOOP_HINTS=0
+    local state_dir="${ALBATOR_STATE_DIR:-/tmp/albator_state}"
+    mkdir -p "$state_dir"
+    ROLLBACK_META_FILE="$state_dir/${SCRIPT_NAME:-script}_rollback_$(date +%Y%m%d_%H%M%S).json"
+    cat > "$ROLLBACK_META_FILE" <<EOF
+{"script":"${SCRIPT_NAME:-unknown}","started_at":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")","changes":[]}
+EOF
+}
+
+record_rollback_change() {
+    local component="$1"
+    local detail="$2"
+    ALBATOR_CHANGES=$((ALBATOR_CHANGES + 1))
+    if command -v jq >/dev/null 2>&1; then
+        local tmp_file="${ROLLBACK_META_FILE}.tmp"
+        jq --arg component "$component" --arg detail "$detail" --arg ts "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+           '.changes += [{"component":$component,"detail":$detail,"timestamp":$ts}]' \
+           "$ROLLBACK_META_FILE" > "$tmp_file" && mv "$tmp_file" "$ROLLBACK_META_FILE"
+    fi
+}
+
+record_noop() {
+    local detail="$1"
+    ALBATOR_NOOP_HINTS=$((ALBATOR_NOOP_HINTS + 1))
+    log "INFO" "No-op: $detail"
+}
+
+finalize_script_state() {
+    local script_status="$1"
+    if command -v jq >/dev/null 2>&1; then
+        local tmp_file="${ROLLBACK_META_FILE}.tmp"
+        jq --arg status "$script_status" --arg finished "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+           '.status = $status | .finished_at = $finished' \
+           "$ROLLBACK_META_FILE" > "$tmp_file" && mv "$tmp_file" "$ROLLBACK_META_FILE"
+    fi
+}
+
+exit_with_status() {
+    local errors="$1"
+    if [[ "$errors" -ne 0 ]]; then
+        finalize_script_state "failed"
+        exit 1
+    fi
+    if [[ "${DRY_RUN:-false}" == "true" ]]; then
+        finalize_script_state "dry_run"
+        exit 0
+    fi
+    if [[ "${ALBATOR_CHANGES:-0}" -eq 0 ]]; then
+        finalize_script_state "already_compliant"
+        exit 10
+    fi
+    finalize_script_state "applied_changes"
+    exit 0
 }
 
 # Progress indicator

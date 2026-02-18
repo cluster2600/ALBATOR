@@ -43,3 +43,24 @@ jobs:
 
       - name: Run core behavior tests
         run: python -m unittest tests/test_core_behaviors.py -v
+
+  optional-health:
+    runs-on: ubuntu-latest
+    needs: lint-static
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install runtime deps
+        run: pip install -r requirements.txt
+
+      - name: Enhanced CLI help smoke test
+        run: python albator_enhanced.py --help
+
+      - name: Web app import smoke test
+        run: python -c "import web.app as w; print('web_import_ok', w.OPTIONAL_BACKEND_AVAILABLE, w.SOCKETIO_AVAILABLE)"

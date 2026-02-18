@@ -50,6 +50,13 @@ apply_firewall_setting() {
         show_warning "DRY RUN: Would run: sudo $FIREWALL_CMD $setting_flag $setting_value"
         return 0
     fi
+    local pre_value
+    pre_value=$(sudo "$FIREWALL_CMD" "$verification_flag" 2>/dev/null || echo "UNKNOWN")
+    if [[ "$pre_value" == *"$expected_output"* ]]; then
+        show_success "$description already compliant"
+        record_noop "$description already compliant"
+        return 0
+    fi
     
     # Apply the setting
     if sudo "$FIREWALL_CMD" "$setting_flag" "$setting_value" 2>>"$LOG_FILE"; then
@@ -59,6 +66,7 @@ apply_firewall_setting() {
         
         if [[ "$current_value" == *"$expected_output"* ]]; then
             show_success "$description"
+            record_rollback_change "$setting_flag" "$description"
             return 0
         else
             show_error "Failed to verify $description (expected: $expected_output, got: $current_value)"
@@ -79,6 +87,7 @@ check_firewall_status() {
     
     if [[ "$global_state" == *"enabled"* ]]; then
         show_success "Firewall is currently enabled"
+        record_noop "Firewall already enabled"
         return 0
     elif [[ "$global_state" == *"disabled"* ]]; then
         show_warning "Firewall is currently disabled"
@@ -236,6 +245,7 @@ main() {
     # Initialize logging
     mkdir -p "$(dirname "$LOG_FILE")"
     log "INFO" "Starting firewall configuration script"
+    init_script_state
     
     # Check if running on macOS 15.x
     local macos_version
@@ -274,12 +284,12 @@ main() {
     if [[ $total_errors -eq 0 ]]; then
         show_success "Firewall configuration completed successfully!"
         log "INFO" "Firewall configuration completed successfully"
-        exit 0
+        exit_with_status 0
     else
         show_error "Firewall configuration completed with $total_errors errors"
         show_error "Check log file: $LOG_FILE"
         log "ERROR" "Firewall configuration completed with $total_errors errors"
-        exit 1
+        exit_with_status "$total_errors"
     fi
 }
 

@@ -48,6 +48,18 @@ apply_setting() {
     
     # Backup current setting
     backup_setting "$domain" "$key"
+
+    local existing_value
+    if [[ "$use_sudo" == "true" ]]; then
+        existing_value=$(sudo defaults read "$domain" "$key" 2>/dev/null || echo "MISSING")
+    else
+        existing_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "MISSING")
+    fi
+    if [[ "$existing_value" == "$value" ]] || [[ "$existing_value" == "1" && "$value" == "true" ]] || [[ "$existing_value" == "0" && "$value" == "false" ]]; then
+        show_success "$description already compliant"
+        record_noop "$description already compliant"
+        return 0
+    fi
     
     # Apply setting
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -73,6 +85,7 @@ apply_setting() {
         
         if [[ "$current_value" == "$value" ]] || [[ "$current_value" == "1" && "$value" == "true" ]] || [[ "$current_value" == "0" && "$value" == "false" ]]; then
             show_success "$description"
+            record_rollback_change "$domain/$key" "$description"
             return 0
         else
             show_error "Failed to verify $description (expected: $value, got: $current_value)"
@@ -99,6 +112,7 @@ disable_service() {
     if sudo launchctl list | grep -q "$service_name" 2>/dev/null; then
         if sudo launchctl unload -w "/System/Library/LaunchDaemons/$service_name.plist" 2>>"$LOG_FILE"; then
             show_success "$description disabled"
+            record_rollback_change "$service_name" "$description disabled"
             return 0
         else
             show_error "Failed to disable $description"
@@ -106,6 +120,7 @@ disable_service() {
         fi
     else
         show_success "$description already disabled"
+        record_noop "$description already disabled"
         return 0
     fi
 }
@@ -131,6 +146,7 @@ configure_system_setting() {
             current_value=$(eval "$verification_cmd" 2>/dev/null || echo "FAILED")
             if [[ "$current_value" == *"$expected_output"* ]]; then
                 show_success "$description"
+                record_rollback_change "$description" "system setting configured"
                 return 0
             else
                 show_error "Failed to verify $description (expected: $expected_output, got: $current_value)"
@@ -180,6 +196,7 @@ configure_privacy() {
     if [[ "$DRY_RUN" != "true" ]]; then
         if sudo defaults write /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist ProgramArguments -array-add "-NoMulticastAdvertisements" 2>>"$LOG_FILE"; then
             show_success "mDNS multicast advertisements disabled"
+            record_rollback_change "com.apple.mDNSResponder" "disabled multicast advertisements"
         else
             show_error "Failed to disable mDNS multicast advertisements"
             ((errors++))
@@ -259,6 +276,7 @@ main() {
     # Initialize logging
     mkdir -p "$(dirname "$LOG_FILE")"
     log "INFO" "Starting privacy configuration script"
+    init_script_state
     
     # Check if running on macOS 15.x
     local macos_version
@@ -283,12 +301,12 @@ main() {
     if [[ $total_errors -eq 0 ]]; then
         show_success "Privacy configuration completed successfully!"
         log "INFO" "Privacy configuration completed successfully"
-        exit 0
+        exit_with_status 0
     else
         show_error "Privacy configuration completed with $total_errors errors"
         show_error "Check log file: $LOG_FILE"
         log "ERROR" "Privacy configuration completed with $total_errors errors"
-        exit 1
+        exit_with_status "$total_errors"
     fi
 }
 

@@ -263,8 +263,11 @@ class AlbatorTestFramework:
         
         return result
     
-    def run_all_tests(self, include_scripts: bool = False) -> Dict[str, Any]:
-        """Run all tests and return comprehensive results"""
+    def run_all_tests(self, include_privileged: bool = False, include_mutating: bool = False) -> Dict[str, Any]:
+        """Run tests and return comprehensive results.
+
+        Default mode is non-mutating and low-privilege only.
+        """
         log_operation_start("run_all_tests")
         
         self.results.clear()
@@ -274,24 +277,16 @@ class AlbatorTestFramework:
         self.logger.info("Running system integrity tests...")
         self.results.extend(self.test_system_integrity())
         
-        # Firewall tests
-        self.logger.info("Running firewall tests...")
-        self.results.extend(self.test_firewall_configuration())
-        
-        # Privacy tests
-        self.logger.info("Running privacy tests...")
-        self.results.extend(self.test_privacy_settings())
-        
-        # Encryption tests
-        self.logger.info("Running encryption tests...")
-        self.results.extend(self.test_encryption_settings())
-        
-        # App security tests
-        self.logger.info("Running app security tests...")
-        self.results.extend(self.test_app_security_settings())
-        
-        # Script execution tests (optional)
-        if include_scripts:
+        if include_privileged:
+            # Read-only privileged state verification tests
+            self.logger.info("Running privileged verification tests...")
+            self.results.extend(self.test_firewall_configuration())
+            self.results.extend(self.test_privacy_settings())
+            self.results.extend(self.test_encryption_settings())
+            self.results.extend(self.test_app_security_settings())
+
+        # Script execution tests (mutating)
+        if include_mutating:
             self.logger.info("Running script execution tests...")
             scripts = [
                 ("privacy.sh", "privacy_script"),
@@ -315,6 +310,10 @@ class AlbatorTestFramework:
             "failed": failed_tests,
             "success_rate": (passed_tests / total_tests * 100) if total_tests > 0 else 0,
             "preflight": preflight_summary,
+            "execution_mode": {
+                "include_privileged": include_privileged,
+                "include_mutating": include_mutating,
+            },
             "results": [
                 {
                     "test_name": r.test_name,
@@ -334,9 +333,9 @@ class AlbatorTestFramework:
         
         return summary
     
-    def generate_report(self, output_file: str = "test_report.json"):
+    def generate_report(self, output_file: str = "test_report.json", include_privileged: bool = False, include_mutating: bool = False):
         """Generate a detailed test report"""
-        summary = self.run_all_tests()
+        summary = self.run_all_tests(include_privileged=include_privileged, include_mutating=include_mutating)
         
         # Write JSON report
         with open(output_file, 'w') as f:
@@ -384,7 +383,9 @@ def main():
     parser = argparse.ArgumentParser(description="Albator Test Framework")
     parser.add_argument("--config", default="config/albator.yaml", help="Configuration file path")
     parser.add_argument("--output", default="test_report.json", help="Output report file")
-    parser.add_argument("--include-scripts", action="store_true", help="Include script execution tests")
+    parser.add_argument("--include-privileged", action="store_true", help="Include privileged read-only verification tests")
+    parser.add_argument("--include-mutating", action="store_true", help="Include mutating script execution tests")
+    parser.add_argument("--include-scripts", action="store_true", help="Deprecated alias for --include-mutating")
     parser.add_argument("--verbose", action="store_true", help="Verbose output")
     
     args = parser.parse_args()
@@ -397,7 +398,11 @@ def main():
     
     # Run tests and generate report
     try:
-        summary = framework.generate_report(args.output)
+        summary = framework.generate_report(
+            args.output,
+            include_privileged=args.include_privileged,
+            include_mutating=(args.include_mutating or args.include_scripts),
+        )
         
         # Exit with appropriate code
         if summary['failed'] > 0:

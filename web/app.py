@@ -123,6 +123,31 @@ rollback_manager = RollbackManager()
 current_operations = {}
 operation_logs = {}
 
+
+def _probe_command(cmd: List[str], expected_substring: str = "", requires_elevation_hint: str = "") -> Dict[str, Any]:
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        output = (result.stdout or result.stderr or "").strip()
+        lowered = output.lower()
+        requires_elevation = any(
+            token in lowered
+            for token in ["not privileged", "operation not permitted", "permission denied", "must be run as root"]
+        )
+        enabled = expected_substring.lower() in lowered if expected_substring else result.returncode == 0
+        return {
+            "enabled": enabled and result.returncode == 0,
+            "status": output or "No output",
+            "requires_elevation": requires_elevation,
+            "hint": requires_elevation_hint if requires_elevation else "",
+        }
+    except Exception as e:
+        return {
+            "enabled": False,
+            "status": str(e),
+            "requires_elevation": False,
+            "hint": "",
+        }
+
 class OperationRunner:
     """Handles running security operations with real-time updates"""
     
@@ -256,47 +281,23 @@ def get_system_status():
             'components': {}
         }
         
-        # Check firewall status
-        try:
-            firewall_output = subprocess.check_output([
-                'sudo', '/usr/libexec/ApplicationFirewall/socketfilterfw', '--getglobalstate'
-            ], text=True)
-            status['components']['firewall'] = {
-                'enabled': 'enabled' in firewall_output.lower(),
-                'status': firewall_output.strip()
-            }
-        except:
-            status['components']['firewall'] = {'enabled': False, 'status': 'Unknown'}
-        
-        # Check FileVault status
-        try:
-            filevault_output = subprocess.check_output(['fdesetup', 'status'], text=True)
-            status['components']['encryption'] = {
-                'enabled': 'FileVault is On' in filevault_output,
-                'status': filevault_output.strip()
-            }
-        except:
-            status['components']['encryption'] = {'enabled': False, 'status': 'Unknown'}
-        
-        # Check Gatekeeper status
-        try:
-            gatekeeper_output = subprocess.check_output(['spctl', '--status'], text=True)
-            status['components']['gatekeeper'] = {
-                'enabled': 'assessments enabled' in gatekeeper_output.lower(),
-                'status': gatekeeper_output.strip()
-            }
-        except:
-            status['components']['gatekeeper'] = {'enabled': False, 'status': 'Unknown'}
-        
-        # Check SIP status
-        try:
-            sip_output = subprocess.check_output(['csrutil', 'status'], text=True)
-            status['components']['sip'] = {
-                'enabled': 'enabled' in sip_output.lower(),
-                'status': sip_output.strip()
-            }
-        except:
-            status['components']['sip'] = {'enabled': False, 'status': 'Unknown'}
+        status['components']['firewall'] = _probe_command(
+            ['/usr/libexec/ApplicationFirewall/socketfilterfw', '--getglobalstate'],
+            expected_substring='enabled',
+            requires_elevation_hint='Run with elevated privileges for full firewall status.'
+        )
+        status['components']['encryption'] = _probe_command(
+            ['fdesetup', 'status'],
+            expected_substring='FileVault is On'
+        )
+        status['components']['gatekeeper'] = _probe_command(
+            ['spctl', '--status'],
+            expected_substring='assessments enabled'
+        )
+        status['components']['sip'] = _probe_command(
+            ['csrutil', 'status'],
+            expected_substring='enabled'
+        )
         
         return jsonify({
             'success': True,

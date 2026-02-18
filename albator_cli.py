@@ -20,6 +20,53 @@ def load_config(path: str = None):
     print("Configuration file not found. Using defaults.")
     return {}
 
+
+def _validate_config_schema(config: dict) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(config, dict):
+        return ["configuration root must be a mapping"]
+
+    required_top = {
+        "profiles": dict,
+        "preflight": dict,
+        "dependencies": dict,
+    }
+    for key, expected_type in required_top.items():
+        value = config.get(key)
+        if value is None:
+            errors.append(f"missing required top-level key: {key}")
+        elif not isinstance(value, expected_type):
+            errors.append(f"key '{key}' must be a {expected_type.__name__}")
+
+    preflight_cfg = config.get("preflight", {})
+    if isinstance(preflight_cfg, dict):
+        min_v = preflight_cfg.get("min_macos_version")
+        enforce = preflight_cfg.get("enforce_min_version")
+        if min_v is None:
+            errors.append("missing required key: preflight.min_macos_version")
+        elif not isinstance(min_v, str):
+            errors.append("preflight.min_macos_version must be a string")
+        if enforce is None:
+            errors.append("missing required key: preflight.enforce_min_version")
+        elif not isinstance(enforce, bool):
+            errors.append("preflight.enforce_min_version must be a boolean")
+
+    deps_cfg = config.get("dependencies", {})
+    if isinstance(deps_cfg, dict):
+        required = deps_cfg.get("required")
+        if required is None:
+            errors.append("missing required key: dependencies.required")
+        elif not isinstance(required, list) or not all(isinstance(x, str) for x in required):
+            errors.append("dependencies.required must be a list of strings")
+    return errors
+
+
+def _version_tuple(version: str):
+    try:
+        return tuple(int(part) for part in str(version).split("."))
+    except Exception:
+        return ()
+
 def _preflight_policy(config: dict) -> dict:
     preflight_cfg = config.get("preflight", {}) if isinstance(config, dict) else {}
     return {
@@ -125,6 +172,49 @@ def maybe_run_preflight(command: str, args: argparse.Namespace, config: dict) ->
         sys.exit(1)
 
 
+def run_doctor(config: dict, policy: dict, scripts: dict[str, str]) -> int:
+    checks = []
+
+    schema_errors = _validate_config_schema(config)
+    checks.append(("config_schema", len(schema_errors) == 0, "; ".join(schema_errors) if schema_errors else "valid"))
+
+    summary = run_preflight(
+        require_sudo=False,
+        require_rules=True,
+        min_macos_version=policy["min_macos_version"],
+        enforce_min_version=policy["enforce_min_version"],
+    )
+    checks.append(("preflight", summary["passed"], f"required_failures={summary['failed_required_count']}, warnings={summary['warning_count']}"))
+
+    for dep in config.get("dependencies", {}).get("required", ["curl", "jq"]):
+        present = subprocess.run(["which", dep], capture_output=True, text=True).returncode == 0
+        checks.append((f"dependency:{dep}", present, "present" if present else "missing"))
+
+    for name, script in scripts.items():
+        exists = os.path.exists(script)
+        executable = os.access(script, os.X_OK)
+        checks.append((f"script_exists:{name}", exists, script))
+        checks.append((f"script_executable:{name}", exists and executable, script))
+
+    current = subprocess.run(["sw_vers", "-productVersion"], capture_output=True, text=True, check=False)
+    current_version = (current.stdout or "unknown").strip()
+    meets = _version_tuple(current_version) >= _version_tuple(policy["min_macos_version"]) if current.returncode == 0 else False
+    checks.append(("min_macos_policy", meets, f"current={current_version}, min={policy['min_macos_version']}"))
+
+    print("Albator Doctor Report")
+    print("=====================")
+    failures = 0
+    for name, passed, detail in checks:
+        status = "PASS" if passed else "FAIL"
+        print(f"[{status}] {name}: {detail}")
+        if not passed:
+            failures += 1
+
+    print("---------------------")
+    print(f"Checks: {len(checks)}  Failures: {failures}")
+    return 0 if failures == 0 else 1
+
+
 def main():
     config = load_config()
 
@@ -144,6 +234,7 @@ def main():
     parser_preflight.add_argument("--require-rules", action="store_true", help="Require local rule YAML files")
     parser_preflight.add_argument("--min-macos-version", type=str, default=None, help="Minimum macOS version threshold (e.g., 26.3)")
     parser_preflight.add_argument("--enforce-min-version", action="store_true", help="Fail preflight when below minimum macOS version")
+    subparsers.add_parser("doctor", help="Run consolidated diagnostics (preflight, config schema, deps, script perms)")
 
     # Bash script commands
     bash_scripts = {
@@ -159,9 +250,16 @@ def main():
 
     args, unknown = parser.parse_known_args()
     policy = _preflight_policy(config)
+    schema_errors = _validate_config_schema(config)
 
-    if args.command in {"legacy", "preflight"} and unknown:
+    if args.command in {"legacy", "preflight", "doctor"} and unknown:
         parser.error(f"unrecognized arguments: {' '.join(unknown)}")
+
+    if schema_errors:
+        print("Configuration schema validation failed:", file=sys.stderr)
+        for err in schema_errors:
+            print(f"  - {err}", file=sys.stderr)
+        sys.exit(2)
 
     if args.command == "preflight":
         summary = run_preflight(
@@ -175,6 +273,9 @@ def main():
         else:
             print(format_preflight_report(summary))
         sys.exit(0 if summary["passed"] else 1)
+
+    if args.command == "doctor":
+        sys.exit(run_doctor(config, policy, bash_scripts))
 
     maybe_run_preflight(args.command, args, config)
 

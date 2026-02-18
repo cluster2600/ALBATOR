@@ -49,3 +49,9 @@ This file defines what is production-core in this repository and what is optiona
   - `python3 albator_cli.py preflight --json`
   - `python3 albator_cli.py <subcommand>`
 - Use optional components only if you explicitly need them and understand their dependency gaps.
+
+## Core-Only Release Profile
+
+- Profile file: `config/profiles/core_only.yaml`
+- Purpose: publish/support a minimal deterministic release boundary.
+- Recommendation: use this profile as the baseline for CI, packaging, and production hardening runs.

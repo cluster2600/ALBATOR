@@ -37,6 +37,7 @@ Run preflight checks:
 
 ```bash
 python3 albator_cli.py preflight --json
+python3 albator_cli.py doctor
 ```
 
 Run individual hardening scripts through the unified CLI:
@@ -96,6 +97,7 @@ Primary runtime config:
 macOS 26.3 profile pack:
 
 - `config/profiles/macos_26_3.yaml`
+- `config/profiles/core_only.yaml` (minimal supported release boundary)
 
 Relevant preflight keys in `config/albator.yaml`:
 
@@ -141,6 +143,8 @@ flowchart TD
 - Set `STRICT_OFFLINE=true` if you want offline mode to fail when no cache exists.
 - `tests/test_security.sh` minimum version is configurable with `MIN_MACOS_VERSION` (default `26.3`).
 - Script fixes are protected against shell injection by rejecting shell control characters.
+- Core hardening scripts return explicit status codes: `0` (applied/success), `10` (already compliant/no-op), `1` (error).
+- Set `ALBATOR_LOG_FORMAT=json` for structured shell-script log lines.
 
 ## Optional/Experimental Components
 

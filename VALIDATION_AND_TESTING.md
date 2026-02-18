@@ -29,6 +29,7 @@ Coverage includes:
 ### 2. Preflight validation
 ```bash
 python3 albator_cli.py preflight --json
+python3 albator_cli.py doctor
 python3 albator_cli.py preflight --require-sudo
 python3 albator_cli.py preflight --require-rules
 ```
@@ -63,11 +64,14 @@ Notes:
 ### 5. Python framework report generation
 ```bash
 python3 tests/test_framework.py --output /tmp/albator_test_report.json --verbose
+python3 tests/test_framework.py --include-privileged --output /tmp/albator_privileged_report.json
+python3 tests/test_framework.py --include-mutating --output /tmp/albator_mutating_report.json
 ```
 Expected:
 - framework starts without `logger` import failure
 - report includes preflight summary
 - failing checks are reported explicitly
+- mutating script execution tests run only when explicitly requested
 
 ## Configuration Knobs Used In Validation
 

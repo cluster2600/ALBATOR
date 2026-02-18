@@ -87,11 +87,13 @@ configure_gatekeeper() {
     
     if [[ "$current_status" == *"assessments enabled"* ]]; then
         show_success "Gatekeeper is already enabled"
+        record_noop "Gatekeeper already enabled"
     else
         show_progress "Enabling Gatekeeper..."
         
         if sudo spctl --master-enable 2>>"$LOG_FILE"; then
             show_success "Gatekeeper enabled successfully"
+            record_rollback_change "gatekeeper" "enabled"
         else
             show_error "Failed to enable Gatekeeper"
             ((errors++))
@@ -104,6 +106,7 @@ configure_gatekeeper() {
     # Enable assessment for all applications
     if sudo spctl --enable 2>>"$LOG_FILE"; then
         show_success "Gatekeeper assessment enabled for all applications"
+        record_rollback_change "gatekeeper_assessment" "enabled for all applications"
     else
         show_warning "Failed to enable Gatekeeper assessment"
         ((errors++))
@@ -393,6 +396,7 @@ main() {
     # Initialize logging
     mkdir -p "$(dirname "$LOG_FILE")"
     log "INFO" "Starting application security configuration script"
+    init_script_state
     
     # Check if running on macOS 15.x
     local macos_version
@@ -444,12 +448,12 @@ main() {
     if [[ $total_errors -eq 0 ]]; then
         show_success "Application security configuration completed successfully!"
         log "INFO" "Application security configuration completed successfully"
-        exit 0
+        exit_with_status 0
     else
         show_error "Application security configuration completed with $total_errors errors"
         show_error "Check log file: $LOG_FILE"
         log "ERROR" "Application security configuration completed with $total_errors errors"
-        exit 1
+        exit_with_status "$total_errors"
     fi
 }
 
