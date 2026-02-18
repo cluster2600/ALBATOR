@@ -102,6 +102,38 @@ Relevant preflight keys in `config/albator.yaml`:
 - `preflight.min_macos_version`
 - `preflight.enforce_min_version`
 
+## Architecture Overview
+
+```mermaid
+flowchart TD
+    U["User"] --> C["albator_cli.py (recommended entrypoint)"]
+    U --> L["albator.sh (legacy, macOS 15.x check)"]
+
+    C --> P["preflight.py"]
+    C --> S1["privacy.sh"]
+    C --> S2["firewall.sh"]
+    C --> S3["encryption.sh"]
+    C --> S4["app_security.sh"]
+    C --> S5["cve_fetch.sh"]
+    C --> S6["apple_updates.sh"]
+    C --> M["main.py (legacy baseline tools)"]
+
+    L --> S1
+    L --> S2
+    L --> S3
+    L --> S4
+    L --> S5
+    L --> S6
+
+    T["tests/"] --> T1["tests/test_security.sh"]
+    T --> T2["tests/test_framework.py"]
+    T --> T3["tests/test_core_behaviors.py"]
+
+    O["Optional components"] --> E["albator_enhanced.py"]
+    O --> W["web/app.py + web/templates/"]
+    E -. "depends on missing lib/* modules in this checkout" .-> X["Not fully self-contained here"]
+```
+
 ## Notes and Limitations
 
 - Some actions require reboot or user interaction (for example FileVault workflows).
