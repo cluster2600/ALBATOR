@@ -7,8 +7,8 @@
 
 import Foundation
 
-class BackgroundTaskScheduler {
-    static let shared = BackgroundTaskScheduler()
+public class BackgroundTaskScheduler {
+    public static let shared = BackgroundTaskScheduler()
 
     private var securityScanTimer: Timer?
     private var cleanupTimer: Timer?
@@ -17,12 +17,12 @@ class BackgroundTaskScheduler {
         Logger.shared.info("Background task scheduler initialized")
     }
 
-    func scheduleSecurityScans() {
+    public func scheduleSecurityScans() {
         // Cancel existing timer if any
         securityScanTimer?.invalidate()
 
         // Schedule new security scan every hour
-        securityScanTimer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { [weak self] _ in
+        securityScanTimer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { _ in
             Task {
                 await SecurityEngine.shared.performComprehensiveScan()
             }
@@ -31,7 +31,7 @@ class BackgroundTaskScheduler {
         Logger.shared.info("Security scan scheduled every hour")
     }
 
-    func scheduleCleanupTasks() {
+    public func scheduleCleanupTasks() {
         // Cancel existing timer if any
         cleanupTimer?.invalidate()
 
@@ -43,7 +43,7 @@ class BackgroundTaskScheduler {
         Logger.shared.info("Cleanup task scheduled every 24 hours")
     }
 
-    func cancelAllTasks() {
+    public func cancelAllTasks() {
         securityScanTimer?.invalidate()
         cleanupTimer?.invalidate()
         securityScanTimer = nil

@@ -9,13 +9,13 @@ import Foundation
 import os.log
 
 // MARK: - Log Level
-enum LogLevel: String, CaseIterable {
+public enum LogLevel: String, CaseIterable {
     case debug = "Debug"
     case info = "Info"
     case warning = "Warning"
     case error = "Error"
 
-    var description: String {
+    public var description: String {
         switch self {
         case .debug: return "DEBUG"
         case .info: return "INFO"
@@ -35,8 +35,8 @@ enum LogLevel: String, CaseIterable {
 }
 
 // MARK: - Logger
-class Logger {
-    static let shared = Logger()
+public class Logger {
+    public static let shared = Logger()
 
     private let subsystem = "com.albator.security"
     private var loggers: [String: OSLog] = [:]
@@ -60,19 +60,19 @@ class Logger {
     }
 
     // MARK: - Public Logging Methods
-    func debug(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
+    public func debug(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
         log(message, level: .debug, category: category, file: file, function: function, line: line)
     }
 
-    func info(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
+    public func info(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
         log(message, level: .info, category: category, file: file, function: function, line: line)
     }
 
-    func warning(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
+    public func warning(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
         log(message, level: .warning, category: category, file: file, function: function, line: line)
     }
 
-    func error(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
+    public func error(_ message: String, category: String = "general", file: String = #file, function: String = #function, line: Int = #line) {
         log(message, level: .error, category: category, file: file, function: function, line: line)
     }
 
@@ -131,7 +131,7 @@ class Logger {
     }
 
     // MARK: - Log Retrieval
-    func getRecentLogs(limit: Int = 100) -> [String] {
+    public func getRecentLogs(limit: Int = 100) -> [String] {
         guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             return []
         }
@@ -147,7 +147,7 @@ class Logger {
         }
     }
 
-    func clearLogs() {
+    public func clearLogs() {
         guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             return
         }
@@ -162,13 +162,13 @@ class Logger {
     }
 
     // MARK: - Performance Logging
-    func logPerformance(_ operation: String, duration: TimeInterval, category: String = "performance") {
+    public func logPerformance(_ operation: String, duration: TimeInterval, category: String = "performance") {
         let message = "\(operation) completed in \(String(format: "%.3f", duration)) seconds"
         info(message, category: category)
     }
 
     // MARK: - Security Event Logging
-    func logSecurityEvent(_ event: String, details: [String: Any]? = nil, category: String = "security") {
+    public func logSecurityEvent(_ event: String, details: [String: Any]? = nil, category: String = "security") {
         var message = "Security Event: \(event)"
         if let details = details {
             message += " - Details: \(details)"
@@ -177,7 +177,7 @@ class Logger {
     }
 
     // MARK: - Error Logging with Context
-    func logError(_ error: Error, context: String? = nil, category: String = "error") {
+    public func logError(_ error: Error, context: String? = nil, category: String = "error") {
         var message = "Error: \(error.localizedDescription)"
         if let context = context {
             message = "\(context) - \(message)"

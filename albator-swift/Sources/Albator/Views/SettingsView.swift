@@ -7,11 +7,13 @@
 
 import SwiftUI
 
-struct SettingsView: View {
+public struct SettingsView: View {
     @EnvironmentObject var configManager: ConfigurationManager
     @State private var showingResetAlert = false
 
-    var body: some View {
+    public init() {}
+
+    public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 // Header

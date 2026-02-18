@@ -8,8 +8,8 @@
 import Foundation
 import CoreData
 
-class CoreDataManager {
-    static let shared = CoreDataManager()
+public class CoreDataManager {
+    public static let shared = CoreDataManager()
 
     lazy var persistentContainer: NSPersistentContainer = {
         // Create a simple in-memory store instead of requiring a model file
@@ -31,17 +31,17 @@ class CoreDataManager {
         return container
     }()
 
-    var context: NSManagedObjectContext {
+    public var context: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
 
     private init() {}
 
-    func setup() {
+    public func setup() {
         Logger.shared.info("Core Data setup completed (in-memory store)")
     }
 
-    func saveContext() {
+    public func saveContext() {
         if context.hasChanges {
             do {
                 try context.save()
@@ -52,7 +52,7 @@ class CoreDataManager {
         }
     }
 
-    func cleanup() {
+    public func cleanup() {
         saveContext()
         Logger.shared.info("Core Data cleanup completed")
     }

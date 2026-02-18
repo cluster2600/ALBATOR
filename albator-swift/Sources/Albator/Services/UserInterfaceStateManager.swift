@@ -8,20 +8,20 @@
 import Foundation
 import SwiftUI
 
-class UserInterfaceStateManager {
-    static let shared = UserInterfaceStateManager()
+public class UserInterfaceStateManager {
+    public static let shared = UserInterfaceStateManager()
 
     private let stateKey = "albator_ui_state"
 
-    @Published var selectedView: String = "dashboard"
-    @Published var sidebarCollapsed: Bool = false
-    @Published var windowSize: CGSize = CGSize(width: 1000, height: 700)
+    @Published public var selectedView: String = "dashboard"
+    @Published public var sidebarCollapsed: Bool = false
+    @Published public var windowSize: CGSize = CGSize(width: 1000, height: 700)
 
     private init() {
         loadState()
     }
 
-    func saveState() {
+    public func saveState() {
         let state: [String: Any] = [
             "selectedView": selectedView,
             "sidebarCollapsed": sidebarCollapsed,
@@ -49,7 +49,7 @@ class UserInterfaceStateManager {
         Logger.shared.debug("UI state loaded")
     }
 
-    func resetToDefaults() {
+    public func resetToDefaults() {
         selectedView = "dashboard"
         sidebarCollapsed = false
         windowSize = CGSize(width: 1000, height: 700)

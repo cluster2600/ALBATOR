@@ -1,33 +1,23 @@
-//
-//  SecurityEngine.swift
-//  Albator-Swift
-//
-//  Core security engine that manages all security scanning and monitoring
-//  functionality for the Albator macOS security hardening tool.
-//
-
 import Foundation
 import SwiftUI
 import Combine
 
-// MARK: - Security Status Enum
-enum SecurityStatus: String {
+public enum SecurityStatus: String {
     case secure = "Secure"
     case warning = "Warning"
     case critical = "Critical"
     case unknown = "Unknown"
 }
 
-// MARK: - Security Activity
-struct SecurityActivity: Identifiable, Codable {
-    let id = UUID()
-    let title: String
-    let timestamp: Date
-    let icon: String
-    let colorString: String
-    let details: String?
+public struct SecurityActivity: Identifiable, Codable {
+    public var id = UUID()
+    public let title: String
+    public let timestamp: Date
+    public let icon: String
+    public let colorString: String
+    public let details: String?
 
-    var color: Color {
+    public var color: Color {
         switch colorString {
         case "green": return .green
         case "red": return .red
@@ -38,7 +28,7 @@ struct SecurityActivity: Identifiable, Codable {
         }
     }
 
-    init(title: String, timestamp: Date, icon: String, color: Color, details: String? = nil) {
+    public init(title: String, timestamp: Date, icon: String, color: Color, details: String? = nil) {
         self.title = title
         self.timestamp = timestamp
         self.icon = icon
@@ -55,65 +45,39 @@ struct SecurityActivity: Identifiable, Codable {
     }
 }
 
-// MARK: - Security Engine
-class SecurityEngine: ObservableObject {
-    static let shared = SecurityEngine()
+public final class SecurityEngine: ObservableObject {
+    public static let shared = SecurityEngine()
 
-    @Published var isScanning = false
-    @Published var riskScore: Double = 0.0
-    @Published var firewallStatus: SecurityStatus = .unknown
-    @Published var encryptionStatus: SecurityStatus = .unknown
-    @Published var gatekeeperStatus: SecurityStatus = .unknown
-    @Published var recentActivity: [SecurityActivity] = []
+    @Published public var isScanning = false
+    @Published public var riskScore: Double = 0.0
+    @Published public var firewallStatus: SecurityStatus = .unknown
+    @Published public var encryptionStatus: SecurityStatus = .unknown
+    @Published public var gatekeeperStatus: SecurityStatus = .unknown
+    @Published public var sipStatus: SecurityStatus = .unknown
+    @Published public var baselineStatus: SecurityStatus = .unknown
+    @Published public var securityDataStatus: SecurityStatus = .unknown
+    @Published public var macosVersion: String = "unknown"
+    @Published public var minimumBaselineVersion: String = SystemSecurityProbe.defaultBaselineVersion()
+    @Published public var recentActivity: [SecurityActivity] = []
 
     private var cancellables = Set<AnyCancellable>()
-    private var scanTimer: Timer?
 
     private init() {
-        setupInitialState()
+        addActivity("Security engine initialized", icon: "gearshape.fill", color: .blue)
         startPeriodicUpdates()
-    }
-
-    private func setupInitialState() {
-        // Initialize with some sample data
-        recentActivity = [
-            SecurityActivity(
-                title: "Firewall scan completed",
-                timestamp: Date().addingTimeInterval(-300),
-                icon: "shield.fill",
-                color: .green,
-                details: "All firewall rules are properly configured"
-            ),
-            SecurityActivity(
-                title: "System update check",
-                timestamp: Date().addingTimeInterval(-600),
-                icon: "arrow.triangle.2.circlepath",
-                color: .blue,
-                details: "System is up to date"
-            ),
-            SecurityActivity(
-                title: "FileVault verification",
-                timestamp: Date().addingTimeInterval(-900),
-                icon: "lock.fill",
-                color: .green,
-                details: "FileVault is enabled and secure"
-            )
-        ]
-
-        // Simulate initial security status
-        updateSecurityStatus()
+        Task { await refreshFromSystemProbe(reason: "initial") }
     }
 
     private func startPeriodicUpdates() {
-        Timer.publish(every: 30, on: .main, in: .common)
+        Timer.publish(every: 60, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                self?.updateSecurityStatus()
+                Task { await self?.refreshFromSystemProbe(reason: "periodic") }
             }
             .store(in: &cancellables)
     }
 
-    func performComprehensiveScan() async {
+    public func performComprehensiveScan() async {
         guard !isScanning else { return }
 
         await MainActor.run {
@@ -121,36 +85,55 @@ class SecurityEngine: ObservableObject {
             addActivity("Starting comprehensive security scan", icon: "magnifyingglass", color: .blue)
         }
 
-        // Simulate scanning process
-        try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
+        await refreshFromSystemProbe(reason: "manual_scan")
 
         await MainActor.run {
-            updateSecurityStatus()
             addActivity("Comprehensive security scan completed", icon: "checkmark.circle.fill", color: .green)
             isScanning = false
         }
     }
 
-    func emergencyStop() {
+    public func emergencyStop() {
         isScanning = false
-        scanTimer?.invalidate()
-        scanTimer = nil
         addActivity("Emergency stop activated", icon: "exclamationmark.triangle.fill", color: .red)
     }
 
-    private func updateSecurityStatus() {
-        // Simulate security checks
-        firewallStatus = Bool.random() ? .secure : .warning
-        encryptionStatus = Bool.random() ? .secure : .warning
-        gatekeeperStatus = Bool.random() ? .secure : .warning
+    @discardableResult
+    public func refreshFromSystemProbe(reason: String) async -> SystemSecuritySnapshot {
+        let snapshot = await Task.detached(priority: .userInitiated) {
+            SystemSecurityProbe.shared.captureSnapshot(minimumBaselineVersion: SystemSecurityProbe.defaultBaselineVersion())
+        }.value
 
-        // Calculate risk score based on status
+        await MainActor.run {
+            self.minimumBaselineVersion = snapshot.minimumBaselineVersion
+            self.macosVersion = snapshot.macosVersion
+            self.firewallStatus = snapshot.firewallStatus
+            self.encryptionStatus = snapshot.fileVaultStatus
+            self.gatekeeperStatus = snapshot.gatekeeperStatus
+            self.sipStatus = snapshot.sipStatus
+            self.baselineStatus = snapshot.baselineStatus
+            self.securityDataStatus = snapshot.securityDataStatus
+            self.riskScore = self.calculateRiskScore(from: snapshot)
+            self.addActivity(
+                "Security snapshot updated",
+                icon: "shield.lefthalf.filled",
+                color: self.riskScore >= 80 ? .green : .orange,
+                details: "reason=\(reason), macOS=\(snapshot.macosVersion), baseline=\(snapshot.minimumBaselineVersion)"
+            )
+        }
+
+        return snapshot
+    }
+
+    private func calculateRiskScore(from snapshot: SystemSecuritySnapshot) -> Double {
         var score = 100.0
-        if firewallStatus != .secure { score -= 15 }
-        if encryptionStatus != .secure { score -= 20 }
-        if gatekeeperStatus != .secure { score -= 10 }
-
-        riskScore = max(0, min(100, score))
+        if snapshot.firewallStatus != .secure { score -= 20 }
+        if snapshot.fileVaultStatus != .secure { score -= 20 }
+        if snapshot.gatekeeperStatus != .secure { score -= 15 }
+        if snapshot.sipStatus != .secure { score -= 20 }
+        if snapshot.baselineStatus != .secure { score -= 10 }
+        if snapshot.securityDataStatus != .secure { score -= 15 }
+        return max(0, min(100, score))
     }
 
     private func addActivity(_ title: String, icon: String, color: Color, details: String? = nil) {
@@ -161,9 +144,8 @@ class SecurityEngine: ObservableObject {
             color: color,
             details: details
         )
-
         recentActivity.insert(activity, at: 0)
-        if recentActivity.count > 10 {
+        if recentActivity.count > 20 {
             recentActivity.removeLast()
         }
     }

@@ -7,17 +7,17 @@
 
 import Foundation
 
-class SecurityEventHandler {
-    static let shared = SecurityEventHandler()
+public class SecurityEventHandler {
+    public static let shared = SecurityEventHandler()
 
     private init() {}
 
-    func startHandling() {
+    public func startHandling() {
         Logger.shared.info("Security event handling started")
         // Set up event listeners and handlers
     }
 
-    func handleSecurityEvent(_ event: String, details: [String: Any]? = nil) {
+    public func handleSecurityEvent(_ event: String, details: [String: Any]? = nil) {
         Logger.shared.logSecurityEvent(event, details: details)
 
         // Handle different types of security events

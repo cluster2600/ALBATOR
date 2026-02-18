@@ -15,6 +15,7 @@ All notable changes to this project are documented in this file.
 - Added mocked script smoke harness under `tests/mocks/bin/` and `tests/test_scripts_smoke_mocked.sh`.
 - Added `DEPRECATIONS.md` with migration guidance.
 - Added release artifact workflow with checksum generation and optional cosign signing.
+- Added `albator-swift/Tests/AlbatorTests/SystemSecurityProbeTests.swift` for Swift baseline/probe validation.
 
 ### Changed
 - Rewrote `README.md` to align documentation with the current repository scope and command behavior.
@@ -27,6 +28,9 @@ All notable changes to this project are documented in this file.
 - Hardened web API session settings and added token/localhost API access controls.
 - Updated validation framework and shell test behavior to be environment-aware (sudo-gated checks skip/defer instead of hard-fail).
 - Updated mutating validation mode to deterministic script args (`--dry-run` / `--offline`) and non-mutating safety.
+- Refactored `albator-swift` package into shared `AlbatorCore` with split CLI/GUI targets.
+- Updated `albator-swift` build/demo/report scripts and README to match real SwiftPM artifacts.
+- Upgraded `albator-swift` dashboard/report pipeline to include macOS 26.3 baseline + security-data status checks.
 
 ### Fixed
 - Fixed CLI passthrough behavior so wrapped script flags are forwarded correctly.
@@ -41,6 +45,9 @@ All notable changes to this project are documented in this file.
 - Fixed `tests/test_security.sh` early exit caused by arithmetic + `set -e`.
 - Fixed `cve_fetch.sh` dry-run/offline summary parsing failures under `set -euo pipefail`.
 - Fixed brittle FileVault/Safari validation matchers for modern macOS command output variants.
+- Fixed `albator-swift` `swift build` failure caused by missing test target path.
+- Fixed `albator-swift` CLI report crash by disabling notification center usage in non-bundled CLI context.
+- Fixed `albator-swift` placeholder/random security state by implementing real system probes.
 
 ## [v3.0.1] - 2026-02-18
 

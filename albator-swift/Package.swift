@@ -1,5 +1,4 @@
 // swift-tools-version: 5.9
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -11,22 +10,32 @@ let package = Package(
     products: [
         .executable(
             name: "Albator-Swift",
-            targets: ["Albator-Swift"]
+            targets: ["AlbatorSwiftCLI"]
+        ),
+        .executable(
+            name: "Albator-SwiftGUI",
+            targets: ["AlbatorSwiftGUI"]
         )
     ],
     dependencies: [],
     targets: [
-        .executableTarget(
-            name: "Albator-Swift",
-            dependencies: [],
-            path: "Sources/Albator",
-            sources: ["main.swift"]
-        ),
         .target(
             name: "AlbatorCore",
             dependencies: [],
             path: "Sources/Albator",
-            exclude: ["main.swift"]
+            exclude: ["Albator-Swift.entitlements"]
+        ),
+        .executableTarget(
+            name: "AlbatorSwiftCLI",
+            dependencies: ["AlbatorCore"],
+            path: "Sources/AlbatorCLI",
+            sources: ["main.swift"]
+        ),
+        .executableTarget(
+            name: "AlbatorSwiftGUI",
+            dependencies: ["AlbatorCore"],
+            path: "Sources/AlbatorGUI",
+            sources: ["AlbatorApp.swift"]
         ),
         .testTarget(
             name: "AlbatorTests",

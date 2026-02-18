@@ -8,10 +8,12 @@
 
 import SwiftUI
 
-struct MainWindowView: View {
+public struct MainWindowView: View {
     @EnvironmentObject var securityEngine: SecurityEngine
     @EnvironmentObject var configManager: ConfigurationManager
     @State private var selectedView: NavigationItem = .dashboard
+
+    public init() {}
     
     enum NavigationItem: String, CaseIterable, Identifiable {
         case dashboard = "Dashboard"
@@ -35,7 +37,7 @@ struct MainWindowView: View {
         }
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationSplitView {
             // Sidebar
             List(NavigationItem.allCases, selection: $selectedView) { item in
@@ -98,12 +100,17 @@ struct SecurityDashboardView: View {
                     
                     Text("Real-time security status and monitoring")
                         .foregroundColor(.secondary)
+                    Text("macOS \(securityEngine.macosVersion) • Baseline \(securityEngine.minimumBaselineVersion)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
                 
                 // Security Status Cards
                 LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: 16),
+                    GridItem(.flexible(), spacing: 16),
                     GridItem(.flexible(), spacing: 16),
                     GridItem(.flexible(), spacing: 16),
                     GridItem(.flexible(), spacing: 16)
@@ -127,6 +134,27 @@ struct SecurityDashboardView: View {
                         status: securityEngine.gatekeeperStatus,
                         icon: "checkmark.shield.fill",
                         color: securityEngine.gatekeeperStatus == .secure ? .green : .red
+                    )
+
+                    SecurityStatusCard(
+                        title: "SIP",
+                        status: securityEngine.sipStatus,
+                        icon: "lock.shield.fill",
+                        color: securityEngine.sipStatus == .secure ? .green : .red
+                    )
+
+                    SecurityStatusCard(
+                        title: "Baseline",
+                        status: securityEngine.baselineStatus,
+                        icon: "checkmark.seal.fill",
+                        color: securityEngine.baselineStatus == .secure ? .green : .orange
+                    )
+
+                    SecurityStatusCard(
+                        title: "Sec Data",
+                        status: securityEngine.securityDataStatus,
+                        icon: "arrow.triangle.2.circlepath",
+                        color: securityEngine.securityDataStatus == .secure ? .green : .orange
                     )
                 }
                 .padding(.horizontal)
@@ -214,7 +242,9 @@ struct SecurityDashboardView: View {
                             icon: "doc.text",
                             color: .green
                         ) {
-                            // Generate report action
+                            Task {
+                                _ = await ReportGenerator.shared.generateComprehensiveReport()
+                            }
                         }
                         
                         QuickActionButton(

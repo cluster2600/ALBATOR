@@ -146,3 +146,26 @@ python3 tests/test_framework.py --include-mutating --output /tmp/albator_mutatin
 - Core scripts `privacy.sh`, `firewall.sh`, `encryption.sh`, `app_security.sh` now support dry-run validation without mandatory sudo when `ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO=true`.
 - `tests/test_security.sh` counter arithmetic was corrected to avoid premature exit under `set -e`.
 - `cve_fetch.sh` parsing and summary generation paths were hardened for `set -euo pipefail`.
+
+## 15. Albator Swift Remediation (Issues #18-#22)
+
+- Fixed Swift package validity and test wiring:
+  - repaired target layout and added real Swift tests under `albator-swift/Tests/AlbatorTests`.
+- Implemented real host security probing in Swift:
+  - firewall, FileVault, Gatekeeper, SIP, macOS version baseline, and security data update settings.
+- Added macOS 26.3-focused feature parity in Swift dashboard/CLI/report output:
+  - baseline compliance
+  - `ConfigDataInstall` / `CriticalUpdateInstall` status
+- Refactored `albator-swift` into shared `AlbatorCore` + split executable products:
+  - `Albator-Swift` (CLI)
+  - `Albator-SwiftGUI` (GUI)
+- Updated Swift scripts/docs to match actual outputs and removed stale `.app` assumptions.
+- Hardened notification behavior for CLI context to avoid non-bundled crash during report generation.
+
+Validation run results (post-fix):
+- `cd albator-swift && swift build --configuration release` ✅
+- `cd albator-swift && swift test` ✅
+- `cd albator-swift && ./build_swift_app.sh` ✅
+- `cd albator-swift && ./simple_cli_demo.sh` ✅
+- `cd albator-swift && ./demo_cli.sh` ✅
+- `cd albator-swift && ./test_reporting.sh` ✅

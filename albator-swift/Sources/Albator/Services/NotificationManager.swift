@@ -10,7 +10,7 @@ import UserNotifications
 import SwiftUI
 
 // MARK: - Notification Type
-enum NotificationType {
+public enum NotificationType {
     case securityAlert
     case scanComplete
     case systemUpdate
@@ -19,21 +19,28 @@ enum NotificationType {
 }
 
 // MARK: - Notification Manager
-class NotificationManager: ObservableObject {
-    static let shared = NotificationManager()
+public class NotificationManager: ObservableObject {
+    public static let shared = NotificationManager()
 
-    @Published var notificationsEnabled = true
-    @Published var pendingNotifications: [AlbatorNotification] = []
+    @Published public var notificationsEnabled = true
+    @Published public var pendingNotifications: [AlbatorNotification] = []
 
-    private let notificationCenter = UNUserNotificationCenter.current()
+    private let notificationCenter: UNUserNotificationCenter?
     private let notificationKey = "albator_notifications"
 
     private init() {
-        requestAuthorization()
+        if Bundle.main.bundleIdentifier != nil {
+            notificationCenter = UNUserNotificationCenter.current()
+            requestAuthorization()
+        } else {
+            notificationCenter = nil
+            notificationsEnabled = false
+        }
         loadPendingNotifications()
     }
 
-    func requestAuthorization() {
+    public func requestAuthorization() {
+        guard let notificationCenter else { return }
         notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
                 Logger.shared.error("Notification authorization failed: \(error.localizedDescription)")
@@ -45,14 +52,14 @@ class NotificationManager: ObservableObject {
         }
     }
 
-    func scheduleNotification(
+    public func scheduleNotification(
         title: String,
         body: String,
         type: NotificationType,
         delay: TimeInterval = 0,
         userInfo: [String: Any]? = nil
     ) {
-        guard notificationsEnabled else { return }
+        guard notificationsEnabled, let notificationCenter else { return }
 
         let content = UNMutableNotificationContent()
         content.title = title
@@ -113,7 +120,7 @@ class NotificationManager: ObservableObject {
         }
     }
 
-    func showImmediateNotification(
+    public func showImmediateNotification(
         title: String,
         body: String,
         type: NotificationType = .info
@@ -121,8 +128,8 @@ class NotificationManager: ObservableObject {
         scheduleNotification(title: title, body: body, type: type, delay: 0)
     }
 
-    func cancelNotification(identifier: String) {
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+    public func cancelNotification(identifier: String) {
+        notificationCenter?.removePendingNotificationRequests(withIdentifiers: [identifier])
 
         DispatchQueue.main.async {
             self.pendingNotifications.removeAll { $0.id == identifier }
@@ -130,9 +137,9 @@ class NotificationManager: ObservableObject {
         }
     }
 
-    func cancelAllNotifications() {
-        notificationCenter.removeAllPendingNotificationRequests()
-        notificationCenter.removeAllDeliveredNotifications()
+    public func cancelAllNotifications() {
+        notificationCenter?.removeAllPendingNotificationRequests()
+        notificationCenter?.removeAllDeliveredNotifications()
 
         DispatchQueue.main.async {
             self.pendingNotifications.removeAll()
@@ -140,7 +147,7 @@ class NotificationManager: ObservableObject {
         }
     }
 
-    func markNotificationAsRead(_ notification: AlbatorNotification) {
+    public func markNotificationAsRead(_ notification: AlbatorNotification) {
         DispatchQueue.main.async {
             if let index = self.pendingNotifications.firstIndex(where: { $0.id == notification.id }) {
                 self.pendingNotifications[index].isDelivered = true
@@ -163,11 +170,11 @@ class NotificationManager: ObservableObject {
     }
 
     // MARK: - Convenience Methods
-    func showSecurityAlert(title: String, body: String) {
+    public func showSecurityAlert(title: String, body: String) {
         showImmediateNotification(title: title, body: body, type: .securityAlert)
     }
 
-    func showScanComplete() {
+    public func showScanComplete() {
         showImmediateNotification(
             title: "Security Scan Complete",
             body: "Your system security scan has finished successfully.",
@@ -175,11 +182,11 @@ class NotificationManager: ObservableObject {
         )
     }
 
-    func showCriticalAlert(title: String, body: String) {
+    public func showCriticalAlert(title: String, body: String) {
         showImmediateNotification(title: title, body: body, type: .criticalAlert)
     }
 
-    func showSystemUpdateAvailable() {
+    public func showSystemUpdateAvailable() {
         showImmediateNotification(
             title: "System Updates Available",
             body: "Security updates are available for your system.",
@@ -189,20 +196,20 @@ class NotificationManager: ObservableObject {
 }
 
 // MARK: - Albator Notification Model
-struct AlbatorNotification: Identifiable, Codable {
-    let id: String
-    let title: String
-    let body: String
-    let type: NotificationType
-    let timestamp: Date
-    var isDelivered: Bool
+public struct AlbatorNotification: Identifiable, Codable {
+    public let id: String
+    public let title: String
+    public let body: String
+    public let type: NotificationType
+    public let timestamp: Date
+    public var isDelivered: Bool
 
     enum CodingKeys: String, CodingKey {
         case id, title, body, timestamp, isDelivered
         case typeString
     }
 
-    init(id: String, title: String, body: String, type: NotificationType, timestamp: Date, isDelivered: Bool) {
+    public init(id: String, title: String, body: String, type: NotificationType, timestamp: Date, isDelivered: Bool) {
         self.id = id
         self.title = title
         self.body = body
@@ -211,7 +218,7 @@ struct AlbatorNotification: Identifiable, Codable {
         self.isDelivered = isDelivered
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
@@ -229,7 +236,7 @@ struct AlbatorNotification: Identifiable, Codable {
         }
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(title, forKey: .title)

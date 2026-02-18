@@ -1,33 +1,26 @@
-//
-//  SystemMonitor.swift
-//  Albator-Swift
-//
-//  Monitors system security status and events.
-//
-
 import Foundation
 
-class SystemMonitor {
-    static let shared = SystemMonitor()
+public final class SystemMonitor {
+    public static let shared = SystemMonitor()
 
     private var isMonitoring = false
     private var monitoringTimer: Timer?
 
     private init() {}
 
-    func startMonitoring() {
+    public func startMonitoring() {
         guard !isMonitoring else { return }
 
         isMonitoring = true
         Logger.shared.info("System monitoring started")
+        performSystemCheck()
 
-        // Start periodic system checks
-        monitoringTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+        monitoringTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { [weak self] _ in
             self?.performSystemCheck()
         }
     }
 
-    func stopMonitoring() {
+    public func stopMonitoring() {
         isMonitoring = false
         monitoringTimer?.invalidate()
         monitoringTimer = nil
@@ -35,30 +28,21 @@ class SystemMonitor {
     }
 
     private func performSystemCheck() {
-        // Perform basic system security checks
-        checkFirewallStatus()
-        checkFileVaultStatus()
-        checkGatekeeperStatus()
-        checkSystemUpdates()
-    }
+        let snapshot = SystemSecurityProbe.shared.captureSnapshot(minimumBaselineVersion: SystemSecurityProbe.defaultBaselineVersion())
+        Logger.shared.info("System check completed: macOS=\(snapshot.macosVersion), baseline=\(snapshot.baselineStatus.rawValue), security_data=\(snapshot.securityDataStatus.rawValue)")
 
-    private func checkFirewallStatus() {
-        // In a real implementation, this would check actual firewall status
-        Logger.shared.debug("Firewall status check completed")
-    }
+        if snapshot.baselineStatus != .secure {
+            SecurityEventHandler.shared.handleSecurityEvent(
+                "baseline_noncompliant",
+                details: [
+                    "current": snapshot.macosVersion,
+                    "minimum": snapshot.minimumBaselineVersion,
+                ]
+            )
+        }
 
-    private func checkFileVaultStatus() {
-        // In a real implementation, this would check FileVault status
-        Logger.shared.debug("FileVault status check completed")
-    }
-
-    private func checkGatekeeperStatus() {
-        // In a real implementation, this would check Gatekeeper status
-        Logger.shared.debug("Gatekeeper status check completed")
-    }
-
-    private func checkSystemUpdates() {
-        // In a real implementation, this would check for system updates
-        Logger.shared.debug("System updates check completed")
+        if snapshot.securityDataStatus == .warning {
+            NotificationManager.shared.showSystemUpdateAvailable()
+        }
     }
 }

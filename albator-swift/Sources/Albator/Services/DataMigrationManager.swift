@@ -7,15 +7,15 @@
 
 import Foundation
 
-class DataMigrationManager {
-    static let shared = DataMigrationManager()
+public class DataMigrationManager {
+    public static let shared = DataMigrationManager()
 
     private let migrationKey = "albator_migration_version"
     private let currentVersion = "1.0.0"
 
     private init() {}
 
-    func performMigrationIfNeeded() {
+    public func performMigrationIfNeeded() {
         let lastVersion = UserDefaults.standard.string(forKey: migrationKey) ?? "0.0.0"
 
         if lastVersion != currentVersion {

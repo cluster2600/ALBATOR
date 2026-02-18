@@ -22,23 +22,23 @@ enum ConfigurationKey: String {
 }
 
 // MARK: - Theme Enum
-enum AppTheme: String, CaseIterable {
+public enum AppTheme: String, CaseIterable {
     case system = "System"
     case light = "Light"
     case dark = "Dark"
 }
 
 // MARK: - Configuration Manager
-class ConfigurationManager: ObservableObject {
-    static let shared = ConfigurationManager()
+public class ConfigurationManager: ObservableObject {
+    public static let shared = ConfigurationManager()
 
-    @Published var autoScanEnabled: Bool = true
-    @Published var scanInterval: TimeInterval = 3600 // 1 hour
-    @Published var notificationsEnabled: Bool = true
-    @Published var logLevel: LogLevel = .info
-    @Published var theme: AppTheme = .system
-    @Published var language: String = "en"
-    @Published var exportPath: String = "~/Desktop"
+    @Published public var autoScanEnabled: Bool = true
+    @Published public var scanInterval: TimeInterval = 3600 // 1 hour
+    @Published public var notificationsEnabled: Bool = true
+    @Published public var logLevel: LogLevel = .info
+    @Published public var theme: AppTheme = .system
+    @Published public var language: String = "en"
+    @Published public var exportPath: String = "~/Desktop"
 
     private let userDefaults = UserDefaults.standard
     private let configurationKey = "albator_configuration"
@@ -47,7 +47,7 @@ class ConfigurationManager: ObservableObject {
         loadConfiguration()
     }
 
-    func saveCurrentState() {
+    public func saveCurrentState() {
         let configuration: [String: Any] = [
             ConfigurationKey.autoScanEnabled.rawValue: autoScanEnabled,
             ConfigurationKey.scanInterval.rawValue: scanInterval,
@@ -85,7 +85,7 @@ class ConfigurationManager: ObservableObject {
         exportPath = configuration[ConfigurationKey.exportPath.rawValue] as? String ?? "~/Desktop"
     }
 
-    func resetToDefaults() {
+    public func resetToDefaults() {
         autoScanEnabled = true
         scanInterval = 3600
         notificationsEnabled = true
@@ -97,7 +97,7 @@ class ConfigurationManager: ObservableObject {
         saveCurrentState()
     }
 
-    func exportConfiguration() -> Data? {
+    public func exportConfiguration() -> Data? {
         let configuration: [String: Any] = [
             ConfigurationKey.autoScanEnabled.rawValue: autoScanEnabled,
             ConfigurationKey.scanInterval.rawValue: scanInterval,
@@ -111,7 +111,7 @@ class ConfigurationManager: ObservableObject {
         return try? JSONSerialization.data(withJSONObject: configuration, options: .prettyPrinted)
     }
 
-    func importConfiguration(from data: Data) -> Bool {
+    public func importConfiguration(from data: Data) -> Bool {
         do {
             let configuration = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
 
