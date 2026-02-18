@@ -78,6 +78,7 @@ configure_gatekeeper() {
     
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would enable Gatekeeper"
+        record_plan_action "gatekeeper" "Enable Gatekeeper" "sudo spctl --master-enable"
         return 0
     fi
     
@@ -185,6 +186,7 @@ configure_quarantine_system() {
     
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would configure quarantine system"
+        record_plan_action "quarantine" "Configure quarantine system" "verify quarantine database and xattrs"
         return 0
     fi
     
@@ -215,22 +217,23 @@ configure_quarantine_system() {
     fi
 }
 
-# Function to perform macOS 15.5 specific security checks
-macos_155_security_checks() {
-    show_progress "Performing macOS 15.5 specific security checks..."
+# Function to perform modern macOS security checks
+macos_modern_security_checks() {
+    show_progress "Performing modern macOS security checks..."
     
     local macos_version
     macos_version=$(sw_vers -productVersion)
     
-    if [[ ! "$macos_version" == 15.* ]]; then
-        show_warning "macOS 15.5 specific checks skipped (current version: $macos_version)"
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    if [[ "$macos_version" != "$min_macos"* ]]; then
+        show_warning "Modern checks tuned for baseline >= $min_macos (current version: $macos_version)"
         return 0
     fi
-    
-    # Enhanced Hardened Runtime checks for macOS 15.5
-    show_progress "Enhanced Hardened Runtime verification for macOS 15.5..."
-    
-    # Check for new security features in macOS 15.5
+
+    show_progress "Enhanced Hardened Runtime verification..."
+
+    # Check for modern security features
     local security_features=(
         "Library Validation"
         "Runtime Exceptions"
@@ -241,8 +244,7 @@ macos_155_security_checks() {
     
     for feature in "${security_features[@]}"; do
         show_progress "Checking: $feature"
-        # Placeholder for actual macOS 15.5 specific checks
-        show_warning "macOS 15.5 $feature check is a placeholder - implement specific verification"
+        show_warning "$feature check is a placeholder - implement specific verification"
     done
     
     # Check for new XPC service security
@@ -257,6 +259,14 @@ macos_155_security_checks() {
         show_success "Enhanced code signing verification passed"
     else
         show_warning "Enhanced code signing verification needs attention"
+    fi
+
+    # Lockdown mode marker check (best-effort non-failing probe)
+    show_progress "Checking Lockdown Mode service marker..."
+    if defaults read /Library/Preferences/com.apple.configurationprofiles.plist _computerLevel >/dev/null 2>&1; then
+        show_success "Lockdown Mode/profile store is reachable"
+    else
+        show_warning "Lockdown Mode/profile marker not readable in current context"
     fi
 }
 
@@ -398,11 +408,13 @@ main() {
     log "INFO" "Starting application security configuration script"
     init_script_state
     
-    # Check if running on macOS 15.x
+    # Check against configured baseline version
     local macos_version
     macos_version=$(sw_vers -productVersion)
-    if [[ ! "$macos_version" == 15.* ]]; then
-        show_warning "This script is designed for macOS 15.x, detected: $macos_version"
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    if [[ "$macos_version" != "$min_macos"* ]]; then
+        show_warning "Configured baseline is macOS >= $min_macos, detected: $macos_version"
     fi
     
     # Check for sudo privileges
@@ -427,8 +439,8 @@ main() {
     # Configure quarantine system
     configure_quarantine_system || ((config_errors++))
     
-    # macOS 15.5 specific checks
-    macos_155_security_checks || ((config_errors++))
+    # Modern macOS checks
+    macos_modern_security_checks || ((config_errors++))
     
     # Run verification
     local verify_errors=0

@@ -4,7 +4,7 @@ This document captures all implemented improvements from the current hardening/d
 
 ## 1. Policy Alignment
 
-- `albator.sh` no longer hardcodes a macOS 15.x gate.
+- `albator.sh` no longer hardcodes a fixed major-version gate.
 - It now reads:
   - `preflight.min_macos_version`
   - `preflight.enforce_min_version`
@@ -118,3 +118,20 @@ python3 tests/test_framework.py --output /tmp/albator_test_report.json
 python3 tests/test_framework.py --include-privileged --output /tmp/albator_privileged_report.json
 python3 tests/test_framework.py --include-mutating --output /tmp/albator_mutating_report.json
 ```
+
+## 13. Additional Hardening And Operability Updates
+
+- Added global `--json-output` to `albator_cli.py` for machine-readable command payloads.
+- Added `rollback_apply.py` for replaying rollback metadata in reverse order.
+- Added dry-run plan metadata generation (`*_plan_*.json`) in `utils.sh`.
+- Removed `eval` execution path from `privacy.sh` and `tests/test_security.sh`.
+- Added mocked integration harness:
+  - `tests/mocks/bin/*`
+  - `tests/test_scripts_smoke_mocked.sh`
+- Extended CI with shell syntax smoke and mocked script smoke execution.
+- Added release workflow `.github/workflows/release-artifacts.yml` with checksum and optional cosign signing.
+- Hardened `web/app.py` API security:
+  - token auth via `ALBATOR_API_TOKEN` + `X-Albator-Token`
+  - localhost restriction fallback when token is unset
+  - stricter session cookie settings
+- Added `DEPRECATIONS.md` and deprecation warning output for legacy/alias command paths.

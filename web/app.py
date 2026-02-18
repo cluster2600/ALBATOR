@@ -8,6 +8,7 @@ import os
 import sys
 import json
 import yaml
+import secrets
 import subprocess
 import threading
 import time
@@ -15,6 +16,7 @@ import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from typing import Dict, List, Any, Optional
+from functools import wraps
 
 try:
     from flask_socketio import SocketIO, emit
@@ -112,6 +114,9 @@ except Exception as e:
 app = Flask(__name__)
 # Use environment variable for secret key, fallback to generated key
 app.config['SECRET_KEY'] = os.environ.get('ALBATOR_SECRET_KEY', os.urandom(24).hex())
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('ALBATOR_COOKIE_SECURE', 'false').lower() == 'true'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Global instances
@@ -122,6 +127,22 @@ rollback_manager = RollbackManager()
 # Global state
 current_operations = {}
 operation_logs = {}
+
+
+def require_api_auth(func):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        token = os.environ.get("ALBATOR_API_TOKEN", "").strip()
+        if token:
+            provided = request.headers.get("X-Albator-Token", "").strip()
+            if not provided or not secrets.compare_digest(token, provided):
+                return jsonify({"success": False, "error": "Unauthorized"}), 401
+        else:
+            # Safe default for local desktop mode when token is not configured.
+            if request.remote_addr not in ("127.0.0.1", "::1", "localhost"):
+                return jsonify({"success": False, "error": "Forbidden"}), 403
+        return func(*args, **kwargs)
+    return wrapped
 
 
 def _probe_command(cmd: List[str], expected_substring: str = "", requires_elevation_hint: str = "") -> Dict[str, Any]:
@@ -227,6 +248,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/profiles')
+@require_api_auth
 def get_profiles():
     """Get available security profiles"""
     try:
@@ -247,6 +269,7 @@ def get_profiles():
         }), 500
 
 @app.route('/api/profile/<profile_name>')
+@require_api_auth
 def get_profile(profile_name):
     """Get specific profile details"""
     try:
@@ -272,6 +295,7 @@ def get_profile(profile_name):
         }), 500
 
 @app.route('/api/system-status')
+@require_api_auth
 def get_system_status():
     """Get current system security status"""
     try:
@@ -311,6 +335,7 @@ def get_system_status():
         }), 500
 
 @app.route('/api/run-operation', methods=['POST'])
+@require_api_auth
 def run_operation():
     """Start a security operation"""
     try:
@@ -379,6 +404,7 @@ def run_operation():
         }), 500
 
 @app.route('/api/operation/<operation_id>')
+@require_api_auth
 def get_operation_status(operation_id):
     """Get status of a running operation"""
     try:
@@ -405,6 +431,7 @@ def get_operation_status(operation_id):
         }), 500
 
 @app.route('/api/rollback-points')
+@require_api_auth
 def get_rollback_points():
     """Get available rollback points"""
     try:
@@ -421,6 +448,7 @@ def get_rollback_points():
         }), 500
 
 @app.route('/api/rollback', methods=['POST'])
+@require_api_auth
 def perform_rollback():
     """Perform rollback to a specific point"""
     try:
@@ -458,6 +486,7 @@ def perform_rollback():
         }), 500
 
 @app.route('/api/test-connection')
+@require_api_auth
 def test_connection():
     """Test API connection"""
     return jsonify({

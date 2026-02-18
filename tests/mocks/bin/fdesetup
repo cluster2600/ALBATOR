@@ -1,0 +1,8 @@
+#!/bin/bash
+case "$1" in
+  status) echo "FileVault is On." ;;
+  recoverykey) echo "recovery key = ABCD-EFGH" ;;
+  enable) ;;
+  *) ;;
+esac
+exit 0

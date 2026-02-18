@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Bootstrap Token escrowed to server: YES"
+exit 0

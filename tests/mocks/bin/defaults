@@ -1,0 +1,11 @@
+#!/bin/bash
+if [[ "$1" == "read" ]]; then
+  case "$*" in
+    *SubmitDiagInfo*AutoSubmit*) echo "0" ;;
+    *assistant.analytics*AnalyticsEnabled*) echo "0" ;;
+    *Safari*SuppressSearchSuggestions*) echo "1" ;;
+    *) echo "1" ;;
+  esac
+  exit 0
+fi
+exit 0

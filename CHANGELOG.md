@@ -11,6 +11,10 @@ All notable changes to this project are documented in this file.
 - Added `config/profiles/core_only.yaml` for minimal supported release scope.
 - Added CI optional-health smoke checks for enhanced/web paths.
 - Added `IMPLEMENTATION_NOTES_2026-02-18.md` documenting all current improvements.
+- Added `rollback_apply.py` to execute rollback metadata files.
+- Added mocked script smoke harness under `tests/mocks/bin/` and `tests/test_scripts_smoke_mocked.sh`.
+- Added `DEPRECATIONS.md` with migration guidance.
+- Added release artifact workflow with checksum generation and optional cosign signing.
 
 ### Changed
 - Rewrote `README.md` to align documentation with the current repository scope and command behavior.
@@ -18,6 +22,9 @@ All notable changes to this project are documented in this file.
 - Updated `tests/test_framework.py` to separate non-mutating default checks from privileged/mutating modes.
 - Updated `albator.sh` to use configurable minimum macOS policy from `config/albator.yaml`.
 - Updated shell script runtime behavior with structured logging support and explicit status signaling.
+- Added unified `--json-output` support across CLI commands, including shell-script wrappers and doctor output.
+- Updated hardening scripts to use configured macOS baseline messaging and dry-run plan artifact recording.
+- Hardened web API session settings and added token/localhost API access controls.
 
 ### Fixed
 - Fixed CLI passthrough behavior so wrapped script flags are forwarded correctly.
@@ -28,6 +35,7 @@ All notable changes to this project are documented in this file.
 - Fixed test/version policy wiring in `tests/test_security.sh` via configurable `MIN_MACOS_VERSION`.
 - Added and enforced minimum macOS preflight policy (`26.3`) with background security update checks.
 - Hardened `web/app.py` status probes to avoid interactive `sudo` and surface elevation hints.
+- Removed `eval` usage from script/test command execution paths.
 
 ## [v3.0.1] - 2026-02-18
 

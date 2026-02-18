@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Secure token is ENABLED for user"
+exit 0

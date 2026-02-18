@@ -13,7 +13,7 @@ SCRIPT_NAME="firewall.sh"
 LOG_FILE="/tmp/albator_firewall.log"
 BACKUP_DIR="/tmp/albator_backup/firewall"
 DRY_RUN=${DRY_RUN:-false}
-FIREWALL_CMD="/usr/libexec/ApplicationFirewall/socketfilterfw"
+FIREWALL_CMD="${FIREWALL_CMD:-/usr/libexec/ApplicationFirewall/socketfilterfw}"
 
 # Function to backup current firewall settings
 backup_firewall_settings() {
@@ -48,6 +48,7 @@ apply_firewall_setting() {
     
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would run: sudo $FIREWALL_CMD $setting_flag $setting_value"
+        record_plan_action "firewall" "$description" "sudo $FIREWALL_CMD $setting_flag $setting_value"
         return 0
     fi
     local pre_value
@@ -105,8 +106,13 @@ configure_firewall() {
     show_progress "Starting firewall configuration..."
     
     # Check if firewall command exists
-    if [[ ! -x "$FIREWALL_CMD" ]]; then
-        show_error "Firewall command not found: $FIREWALL_CMD"
+    if [[ "$FIREWALL_CMD" == /* ]]; then
+        if [[ ! -x "$FIREWALL_CMD" ]]; then
+            show_error "Firewall command not found: $FIREWALL_CMD"
+            return 1
+        fi
+    elif ! command -v "$FIREWALL_CMD" >/dev/null 2>&1; then
+        show_error "Firewall command not found in PATH: $FIREWALL_CMD"
         return 1
     fi
     
@@ -247,11 +253,13 @@ main() {
     log "INFO" "Starting firewall configuration script"
     init_script_state
     
-    # Check if running on macOS 15.x
+    # Check against configured baseline version
     local macos_version
     macos_version=$(sw_vers -productVersion)
-    if [[ ! "$macos_version" == 15.* ]]; then
-        show_warning "This script is designed for macOS 15.x, detected: $macos_version"
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    if [[ "$macos_version" != "$min_macos"* ]]; then
+        show_warning "Configured baseline is macOS >= $min_macos, detected: $macos_version"
     fi
     
     # Check for sudo privileges

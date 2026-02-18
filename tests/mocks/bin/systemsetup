@@ -1,0 +1,5 @@
+#!/bin/bash
+if [[ "$1" == "-getremotelogin" ]]; then
+  echo "Remote Login: Off"
+fi
+exit 0

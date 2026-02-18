@@ -1,9 +1,11 @@
 import argparse
+import json
 import os
 import pathlib
 import subprocess
 import tempfile
 import unittest
+import io
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -132,6 +134,15 @@ class TestCliScriptDispatch(unittest.TestCase):
         args, unknown = parser.parse_known_args(["privacy", "--dry-run"])
         self.assertEqual(args.command, "privacy")
         self.assertEqual(unknown, ["--dry-run"])
+
+    def test_run_bash_script_json_output_success(self):
+        fake = subprocess.CompletedProcess(args=["bash", "x.sh"], returncode=0, stdout="ok\n", stderr="")
+        with patch("albator_cli.subprocess.run", return_value=fake), patch("sys.stdout", new_callable=io.StringIO) as out:
+            rc = albator_cli.run_bash_script("x.sh", ["--dry-run"], json_output=True)
+        self.assertEqual(rc, 0)
+        payload = json.loads(out.getvalue())
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["script"], "x.sh")
 
 
 class TestPreflightAutoGate(unittest.TestCase):

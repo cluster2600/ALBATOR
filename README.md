@@ -38,6 +38,7 @@ Run preflight checks:
 ```bash
 python3 albator_cli.py preflight --json
 python3 albator_cli.py doctor
+python3 albator_cli.py --json-output doctor
 ```
 
 Run individual hardening scripts through the unified CLI:
@@ -47,6 +48,7 @@ python3 albator_cli.py privacy
 python3 albator_cli.py firewall
 python3 albator_cli.py encryption
 python3 albator_cli.py app_security
+python3 albator_cli.py --json-output privacy --dry-run
 ```
 
 Run threat intelligence helpers:
@@ -64,7 +66,7 @@ The Bash orchestrator remains available:
 ./albator.sh --firewall --privacy --report --test
 ```
 
-Use this path only if you explicitly want the macOS 15.x-oriented flow.
+Use this path only if you explicitly want the legacy orchestration flow.
 
 ## Testing and Validation
 
@@ -77,7 +79,7 @@ Shell validation suite:
 Python integration-style checks:
 
 ```bash
-python3 tests/test_framework.py --verbose --include-scripts
+python3 tests/test_framework.py --verbose --include-mutating
 ```
 
 Core unit tests:
@@ -145,6 +147,8 @@ flowchart TD
 - Script fixes are protected against shell injection by rejecting shell control characters.
 - Core hardening scripts return explicit status codes: `0` (applied/success), `10` (already compliant/no-op), `1` (error).
 - Set `ALBATOR_LOG_FORMAT=json` for structured shell-script log lines.
+- Dry-run executions now generate plan artifacts in `${ALBATOR_STATE_DIR:-/tmp/albator_state}`.
+- API endpoints in `web/app.py` require `X-Albator-Token` when `ALBATOR_API_TOKEN` is set.
 
 ## Optional/Experimental Components
 
@@ -155,6 +159,7 @@ flowchart TD
 - Security policy and disclosure process: `SECURITY.md`
 - Validation/testing reference: `VALIDATION_AND_TESTING.md`
 - Core-vs-optional component map: `CORE_VS_OPTIONAL.md`
+- Deprecation policy and migration notes: `DEPRECATIONS.md`
 - Full implementation notes (2026-02-18 pass): `IMPLEMENTATION_NOTES_2026-02-18.md`
 - Change history: `CHANGELOG.md`
 

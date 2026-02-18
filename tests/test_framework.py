@@ -395,6 +395,9 @@ def main():
     
     if args.verbose:
         framework.logger.setLevel("DEBUG")
+
+    if args.include_scripts:
+        framework.logger.warning("--include-scripts is deprecated; use --include-mutating")
     
     # Run tests and generate report
     try:

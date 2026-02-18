@@ -1,0 +1,7 @@
+#!/bin/bash
+if [[ "$1" == "--status" ]]; then
+  echo "assessments enabled"
+elif [[ "$1" == "--assess" ]]; then
+  echo "accepted"
+fi
+exit 0

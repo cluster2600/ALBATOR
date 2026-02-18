@@ -139,15 +139,20 @@ fetch_apple_updates() {
 parse_updates() {
     local html_content=$1
     local updates_json="{\"updates\": [], \"metadata\": {}}"
-    
-    show_progress "Parsing updates for macOS Sequoia 15.x..."
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    local target_major
+    target_major=$(echo "$min_macos" | cut -d'.' -f1)
+    local macos_pattern="macOS ([A-Za-z]+ )?${target_major}(\\.[0-9]+)?"
+
+    show_progress "Parsing updates for macOS ${target_major}.x..."
     
     if [[ "$USE_PUP" == "true" ]]; then
         # Use pup to extract update entries
         local parsed_updates
         parsed_updates=$(echo "$html_content" | pup 'table tbody tr json{}' 2>/dev/null | jq -r '
             .[] | 
-            select(.children[] | .text | test("macOS (Sequoia )?15(\\.\\d+)?")) | 
+            select(.children[] | .text | test("'"$macos_pattern"'")) | 
             {
                 date: .children[0].text,
                 product: .children[1].text,
@@ -169,7 +174,7 @@ parse_updates() {
     else
         # Fallback to grep/awk parsing
         local temp_file=$(mktemp)
-        echo "$html_content" | grep -E -A 3 -B 1 "macOS (Sequoia )?15(\\.\\d+)?" > "$temp_file" 2>/dev/null || true
+        echo "$html_content" | grep -E -A 3 -B 1 "$macos_pattern" > "$temp_file" 2>/dev/null || true
         
         # Basic parsing with awk
         local updates_text=""
@@ -187,7 +192,7 @@ parse_updates() {
             updates_json=$(echo '{
                 "updates": [{
                     "date": "Check website",
-                    "product": "macOS Sequoia 15.x updates available",
+                    "product": "macOS '"$target_major"'.x updates available",
                     "link": "'$APPLE_URL'"
                 }],
                 "metadata": {
@@ -207,13 +212,17 @@ parse_updates() {
 display_updates() {
     local updates_json=$1
     local update_count=$(echo "$updates_json" | jq -r '.updates | length')
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    local target_major
+    target_major=$(echo "$min_macos" | cut -d'.' -f1)
     
     echo ""
-    echo "🍎 Apple Security Updates for macOS Sequoia 15.x"
+    echo "🍎 Apple Security Updates for macOS ${target_major}.x"
     echo "================================================"
     
     if [[ "$update_count" -eq 0 ]]; then
-        show_warning "No recent macOS Sequoia 15.x updates found"
+        show_warning "No recent macOS ${target_major}.x updates found"
         return
     fi
     
@@ -237,6 +246,8 @@ display_updates() {
 generate_summary() {
     local updates_json=$1
     local summary_file="${CACHE_DIR}/apple_updates_summary_$(date +%Y%m%d_%H%M%S).json"
+    local min_macos
+    min_macos=$(get_min_macos_version)
     
     show_progress "Generating summary report..."
     
@@ -246,7 +257,7 @@ generate_summary() {
             total_updates: (.updates | length),
             latest_update: (.updates[0] // null),
             report_date: "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",
-            macos_version: "15.x (Sequoia)",
+            macos_version: "'$min_macos' baseline",
             cache_status: "'$(is_cache_valid && echo "valid" || echo "refreshed")'"
         },
         updates: .updates,

@@ -1,4 +1,7 @@
 import argparse
+import contextlib
+import io
+import json
 import subprocess
 import sys
 import yaml
@@ -74,17 +77,45 @@ def _preflight_policy(config: dict) -> dict:
         "enforce_min_version": bool(preflight_cfg.get("enforce_min_version", True)),
     }
 
-def run_bash_script(script_name, args=None):
+def _print_json(data: dict) -> None:
+    print(json.dumps(data, indent=2, sort_keys=True))
+
+
+def run_bash_script(script_name, args=None, json_output: bool = False):
     cmd = ["bash", script_name]
     if args:
         cmd.extend(args)
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(result.stdout)
+        if json_output:
+            _print_json({
+                "command": "script",
+                "script": script_name,
+                "args": args or [],
+                "success": True,
+                "returncode": result.returncode,
+                "stdout": (result.stdout or "").strip(),
+                "stderr": (result.stderr or "").strip(),
+            })
+        else:
+            print(result.stdout)
+        return 0
     except subprocess.CalledProcessError as e:
         stdout = (e.stdout or "").strip()
         stderr = (e.stderr or "").strip()
         details = "\n".join(part for part in [stderr, stdout] if part) or "(no output)"
+        if json_output:
+            _print_json({
+                "command": "script",
+                "script": script_name,
+                "args": args or [],
+                "success": False,
+                "returncode": e.returncode,
+                "stdout": stdout,
+                "stderr": stderr,
+                "error": details,
+            })
+            return e.returncode
         print(f"Error running {script_name}:\n{details}", file=sys.stderr)
         sys.exit(e.returncode)
 
@@ -143,7 +174,7 @@ def run_legacy_command(args: argparse.Namespace) -> None:
     finally:
         os.chdir(generator.original_wd)
 
-def maybe_run_preflight(command: str, args: argparse.Namespace, config: dict) -> None:
+def maybe_run_preflight(command: str, args: argparse.Namespace, config: dict, json_output: bool = False) -> None:
     """Run preflight automatically before mutating actions."""
     mutating_script_commands = {"privacy", "firewall", "encryption", "app_security"}
     mutating_legacy_actions = {"apply", "generate", "tailor"}
@@ -166,13 +197,22 @@ def maybe_run_preflight(command: str, args: argparse.Namespace, config: dict) ->
     else:
         return
 
-    print(format_preflight_report(summary))
+    if not json_output:
+        print(format_preflight_report(summary))
     if not summary["passed"]:
-        print("Aborting because preflight failed required checks.", file=sys.stderr)
+        if json_output:
+            _print_json({
+                "command": "preflight_gate",
+                "success": False,
+                "error": "Aborting because preflight failed required checks.",
+                "summary": summary,
+            })
+        else:
+            print("Aborting because preflight failed required checks.", file=sys.stderr)
         sys.exit(1)
 
 
-def run_doctor(config: dict, policy: dict, scripts: dict[str, str]) -> int:
+def run_doctor(config: dict, policy: dict, scripts: dict[str, str], json_output: bool = False) -> int:
     checks = []
 
     schema_errors = _validate_config_schema(config)
@@ -201,17 +241,29 @@ def run_doctor(config: dict, policy: dict, scripts: dict[str, str]) -> int:
     meets = _version_tuple(current_version) >= _version_tuple(policy["min_macos_version"]) if current.returncode == 0 else False
     checks.append(("min_macos_policy", meets, f"current={current_version}, min={policy['min_macos_version']}"))
 
-    print("Albator Doctor Report")
-    print("=====================")
     failures = 0
+    serialized_checks = []
     for name, passed, detail in checks:
-        status = "PASS" if passed else "FAIL"
-        print(f"[{status}] {name}: {detail}")
         if not passed:
             failures += 1
+        serialized_checks.append({"name": name, "passed": passed, "detail": detail})
 
-    print("---------------------")
-    print(f"Checks: {len(checks)}  Failures: {failures}")
+    if json_output:
+        _print_json({
+            "command": "doctor",
+            "success": failures == 0,
+            "checks": serialized_checks,
+            "summary": {"checks": len(checks), "failures": failures},
+            "policy": policy,
+        })
+    else:
+        print("Albator Doctor Report")
+        print("=====================")
+        for check in serialized_checks:
+            status = "PASS" if check["passed"] else "FAIL"
+            print(f"[{status}] {check['name']}: {check['detail']}")
+        print("---------------------")
+        print(f"Checks: {len(checks)}  Failures: {failures}")
     return 0 if failures == 0 else 1
 
 
@@ -221,6 +273,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Albator unified CLI for macOS hardening"
     )
+    parser.add_argument("--json-output", action="store_true", help="Emit command output as JSON where supported")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Legacy Python tool commands
@@ -268,23 +321,47 @@ def main():
             min_macos_version=args.min_macos_version or policy["min_macos_version"],
             enforce_min_version=args.enforce_min_version or policy["enforce_min_version"],
         )
-        if args.json:
+        if args.json or args.json_output:
             print(preflight_to_json(summary))
         else:
             print(format_preflight_report(summary))
         sys.exit(0 if summary["passed"] else 1)
 
     if args.command == "doctor":
-        sys.exit(run_doctor(config, policy, bash_scripts))
+        sys.exit(run_doctor(config, policy, bash_scripts, json_output=args.json_output))
 
-    maybe_run_preflight(args.command, args, config)
+    maybe_run_preflight(args.command, args, config, json_output=args.json_output)
 
     if args.command == "legacy":
+        if args.json_output:
+            stdout_capture = io.StringIO()
+            stderr_capture = io.StringIO()
+            exit_code = 0
+            with contextlib.redirect_stdout(stdout_capture), contextlib.redirect_stderr(stderr_capture):
+                try:
+                    run_legacy_command(args)
+                except SystemExit as e:
+                    exit_code = int(e.code or 0)
+            _print_json({
+                "command": "legacy",
+                "action": args.action,
+                "keyword": args.keyword,
+                "success": exit_code == 0,
+                "returncode": exit_code,
+                "stdout": stdout_capture.getvalue().strip(),
+                "stderr": stderr_capture.getvalue().strip(),
+                "warnings": [
+                    "legacy command path remains supported but may be removed in a future major release"
+                ],
+            })
+            sys.exit(exit_code)
+        print("Warning: 'legacy' command path is deprecated and may be removed in a future major release.", file=sys.stderr)
         run_legacy_command(args)
     else:
         script = bash_scripts.get(args.command)
         if script:
-            run_bash_script(script, unknown)
+            rc = run_bash_script(script, unknown, json_output=args.json_output)
+            sys.exit(rc)
         else:
             print(f"Unknown command: {args.command}")
             sys.exit(1)

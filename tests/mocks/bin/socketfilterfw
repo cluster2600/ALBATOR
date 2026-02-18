@@ -1,0 +1,11 @@
+#!/bin/bash
+case "$1" in
+  --getglobalstate) echo "Firewall is enabled. (State = 1)" ;;
+  --getstealthmode) echo "Stealth mode enabled" ;;
+  --getblockall) echo "Block all mode is enabled" ;;
+  --getloggingmode) echo "Firewall logging enabled" ;;
+  --getallowsigned) echo "Allows signed built-in software disabled" ;;
+  --getallowsignedapp) echo "Allows downloaded signed software disabled" ;;
+  *) ;;
+esac
+exit 0

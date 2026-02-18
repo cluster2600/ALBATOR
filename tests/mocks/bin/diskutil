@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ "$1" == "info" ]]; then
+  echo "Type (Bundle): apfs"
+  echo "File System Personality: APFS"
+else
+  echo "FileVault: Yes"
+fi
+exit 0

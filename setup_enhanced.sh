@@ -22,7 +22,7 @@ MACOS_VERSION=$(sw_vers -productVersion)
 echo "   macOS Version: $MACOS_VERSION"
 
 if [[ ! "$MACOS_VERSION" == 15.* ]]; then
-    echo -e "${YELLOW}⚠️  Warning: This tool is designed for macOS 15.x (Sequoia)${NC}"
+    echo -e "${YELLOW}⚠️  Warning: baseline mismatch detected; review preflight policy${NC}"
     echo "   Current version: $MACOS_VERSION"
     echo "   Some features may not work as expected."
 fi

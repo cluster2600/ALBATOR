@@ -1,0 +1,12 @@
+#!/bin/bash
+if [[ "$1" == "-n" && "$2" == "true" ]]; then
+  exit 0
+fi
+args=()
+for a in "$@"; do
+  if [[ "$a" == "-n" ]]; then
+    continue
+  fi
+  args+=("$a")
+done
+"${args[@]}"

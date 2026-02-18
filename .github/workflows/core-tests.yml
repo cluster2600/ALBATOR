@@ -25,6 +25,11 @@ jobs:
           find . -type f -name '*.sh' -not -path './.git/*' -print0 \
             | xargs -0 shellcheck -S error
 
+      - name: Shell syntax smoke
+        run: |
+          find . -type f -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 -I{} bash -n "{}"
+
       - name: Python static compile check
         run: |
           python -m py_compile albator_cli.py main.py rule_handler.py preflight.py tests/test_core_behaviors.py
@@ -64,3 +69,6 @@ jobs:
 
       - name: Web app import smoke test
         run: python -c "import web.app as w; print('web_import_ok', w.OPTIONAL_BACKEND_AVAILABLE, w.SOCKETIO_AVAILABLE)"
+
+      - name: Mocked script smoke harness
+        run: bash tests/test_scripts_smoke_mocked.sh

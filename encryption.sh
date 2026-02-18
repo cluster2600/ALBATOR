@@ -106,6 +106,7 @@ enable_filevault() {
     
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would enable FileVault encryption"
+        record_plan_action "filevault" "Enable FileVault encryption" "sudo fdesetup enable -user $(whoami)"
         return 0
     fi
     
@@ -141,12 +142,13 @@ enable_filevault() {
     return $errors
 }
 
-# Function to configure recovery key (macOS 15.5 enhancements)
+# Function to configure recovery key enhancements
 configure_recovery_key() {
-    show_progress "Configuring recovery key settings for macOS 15.5..."
+    show_progress "Configuring recovery key settings..."
     
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would configure recovery key settings"
+        record_plan_action "filevault_recovery" "Configure recovery key settings" "sudo fdesetup recoverykey"
         return 0
     fi
     
@@ -164,12 +166,11 @@ configure_recovery_key() {
         show_success "Recovery key is configured"
         record_noop "Recovery key already configured"
         
-        # macOS 15.5: Enhanced recovery key security
-        show_progress "Applying macOS 15.5 recovery key security enhancements..."
+        show_progress "Applying recovery key security enhancements..."
         
-        # Placeholder for macOS 15.5 specific recovery key enhancements
+        # Placeholder for recovery key enhancements
         # These would include secure storage options, key rotation, etc.
-        show_warning "macOS 15.5 recovery key enhancements are placeholders"
+        show_warning "Recovery key enhancements are placeholders"
         show_warning "Implement secure key storage and rotation as needed"
         
     else
@@ -303,11 +304,13 @@ main() {
     log "INFO" "Starting encryption configuration script"
     init_script_state
     
-    # Check if running on macOS 15.x
+    # Check against configured baseline version
     local macos_version
     macos_version=$(sw_vers -productVersion)
-    if [[ ! "$macos_version" == 15.* ]]; then
-        show_warning "This script is designed for macOS 15.x, detected: $macos_version"
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    if [[ "$macos_version" != "$min_macos"* ]]; then
+        show_warning "Configured baseline is macOS >= $min_macos, detected: $macos_version"
     fi
     
     # Check for sudo privileges

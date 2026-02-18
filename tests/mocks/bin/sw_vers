@@ -1,0 +1,7 @@
+#!/bin/bash
+if [[ "$1" == "-productVersion" ]]; then
+  echo "26.3"
+else
+  echo "ProductName:\tmacOS"
+  echo "ProductVersion:\t26.3"
+fi

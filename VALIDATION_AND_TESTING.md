@@ -30,6 +30,7 @@ Coverage includes:
 ```bash
 python3 albator_cli.py preflight --json
 python3 albator_cli.py doctor
+python3 albator_cli.py --json-output doctor
 python3 albator_cli.py preflight --require-sudo
 python3 albator_cli.py preflight --require-rules
 ```
@@ -67,12 +68,14 @@ Notes:
 python3 tests/test_framework.py --output /tmp/albator_test_report.json --verbose
 python3 tests/test_framework.py --include-privileged --output /tmp/albator_privileged_report.json
 python3 tests/test_framework.py --include-mutating --output /tmp/albator_mutating_report.json
+bash tests/test_scripts_smoke_mocked.sh
 ```
 Expected:
 - framework starts without `logger` import failure
 - report includes preflight summary
 - failing checks are reported explicitly
 - mutating script execution tests run only when explicitly requested
+- mocked smoke harness validates script dry-run behavior without requiring host macOS internals
 
 ### 6. Enhanced and web optional health checks
 ```bash
@@ -96,6 +99,8 @@ preflight:
 - `MIN_MACOS_VERSION`: minimum version for `tests/test_security.sh` (default: `26.3`)
 - `STRICT_OFFLINE`: when `true`, `apple_updates.sh --offline` exits if cache is missing
 - `ALBATOR_LOG_FORMAT`: set to `json` for structured script logs
+- `ALBATOR_API_TOKEN`: when set, required as `X-Albator-Token` for `/api/*` endpoints
+- `ALBATOR_COOKIE_SECURE`: set `true` to enforce secure-only session cookie in web mode
 
 ## Interpretation Guidance
 - A failing mutating command without sudo is expected when preflight enforces privilege checks.

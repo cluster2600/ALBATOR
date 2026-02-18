@@ -83,7 +83,7 @@ run_test() {
     
     echo -e "\n${BLUE}Testing:${NC} $description"
     
-    if output=$(eval "$command" 2>&1); then
+    if output=$(bash -c "$command" 2>&1); then
         if [[ "$output" == *"$expected"* ]]; then
             print_status "PASS" "$test_name"
             echo "  Expected: $expected"

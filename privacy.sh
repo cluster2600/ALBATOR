@@ -64,35 +64,82 @@ apply_setting() {
     # Apply setting
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would set $domain $key to $value"
+        record_plan_action "$domain/$key" "$description" "defaults write $domain $key -$value_type $value"
         return 0
     fi
-    
-    local cmd
+
     if [[ "$use_sudo" == "true" ]]; then
-        cmd="sudo defaults write \"$domain\" \"$key\" -$value_type $value"
-    else
-        cmd="defaults write \"$domain\" \"$key\" -$value_type $value"
-    fi
-    
-    if eval "$cmd" 2>>"$LOG_FILE"; then
-        # Verify setting was applied
-        local current_value
-        if [[ "$use_sudo" == "true" ]]; then
-            current_value=$(sudo defaults read "$domain" "$key" 2>/dev/null || echo "FAILED")
+        if sudo defaults write "$domain" "$key" "-$value_type" "$value" 2>>"$LOG_FILE"; then
+            :
         else
-            current_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "FAILED")
-        fi
-        
-        if [[ "$current_value" == "$value" ]] || [[ "$current_value" == "1" && "$value" == "true" ]] || [[ "$current_value" == "0" && "$value" == "false" ]]; then
-            show_success "$description"
-            record_rollback_change "$domain/$key" "$description"
-            return 0
-        else
-            show_error "Failed to verify $description (expected: $value, got: $current_value)"
+            show_error "Failed to apply $description"
             return 1
         fi
     else
-        show_error "Failed to apply $description"
+        if defaults write "$domain" "$key" "-$value_type" "$value" 2>>"$LOG_FILE"; then
+            :
+        else
+            show_error "Failed to apply $description"
+            return 1
+        fi
+    fi
+    
+    # Verify setting was applied
+    local current_value
+    if [[ "$use_sudo" == "true" ]]; then
+        current_value=$(sudo defaults read "$domain" "$key" 2>/dev/null || echo "FAILED")
+    else
+        current_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "FAILED")
+    fi
+    
+    if [[ "$current_value" == "$value" ]] || [[ "$current_value" == "1" && "$value" == "true" ]] || [[ "$current_value" == "0" && "$value" == "false" ]]; then
+        show_success "$description"
+        record_rollback_change "$domain/$key" "$description"
+        return 0
+    else
+        show_error "Failed to verify $description (expected: $value, got: $current_value)"
+        return 1
+    fi
+}
+
+# Function to configure system setting
+configure_system_setting() {
+    local command=$1
+    local description=$2
+    local verification_cmd=$3
+    local expected_output=$4
+    
+    show_progress "Configuring: $description"
+    
+    if [[ "$DRY_RUN" == "true" ]]; then
+        show_warning "DRY RUN: Would run: $command"
+        record_plan_action "$description" "$description" "$command"
+        return 0
+    fi
+
+    local -a command_parts
+    read -r -a command_parts <<< "$command"
+    if "${command_parts[@]}" 2>>"$LOG_FILE"; then
+        # Verify setting was applied
+        if [[ -n "$verification_cmd" ]]; then
+            local -a verification_parts
+            local current_value
+            read -r -a verification_parts <<< "$verification_cmd"
+            current_value=$("${verification_parts[@]}" 2>/dev/null || echo "FAILED")
+            if [[ "$current_value" == *"$expected_output"* ]]; then
+                show_success "$description"
+                record_rollback_change "$description" "system setting configured"
+                return 0
+            else
+                show_error "Failed to verify $description (expected: $expected_output, got: $current_value)"
+                return 1
+            fi
+        else
+            show_success "$description"
+            return 0
+        fi
+    else
+        show_error "Failed to configure $description"
         return 1
     fi
 }
@@ -106,6 +153,7 @@ disable_service() {
     
     if [[ "$DRY_RUN" == "true" ]]; then
         show_warning "DRY RUN: Would disable $service_name"
+        record_plan_action "$service_name" "$description" "launchctl unload -w /System/Library/LaunchDaemons/$service_name.plist"
         return 0
     fi
     
@@ -125,43 +173,6 @@ disable_service() {
     fi
 }
 
-# Function to configure system setting
-configure_system_setting() {
-    local command=$1
-    local description=$2
-    local verification_cmd=$3
-    local expected_output=$4
-    
-    show_progress "Configuring: $description"
-    
-    if [[ "$DRY_RUN" == "true" ]]; then
-        show_warning "DRY RUN: Would run: $command"
-        return 0
-    fi
-    
-    if eval "$command" 2>>"$LOG_FILE"; then
-        # Verify the setting
-        if [[ -n "$verification_cmd" ]]; then
-            local current_value
-            current_value=$(eval "$verification_cmd" 2>/dev/null || echo "FAILED")
-            if [[ "$current_value" == *"$expected_output"* ]]; then
-                show_success "$description"
-                record_rollback_change "$description" "system setting configured"
-                return 0
-            else
-                show_error "Failed to verify $description (expected: $expected_output, got: $current_value)"
-                return 1
-            fi
-        else
-            show_success "$description"
-            return 0
-        fi
-    else
-        show_error "Failed to configure $description"
-        return 1
-    fi
-}
-
 # Main privacy configuration function
 configure_privacy() {
     local errors=0
@@ -175,8 +186,8 @@ configure_privacy() {
     # Disable Siri analytics
     apply_setting "com.apple.assistant.analytics" "AnalyticsEnabled" "false" "bool" "Siri analytics" "false" || ((errors++))
     
-    # Disable new telemetry service for macOS 15.5
-    apply_setting "com.apple.newTelemetryService" "AutoSubmit" "false" "bool" "New telemetry service (macOS 15.5)" "true" || ((errors++))
+    # Disable modern telemetry service
+    apply_setting "com.apple.newTelemetryService" "AutoSubmit" "false" "bool" "New telemetry service" "true" || ((errors++))
     
     # Configure Safari privacy settings
     apply_setting "com.apple.Safari" "UniversalSearchEnabled" "false" "bool" "Safari universal search" "false" || ((errors++))
@@ -203,6 +214,7 @@ configure_privacy() {
         fi
     else
         show_warning "DRY RUN: Would disable mDNS multicast advertisements"
+        record_plan_action "com.apple.mDNSResponder" "Disable mDNS multicast advertisements" "defaults write /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist ProgramArguments -array-add -NoMulticastAdvertisements"
     fi
     
     return $errors
@@ -225,8 +237,10 @@ verify_settings() {
     for test in "${tests[@]}"; do
         IFS=':' read -r cmd expected description <<< "$test"
         
+        local -a cmd_parts
+        read -r -a cmd_parts <<< "$cmd"
         local actual
-        actual=$(eval "$cmd" 2>/dev/null || echo "FAILED")
+        actual=$("${cmd_parts[@]}" 2>/dev/null || echo "FAILED")
         
         if [[ "$actual" == *"$expected"* ]]; then
             show_success "✓ $description"
@@ -278,11 +292,13 @@ main() {
     log "INFO" "Starting privacy configuration script"
     init_script_state
     
-    # Check if running on macOS 15.x
+    # Check against configured baseline version
     local macos_version
     macos_version=$(sw_vers -productVersion)
-    if [[ ! "$macos_version" == 15.* ]]; then
-        show_warning "This script is designed for macOS 15.x, detected: $macos_version"
+    local min_macos
+    min_macos=$(get_min_macos_version)
+    if [[ "$macos_version" != "$min_macos"* ]]; then
+        show_warning "Configured baseline is macOS >= $min_macos, detected: $macos_version"
     fi
     
     # Run configuration

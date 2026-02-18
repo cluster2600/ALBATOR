@@ -1,0 +1,5 @@
+#!/bin/bash
+if [[ "$1" == "print" ]]; then
+  echo "com.apple.xpc"
+fi
+exit 0

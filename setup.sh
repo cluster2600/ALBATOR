@@ -70,10 +70,10 @@ check_macos_version() {
     version=$(sw_vers -productVersion)
     
     if [[ "$version" == 15.* ]]; then
-        print_status "SUCCESS" "macOS 15.x (Sequoia) detected: $version"
+        print_status "SUCCESS" "Supported macOS baseline detected: $version"
         return 0
     else
-        print_status "WARN" "This tool is designed for macOS 15.x, detected: $version"
+        print_status "WARN" "Baseline mismatch detected: $version"
         return 1
     fi
 }

@@ -1,0 +1,42 @@
+name: Release Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-checksum:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create source tarball
+        run: |
+          git archive --format=tar.gz --output albator-${GITHUB_REF_NAME}.tar.gz HEAD
+
+      - name: Generate checksums
+        run: |
+          sha256sum albator-${GITHUB_REF_NAME}.tar.gz > albator-${GITHUB_REF_NAME}.sha256
+
+      - name: Optional keyless signing with cosign
+        if: ${{ vars.ALBATOR_ENABLE_COSIGN == 'true' }}
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Sign checksum (optional)
+        if: ${{ vars.ALBATOR_ENABLE_COSIGN == 'true' }}
+        run: |
+          cosign sign-blob --yes \
+            --output-signature albator-${GITHUB_REF_NAME}.sha256.sig \
+            albator-${GITHUB_REF_NAME}.sha256
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: albator-release-${{ github.ref_name }}
+          path: |
+            albator-${{ github.ref_name }}.tar.gz
+            albator-${{ github.ref_name }}.sha256
+            albator-${{ github.ref_name }}.sha256.sig
+          if-no-files-found: ignore
