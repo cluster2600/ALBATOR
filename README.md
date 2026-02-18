@@ -150,6 +150,7 @@ flowchart TD
 
 - Security policy and disclosure process: `SECURITY.md`
 - Validation/testing reference: `VALIDATION_AND_TESTING.md`
+- Core-vs-optional component map: `CORE_VS_OPTIONAL.md`
 - Change history: `CHANGELOG.md`
 
 ## Contributing

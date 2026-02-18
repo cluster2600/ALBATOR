@@ -9,12 +9,27 @@ import sys
 import json
 import argparse
 import subprocess
+import logging
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 
 # Add lib directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
+
+
+def _fallback_logger(name: str):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+        logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    return logger
+
+
+def _noop(*args, **kwargs):
+    return None
 
 try:
     from logger import get_logger, log_operation_start, log_operation_success, log_operation_failure
@@ -25,8 +40,21 @@ try:
     from rollback import RollbackManager
     from cli_enhancements import AlbatorCompleter, CommandHistory, BatchProcessor, PluginManager
 except ImportError as e:
-    print(f"Warning: Could not import some modules: {e}")
-    print("Some features may not be available.")
+    get_logger = _fallback_logger
+    log_operation_start = _noop
+    log_operation_success = _noop
+    log_operation_failure = _noop
+    ConfigurationManager = None
+    ComplianceReporter = None
+    AnalyticsDashboard = None
+    FleetManager = None
+    RollbackManager = None
+    AlbatorCompleter = None
+    CommandHistory = None
+    BatchProcessor = None
+    PluginManager = None
+    print(f"Warning: Optional enhanced modules unavailable: {e}")
+    print("Only core script orchestration features will be available.")
 
 class AlbatorEnhanced:
     """Enhanced Albator CLI with integrated features"""
@@ -34,20 +62,20 @@ class AlbatorEnhanced:
     def __init__(self, config_path: str = "config/albator.yaml"):
         """Initialize the enhanced Albator CLI"""
         self.config_path = config_path
-        self.logger = get_logger("albator_enhanced") if 'get_logger' in globals() else None
+        self.logger = get_logger("albator_enhanced")
         
         # Initialize managers
         try:
-            self.config_manager = ConfigurationManager(config_path)
-            self.compliance_reporter = ComplianceReporter(config_path)
-            self.analytics_dashboard = AnalyticsDashboard()
-            self.fleet_manager = FleetManager(config_path)
-            self.rollback_manager = RollbackManager()
+            self.config_manager = ConfigurationManager(config_path) if ConfigurationManager else None
+            self.compliance_reporter = ComplianceReporter(config_path) if ComplianceReporter else None
+            self.analytics_dashboard = AnalyticsDashboard() if AnalyticsDashboard else None
+            self.fleet_manager = FleetManager(config_path) if FleetManager else None
+            self.rollback_manager = RollbackManager() if RollbackManager else None
             
             # Initialize CLI enhancement components
-            self.command_history = CommandHistory() if 'CommandHistory' in globals() else None
-            self.batch_processor = BatchProcessor() if 'BatchProcessor' in globals() else None
-            self.plugin_manager = PluginManager() if 'PluginManager' in globals() else None
+            self.command_history = CommandHistory() if CommandHistory else None
+            self.batch_processor = BatchProcessor() if BatchProcessor else None
+            self.plugin_manager = PluginManager() if PluginManager else None
         except Exception as e:
             print(f"Warning: Could not initialize all managers: {e}")
             self.config_manager = None

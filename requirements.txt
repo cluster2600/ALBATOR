@@ -1,103 +1,13 @@
-# Albator - macOS 15 Hardening Tool Requirements
-# This file lists the dependencies required to run the Albator scripts.
+# Albator Python dependencies (current repository scope)
 
-# =============================================================================
-# SYSTEM TOOLS (Install with Homebrew: brew install <tool>)
-# =============================================================================
-
-# curl
-#    Purpose: Fetch data from GitHub Security Advisories API and Apple security updates page.
-#    Installation: brew install curl
-#    Note: Typically pre-installed on macOS, but verify with 'curl --version'.
-
-# jq
-#    Purpose: Parse JSON responses from the GitHub Security Advisories API.
-#    Installation: brew install jq
-#    Note: Required for cve_fetch.sh. Install if 'jq --version' fails.
-
-# pup
-#    Purpose: Parse HTML content from Apple security updates page.
-#    Installation: brew install pup
-#    Note: Optional but recommended for apple_updates.sh. Falls back to grep/awk if not installed.
-
-# Optional: For enhanced GitHub API access
-# github-cli (gh)
-#    Purpose: Alternative to curl for authenticated GitHub API requests (optional).
-#    Installation: brew install gh
-#    Note: Requires a GitHub Personal Access Token for rate limit increases.
-
-# =============================================================================
-# PYTHON PACKAGES (Install with pip: pip3 install -r requirements.txt)
-# =============================================================================
-
-# Core dependencies for enhanced features
+# Core CLI/config parsing
 PyYAML>=6.0.1
-python-dotenv>=1.0.0
 
-# Data analysis and visualization
-pandas>=2.0.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
-numpy>=1.24.0
-
-# Web interface dependencies
+# Web UI (optional component under web/)
 Flask>=2.3.3
 Flask-SocketIO>=5.3.6
 python-socketio>=5.8.0
 eventlet>=0.33.3
-Flask-Login>=0.6.3
-Flask-WTF>=1.1.1
-WTForms>=3.0.1
-Werkzeug>=2.3.7
 
-# API Server dependencies
-Flask-CORS>=4.0.0
-PyJWT>=2.8.0
-
-# SSH and network operations for fleet management
-paramiko>=3.3.0
-requests>=2.31.0
-
-# Development and debugging
-Werkzeug>=2.3.7
-
-# Machine Learning dependencies
-scikit-learn>=1.3.0
-joblib>=1.3.0
-
-# Cloud integration dependencies
-boto3>=1.28.0  # AWS
-azure-storage-blob>=12.17.0  # Azure
-google-cloud-storage>=2.10.0  # GCP
-cryptography>=41.0.0  # For data encryption
-
-# Security and Zero Trust dependencies
-psutil>=5.9.0  # System monitoring for behavioral analysis
-PyJWT>=2.8.0  # JWT token management
-
-# Optional: For production deployment
-gunicorn>=21.2.0
-
-# =============================================================================
-# SYSTEM REQUIREMENTS
-# =============================================================================
-# - macOS 15.5 (Sequoia)
-# - Python 3.8 or higher
-# - Administrator privileges (sudo access) for hardening scripts
-# - Internet connection for CVE and Apple updates fetching
-# - SSH access for fleet management features
-
-# =============================================================================
-# INSTALLATION INSTRUCTIONS
-# =============================================================================
-# 1. Install system tools:
-#    brew install curl jq pup
-#
-# 2. Install Python packages:
-#    pip3 install -r requirements.txt
-#
-# 3. For web interface only:
-#    pip3 install -r web/requirements.txt
-#
-# 4. Verify installation:
-#    python3 albator_enhanced.py --help
+# Optional local env loading for operators
+python-dotenv>=1.0.0

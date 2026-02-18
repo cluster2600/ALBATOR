@@ -11,16 +11,103 @@ import yaml
 import subprocess
 import threading
 import time
+import logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_from_directory
-from flask_socketio import SocketIO, emit
 from typing import Dict, List, Any, Optional
+
+try:
+    from flask_socketio import SocketIO, emit
+    SOCKETIO_AVAILABLE = True
+except Exception:
+    SOCKETIO_AVAILABLE = False
+
+    class SocketIO:  # type: ignore[override]
+        def __init__(self, app, cors_allowed_origins="*"):
+            self.app = app
+
+        def run(self, app, host="127.0.0.1", port=5000, debug=False):
+            app.run(host=host, port=port, debug=debug)
+
+        def emit(self, *args, **kwargs):
+            return None
+
+        def on(self, _event):
+            def decorator(func):
+                return func
+            return decorator
+
+    def emit(*args, **kwargs):  # type: ignore[override]
+        return None
 
 # Add lib directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
-from logger import get_logger, log_operation_start, log_operation_success, log_operation_failure
-from config_manager import ConfigurationManager
-from rollback import RollbackManager
+
+
+def _fallback_logger(name: str):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+        logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    return logger
+
+
+def _noop(*args, **kwargs):
+    return None
+
+
+class _FallbackConfigManager:
+    def __init__(self, config_path: str = "config/albator.yaml"):
+        self.config_path = config_path
+        self._config = self._load()
+
+    def _load(self) -> Dict[str, Any]:
+        try:
+            with open(self.config_path, "r") as f:
+                return yaml.safe_load(f) or {}
+        except Exception:
+            return {}
+
+    def get_profiles(self) -> List[str]:
+        return list((self._config.get("profiles") or {}).keys())
+
+    def get_profile(self, profile_name: str) -> Dict[str, Any]:
+        return (self._config.get("profiles") or {}).get(profile_name)
+
+    def get_profile_summary(self, profile_name: str) -> Dict[str, Any]:
+        profile = self.get_profile(profile_name) or {}
+        return {
+            "name": profile_name,
+            "description": profile.get("description", "No description"),
+            "keys": sorted([k for k in profile.keys() if k != "description"]),
+        }
+
+
+class _FallbackRollbackManager:
+    def list_rollback_points(self) -> List[Dict[str, Any]]:
+        return []
+
+    def rollback(self, rollback_id: str, dry_run: bool = False) -> bool:
+        return False
+
+
+try:
+    from logger import get_logger, log_operation_start, log_operation_success, log_operation_failure
+    from config_manager import ConfigurationManager
+    from rollback import RollbackManager
+    OPTIONAL_BACKEND_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: Optional web backend modules unavailable: {e}")
+    print("Using config-only fallback backend.")
+    get_logger = _fallback_logger
+    log_operation_start = _noop
+    log_operation_success = _noop
+    log_operation_failure = _noop
+    ConfigurationManager = _FallbackConfigManager
+    RollbackManager = _FallbackRollbackManager
+    OPTIONAL_BACKEND_AVAILABLE = False
 
 app = Flask(__name__)
 # Use environment variable for secret key, fallback to generated key
@@ -375,6 +462,8 @@ def test_connection():
     return jsonify({
         'success': True,
         'message': 'Albator Web Interface is running',
+        'optional_backend_available': OPTIONAL_BACKEND_AVAILABLE,
+        'socketio_available': SOCKETIO_AVAILABLE,
         'timestamp': datetime.now().isoformat()
     })
 
