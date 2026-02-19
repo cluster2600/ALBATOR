@@ -15,7 +15,7 @@ Albator is a macOS hardening toolkit that combines shell-based security scripts 
 ## Version Notes
 
 - The legacy entrypoint `albator.sh` now reads `preflight.min_macos_version` and `preflight.enforce_min_version`.
-- Current preflight policy defaults to a minimum macOS version of `26.3` via config and test defaults.
+- Current preflight policy defaults to baseline pack version `26.3` (used for version-aware checks and test defaults).
 - If you use modern flows, run `albator_cli.py preflight` first and follow its output.
 
 ## Requirements
@@ -30,6 +30,18 @@ Install Python dependencies:
 ```bash
 pip3 install -r requirements.txt
 ```
+
+## macOS Compatibility
+
+Albator is tested primarily on recent macOS releases. Some features (FileVault, system extensions, MDM-related settings) can be release-specific.
+
+| macOS version | Support level | Notes |
+|---|---|---|
+| 15.x (Sequoia) | Supported | Primary target for current scripts and probes. |
+| 14.x (Sonoma) | Best-effort | Many scripts work; some output signatures may differ. |
+| 13.x and older | Not supported | Use at your own risk; expect missing tooling and behavior drift. |
+
+The repository also includes a versioned **baseline/profile pack** currently labeled `26.3`. This is an internal pack/version identifier (not a macOS marketing/version codename).
 
 ## Quick Start
 
@@ -97,7 +109,7 @@ Primary runtime config:
 
 - `config/albator.yaml`
 
-macOS 26.3 profile pack:
+Baseline profile pack `26.3`:
 
 - `config/profiles/macos_26_3.yaml`
 - `config/profiles/core_only.yaml` (minimal supported release boundary)
@@ -162,7 +174,7 @@ flowchart TD
 - Some actions require reboot or user interaction (for example FileVault workflows).
 - `apple_updates.sh --offline` now degrades gracefully when cache is missing.
 - Set `STRICT_OFFLINE=true` if you want offline mode to fail when no cache exists.
-- `tests/test_security.sh` minimum version is configurable with `MIN_MACOS_VERSION` (default `26.3`).
+- `tests/test_security.sh` minimum version policy is configurable with `MIN_MACOS_VERSION` (default `26.3`).
 - Script fixes are protected against shell injection by rejecting shell control characters.
 - Core hardening scripts return explicit status codes: `0` (applied/success), `10` (already compliant/no-op), `1` (error).
 - Set `ALBATOR_LOG_FORMAT=json` for structured shell-script log lines.
