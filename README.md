@@ -37,11 +37,12 @@ Albator is tested primarily on recent macOS releases. Some features (FileVault, 
 
 | macOS version | Support level | Notes |
 |---|---|---|
+| **26.x Tahoe** | ✅ Primary Dev Target | Current dev baseline (26.3 validated). Successor to Sequoia. 26.4 testing Monday. |
 | 15.x (Sequoia) | Supported | Primary target for current scripts and probes. |
 | 14.x (Sonoma) | Best-effort | Many scripts work; some output signatures may differ. |
 | 13.x and older | Not supported | Use at your own risk; expect missing tooling and behavior drift. |
 
-The repository also includes a versioned **baseline/profile pack** currently labeled `26.3`. This is an internal pack/version identifier (not a macOS marketing/version codename).
+> **Note**: `26.3` corresponds to the current **macOS Tahoe** beta. Default `min_macos_version` in `config/albator.yaml` targets this build. For production use on macOS 15.x, adjust to `"15.0"`.
 
 ## Quick Start
 
