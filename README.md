@@ -1,148 +1,115 @@
-# Albator
+# Albator - macOS Hardening Toolkit
 
 ![Albator](albator.png)
 
-Albator is a macOS hardening toolkit that combines shell-based security scripts with Python wrappers for preflight checks, legacy baseline generation, and test automation.
+**Albator** is a comprehensive macOS hardening toolkit designed for security professionals and power users. It combines robust shell scripts for system configuration with a modern Python framework for preflight checks, baseline validation, rollback management, and threat intelligence.
 
-## Current Scope
+## 🚀 Key Features
 
-- Core hardening scripts: `privacy.sh`, `firewall.sh`, `encryption.sh`, `app_security.sh`
-- Security intelligence scripts: `cve_fetch.sh`, `apple_updates.sh`
-- Legacy orchestrator: `albator.sh` (now enforces configurable min macOS policy from `config/albator.yaml`)
-- Unified Python CLI: `albator_cli.py` with preflight and script passthrough
-- Validation assets: `tests/test_security.sh`, `tests/test_framework.py`, `tests/test_core_behaviors.py`
+- **Hardening Scripts**: Modular Bash scripts for Privacy, Firewall, Encryption, and App Security.
+- **Preflight & Validation**: Python-based checks to ensure your environment meets minimum safety requirements before changes.
+- **Rollback Capability**: Automated rollback of applied changes via JSON metadata (new!).
+- **Threat Intelligence**: Fetch and analyze CVEs from GitHub, NVD, and Apple Security updates.
+- **Unified CLI**: A single Python entry point (`albator_cli.py`) to orchestrate all tools.
+- **Legacy Compatibility**: Includes the classic `albator.sh` orchestrator.
 
-## Version Notes
+## 📂 Project Structure
 
-- The legacy entrypoint `albator.sh` now reads `preflight.min_macos_version` and `preflight.enforce_min_version`.
-- Current preflight policy defaults to baseline pack version `26.3` (used for version-aware checks and test defaults).
-- If you use modern flows, run `albator_cli.py preflight` first and follow its output.
+| Component | File(s) | Description |
+|---|---|---|
+| **Unified CLI** | `albator_cli.py` | **Recommended entry point.** Runs preflight, hardening, and tools. |
+| **Core Hardening** | `privacy.sh`, `firewall.sh`, `encryption.sh`, `app_security.sh` | Bash scripts implementing security controls. |
+| **Rollback** | `rollback_apply.py` | Reverts changes using generated state metadata. |
+| **Threat Intel** | `cve_fetch.sh`, `apple_updates.sh` | Fetches security advisories and update lists. |
+| **Legacy** | `albator.sh` | Classic Bash orchestrator (ASCII art included). |
+| **Validation** | `tests/*` | Shell and Python tests for compliance verification. |
+| **Config** | `config/albator.yaml` | Runtime configuration (policies, versions). |
 
-## Requirements
+## 📦 Requirements
 
-- macOS with administrator privileges (`sudo`)
-- Python 3.8+
-- `curl` and `jq` (required for CVE/update fetch workflows)
-- `pup` (optional, used by update parsing when available)
+- **Python 3.8+**
+- **Administrator privileges** (`sudo`) for hardening actions
+- **Dependencies**: `curl`, `jq` (required), `pup` (optional for HTML parsing)
 
 Install Python dependencies:
-
 ```bash
 pip3 install -r requirements.txt
 ```
 
-## macOS Compatibility
+### macOS Compatibility
 
-Albator is tested primarily on recent macOS releases. Some features (FileVault, system extensions, MDM-related settings) can be release-specific.
+Albator is tested on current and upcoming macOS releases, including internal beta builds.
 
 | macOS version | Support level | Notes |
 |---|---|---|
-| 15.x (Sequoia) | Supported | Primary target for current scripts and probes. |
-| 14.x (Sonoma) | Best-effort | Many scripts work; some output signatures may differ. |
-| 13.x and older | Not supported | Use at your own risk; expect missing tooling and behavior drift. |
+| **26.x Tahoe** | ✅ Primary Dev Target | Current dev baseline (26.3 validated). Successor to Sequoia. 26.4 testing Monday. |
+| **15.x (Sequoia)** | ✅ Supported | Production-stable target for current scripts. |
+| **14.x (Sonoma)** | ⚠️ Best-effort | Many scripts work; some output signatures may differ. |
+| **13.x and older** | ❌ Not supported | Use at your own risk; expect missing tooling and behavior drift. |
 
-The repository also includes a versioned **baseline/profile pack** currently labeled `26.3`. This is an internal pack/version identifier (not a macOS marketing/version codename).
+> **Note**: The default `min_macos_version` in `config/albator.yaml` is set to `26.3` to match the current beta environment. For production use on macOS 15.x, adjust `config/albator.yaml`:
+> ```yaml
+> preflight:
+>   min_macos_version: "15.0"
+>   enforce_min_version: true
+> ```
 
-## Quick Start
+## 🛠️ Quick Start
 
-Run preflight checks:
-
+### 1. Preflight Checks
+Ensure your system is ready and meets the defined baseline.
 ```bash
 python3 albator_cli.py preflight --json
-python3 albator_cli.py doctor
-python3 albator_cli.py --json-output doctor
 ```
 
-Run individual hardening scripts through the unified CLI:
-
+### 2. Apply Hardening
+Run individual modules via the unified CLI (handles sudo prompts and logging).
 ```bash
 python3 albator_cli.py privacy
 python3 albator_cli.py firewall
 python3 albator_cli.py encryption
 python3 albator_cli.py app_security
+```
+
+*Note: Dry-run mode is available to simulate changes.*
+```bash
 python3 albator_cli.py --json-output privacy --dry-run
 ```
 
-Run threat intelligence helpers:
-
+### 3. Rollback Changes
+If a hardening script causes issues, use the generated metadata file (stored in `ALBATOR_STATE_DIR`) to revert.
 ```bash
+# Dry run first
+python3 rollback_apply.py --meta /tmp/albator_state/rollback_meta.json --dry-run
+
+# Apply rollback
+python3 rollback_apply.py --meta /tmp/albator_state/rollback_meta.json
+```
+
+### 4. Threat Intelligence
+Fetch the latest security advisories:
+```bash
+# Fetch CVEs from GitHub/NVD
 python3 albator_cli.py cve_fetch --dry-run
+
+# Check for Apple software updates (offline cache supported)
 python3 albator_cli.py apple_updates --offline --verbose
 ```
 
-## Legacy Entrypoint
+## ⚙️ Configuration
 
-The Bash orchestrator remains available:
+Runtime behavior is controlled by `config/albator.yaml`.
+Key settings:
+- `preflight.min_macos_version`: Enforce minimum OS version (e.g., "15.0").
+- `preflight.enforce_min_version`: Boolean to block execution on older OS.
 
-```bash
-./albator.sh --firewall --privacy --report --test
-```
-
-Use this path only if you explicitly want the legacy orchestration flow.
-
-## Testing and Validation
-
-Shell validation suite:
-
-```bash
-./tests/test_security.sh --verbose
-```
-
-Python integration-style checks:
-
-```bash
-python3 tests/test_framework.py --verbose --include-mutating
-python3 tests/test_framework.py --verbose --include-privileged
-```
-
-Core unit tests:
-
-```bash
-python3 -m unittest tests/test_core_behaviors.py -v
-```
-
-For the full validation matrix, see `VALIDATION_AND_TESTING.md`.
-
-## Configuration
-
-Primary runtime config:
-
-- `config/albator.yaml`
-
-Baseline profile pack `26.3`:
-
-- `config/profiles/macos_26_3.yaml`
-- `config/profiles/core_only.yaml` (minimal supported release boundary)
-
-Relevant preflight keys in `config/albator.yaml`:
-
-- `preflight.min_macos_version`
-- `preflight.enforce_min_version`
-
-## GitHub Releases (Binaries + Source)
-
-Albator now includes automated tag-based release publishing with macOS Swift binaries.
-
-When a tag matching `v*` is pushed (example: `v3.0.2`), workflow `.github/workflows/release-artifacts.yml` builds and publishes:
-- `albator-swift-vX.Y.Z-macos-arm64.tar.gz`
-- `*.sha256` checksum files for each artifact
-- source archive `albator-vX.Y.Z.tar.gz` + checksum
-
-Publish a release:
-
-```bash
-git tag v3.0.2
-git push origin v3.0.2
-```
-
-For Swift-specific details, see `albator-swift/README.md`.
-
-## Architecture Overview
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TD
-    U["User"] --> C["albator_cli.py (recommended entrypoint)"]
-    U --> L["albator.sh (legacy orchestrator, configurable version policy)"]
+    U["User"] --> C["albator_cli.py (Primary)"]
+    U --> L["albator.sh (Legacy)"]
+    U --> R["rollback_apply.py (Recovery)"]
 
     C --> P["preflight.py"]
     C --> S1["privacy.sh"]
@@ -151,54 +118,31 @@ flowchart TD
     C --> S4["app_security.sh"]
     C --> S5["cve_fetch.sh"]
     C --> S6["apple_updates.sh"]
-    C --> M["main.py (legacy baseline tools)"]
 
-    L --> S1
-    L --> S2
-    L --> S3
-    L --> S4
-    L --> S5
-    L --> S6
+    L --> S1 & S2 & S3 & S4 & S5 & S6
 
-    T["tests/"] --> T1["tests/test_security.sh"]
-    T --> T2["tests/test_framework.py"]
-    T --> T3["tests/test_core_behaviors.py"]
+    subgraph Core Logic
+        S1 & S2 & S3 & S4
+    end
 
-    O["Optional components"] --> E["albator_enhanced.py"]
-    O --> W["web/app.py + web/templates/"]
-    E -. "depends on missing lib/* modules in this checkout" .-> X["Not fully self-contained here"]
+    subgraph Intel
+        S5 & S6
+    end
+
+    R -.-> |Reads| META["JSON Metadata"]
+    Core Logic -.-> |Generates| META
 ```
 
-## Notes and Limitations
+## ⚠️ Notes & Limitations
 
-- Some actions require reboot or user interaction (for example FileVault workflows).
-- `apple_updates.sh --offline` now degrades gracefully when cache is missing.
-- Set `STRICT_OFFLINE=true` if you want offline mode to fail when no cache exists.
-- `tests/test_security.sh` minimum version policy is configurable with `MIN_MACOS_VERSION` (default `26.3`).
-- Script fixes are protected against shell injection by rejecting shell control characters.
-- Core hardening scripts return explicit status codes: `0` (applied/success), `10` (already compliant/no-op), `1` (error).
-- Set `ALBATOR_LOG_FORMAT=json` for structured shell-script log lines.
-- Dry-run executions now generate plan artifacts in `${ALBATOR_STATE_DIR:-/tmp/albator_state}`.
-- API endpoints in `web/app.py` require `X-Albator-Token` when `ALBATOR_API_TOKEN` is set.
-- Set `ALBATOR_TEST_ALLOW_DRYRUN_NO_SUDO=true` to allow deterministic dry-run script validation without non-interactive sudo.
+- **State Directory**: Scripts generate rollback metadata in `/tmp/albator_state` (configurable via `ALBATOR_STATE_DIR`).
+- **Offline Mode**: `apple_updates.sh` degrades gracefully if offline and cache is missing. Set `STRICT_OFFLINE=true` to force failure.
+- **Enterprise Features**: `albator_enhanced.py` contains placeholders for advanced integrations (Fleet, Analytics) which depend on external `lib/` modules not present in the open-source release.
 
-## Optional/Experimental Components
+## 🤝 Contributing
 
-- `albator_enhanced.py` and `web/` are present, but some enhanced enterprise modules referenced by `albator_enhanced.py` are not included in this checkout (`lib/` imports). Treat that path as optional unless those modules are restored.
+See `CONTRIBUTING.md` for guidelines. Please open issues with reproducible test cases.
 
-## Security and Project Docs
-
-- Security policy and disclosure process: `SECURITY.md`
-- Validation/testing reference: `VALIDATION_AND_TESTING.md`
-- Core-vs-optional component map: `CORE_VS_OPTIONAL.md`
-- Deprecation policy and migration notes: `DEPRECATIONS.md`
-- Full implementation notes (2026-02-18 pass): `IMPLEMENTATION_NOTES_2026-02-18.md`
-- Change history: `CHANGELOG.md`
-
-## Contributing
-
-Open an issue or pull request with a reproducible test case and expected behavior.
-
-## License
+## 📄 License
 
 MIT License.
