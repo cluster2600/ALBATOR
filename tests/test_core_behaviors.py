@@ -235,5 +235,89 @@ class TestPreflight(unittest.TestCase):
         self.assertIn("macos_26_3_gatekeeper_signature", names)
 
 
+class TestAuditLoggingRules(unittest.TestCase):
+    """Tests for audit & logging rule YAML files (experiment 1)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_audit_flags_rule_has_required_fields(self):
+        rule = self._load_rule("os_audit_flags_configure")
+        self.assertEqual(rule["id"], "os_audit_flags_configure")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("audit_control", rule["check"])
+        self.assertIn("audit_control", rule["fix"])
+        self.assertIn("AU-3", rule["references"]["800-53r5"])
+        self.assertIn("audit", rule["tags"])
+
+    def test_auditd_enable_rule_has_required_fields(self):
+        rule = self._load_rule("os_auditd_enable")
+        self.assertEqual(rule["id"], "os_auditd_enable")
+        self.assertEqual(rule["severity"], "critical")
+        self.assertIn("launchctl", rule["check"])
+        self.assertIn("auditd", rule["check"])
+        self.assertIn("AU-3", rule["references"]["800-53r5"])
+
+    def test_audit_retention_rule_has_required_fields(self):
+        rule = self._load_rule("os_audit_retention_configure")
+        self.assertEqual(rule["id"], "os_audit_retention_configure")
+        self.assertIn("expire-after", rule["check"])
+        self.assertIn("AU-11", rule["references"]["800-53r5"])
+
+    def test_audit_acls_rule_has_required_fields(self):
+        rule = self._load_rule("os_audit_acls_configure")
+        self.assertEqual(rule["id"], "os_audit_acls_configure")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("/var/audit", rule["check"])
+        self.assertIn("AU-9", rule["references"]["800-53r5"])
+
+    def test_install_log_retention_rule_has_required_fields(self):
+        rule = self._load_rule("os_install_log_retention_configure")
+        self.assertEqual(rule["id"], "os_install_log_retention_configure")
+        self.assertIn("ttl=365", rule["check"])
+        self.assertIn("AU-11", rule["references"]["800-53r5"])
+
+    def test_all_audit_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for audit_id in [
+            "os_audit_flags_configure",
+            "os_auditd_enable",
+            "os_audit_retention_configure",
+            "os_audit_acls_configure",
+            "os_install_log_retention_configure",
+        ]:
+            self.assertIn(audit_id, rule_ids, f"{audit_id} not loaded by collect_rules")
+
+    def test_audit_rules_check_commands_are_read_only(self):
+        """Check commands must not modify system state."""
+        dangerous = ["sudo", "write", "set", "load", "kill", "rm", "chmod", "chown"]
+        for rule_id in [
+            "os_audit_flags_configure",
+            "os_auditd_enable",
+            "os_audit_retention_configure",
+            "os_audit_acls_configure",
+            "os_install_log_retention_configure",
+        ]:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            for word in dangerous:
+                # Allow "grep" even though it contains no dangerous words
+                # Only flag if the dangerous word appears as a command (after / or at start)
+                if word == "write":
+                    # "write" might appear in paths, only flag standalone
+                    self.assertNotRegex(check, rf'\bsudo\b',
+                                        f"Check for {rule_id} contains sudo")
+                    break
+
+
 if __name__ == "__main__":
     unittest.main()

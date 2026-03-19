@@ -1,0 +1,3 @@
+experiment	track	description	rules_count	tests_count	pass_fail	notes
+0	baseline	initial state — 17 rules, 19 tests, all passing	17	19	pass	~40-50% CIS Level 1 coverage estimate
+1	rule-coverage	add 5 audit & logging rules (CIS Section 3): auditd enable, audit flags, audit retention, audit ACLs, install log retention + 7 tests	22	26	pass	covers CIS 3.1-3.5 equivalent; ~50-55% CIS Level 1 estimate

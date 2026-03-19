@@ -1,0 +1,16 @@
+title: "Enable Security Auditing (auditd)"
+id: "os_auditd_enable"
+severity: "critical"
+discussion: "The audit daemon (auditd) must be running to generate audit records. Without the audit daemon, no audit events are captured, making it impossible to detect or investigate security incidents. The audit daemon is managed via launchctl on macOS."
+check: "/bin/launchctl list | /usr/bin/grep -q 'com.apple.auditd'"
+fix: "sudo /bin/launchctl load -w /System/Library/LaunchDaemons/com.apple.auditd.plist"
+references:
+  cci: ["CCI-000130", "CCI-000131", "CCI-000132", "CCI-000134"]
+  cce: ["CCE-92834-2"]
+  800-53r5: ["AU-3", "AU-12", "AU-14(1)"]
+  disa_stig: ["V-259761"]
+  srg: ["SRG-OS-000037-GPOS-00015", "SRG-OS-000038-GPOS-00016", "SRG-OS-000039-GPOS-00017"]
+odv: "missing"
+tags: ["stig", "security", "audit"]
+result: "pass"
+mobileconfig: "missing"
