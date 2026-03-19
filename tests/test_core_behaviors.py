@@ -319,5 +319,97 @@ class TestAuditLoggingRules(unittest.TestCase):
                     break
 
 
+class TestPasswordPolicyRules(unittest.TestCase):
+    """Tests for password policy rule YAML files (experiment 2)."""
+
+    PASSWORD_RULE_IDS = [
+        "os_password_min_length",
+        "os_password_complexity",
+        "os_password_history",
+        "os_password_max_age",
+        "os_password_lockout",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_password_min_length_rule(self):
+        rule = self._load_rule("os_password_min_length")
+        self.assertEqual(rule["id"], "os_password_min_length")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("pwpolicy", rule["check"])
+        self.assertIn("pwpolicy", rule["fix"])
+        self.assertIn("IA-5(1)", rule["references"]["800-53r5"])
+        self.assertIn("password", rule["tags"])
+
+    def test_password_complexity_rule(self):
+        rule = self._load_rule("os_password_complexity")
+        self.assertEqual(rule["id"], "os_password_complexity")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("pwpolicy", rule["check"])
+        self.assertIn("IA-5(1)", rule["references"]["800-53r5"])
+        self.assertIn("password", rule["tags"])
+
+    def test_password_history_rule(self):
+        rule = self._load_rule("os_password_history")
+        self.assertEqual(rule["id"], "os_password_history")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("pwpolicy", rule["check"])
+        self.assertIn("usingHistory", rule["fix"])
+        self.assertIn("IA-5(1)", rule["references"]["800-53r5"])
+
+    def test_password_max_age_rule(self):
+        rule = self._load_rule("os_password_max_age")
+        self.assertEqual(rule["id"], "os_password_max_age")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("pwpolicy", rule["check"])
+        self.assertIn("maxMinutesUntilChangePassword", rule["fix"])
+        self.assertIn("IA-5(1)", rule["references"]["800-53r5"])
+
+    def test_password_lockout_rule(self):
+        rule = self._load_rule("os_password_lockout")
+        self.assertEqual(rule["id"], "os_password_lockout")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("pwpolicy", rule["check"])
+        self.assertIn("maxFailedLoginAttempts", rule["fix"])
+        self.assertIn("AC-7", rule["references"]["800-53r5"])
+
+    def test_all_password_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for pw_id in self.PASSWORD_RULE_IDS:
+            self.assertIn(pw_id, rule_ids, f"{pw_id} not loaded by collect_rules")
+
+    def test_password_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.PASSWORD_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+            self.assertNotRegex(check, r'\bsetglobalpolicy\b',
+                                f"Check for {rule_id} contains setglobalpolicy")
+
+    def test_password_rules_have_required_schema_fields(self):
+        """All password rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.PASSWORD_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            # References must include 800-53r5
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()
