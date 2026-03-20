@@ -1,0 +1,16 @@
+title: "Disable Remote Apple Events"
+id: "os_remote_apple_events_disable"
+severity: "high"
+discussion: "Remote Apple Events allows applications on other computers to send Apple events to the Mac, enabling remote script execution via AppleScript. This capability can be exploited for unauthorized remote control. CIS Benchmark Section 2.3.2 recommends disabling Remote Apple Events."
+check: "/bin/launchctl print-disabled system 2>/dev/null | /usr/bin/grep -c 'com.apple.AEServer.*=>.*disabled'"
+fix: "sudo /bin/launchctl disable system/com.apple.AEServer && sudo /bin/launchctl bootout system/com.apple.AEServer 2>/dev/null; true"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92843-3"]
+  800-53r5: ["CM-7", "AC-17"]
+  disa_stig: ["V-259773"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

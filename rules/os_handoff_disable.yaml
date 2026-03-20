@@ -1,0 +1,16 @@
+title: "Disable Handoff"
+id: "os_handoff_disable"
+severity: "low"
+discussion: "Handoff allows users to continue tasks between Apple devices. This feature transmits data between devices over Bluetooth and Wi-Fi, which could expose sensitive information in transit. CIS Benchmark Section 2.1.2 recommends disabling Handoff on hardened systems to reduce data leakage risk."
+check: "/usr/bin/defaults read ~/Library/Preferences/ByHost/com.apple.coreservices.useractivityd.plist ActivityAdvertisingAllowed 2>/dev/null"
+fix: "/usr/bin/defaults write ~/Library/Preferences/ByHost/com.apple.coreservices.useractivityd.plist ActivityAdvertisingAllowed -bool false && /usr/bin/defaults write ~/Library/Preferences/ByHost/com.apple.coreservices.useractivityd.plist ActivityReceivingAllowed -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92842-5"]
+  800-53r5: ["CM-7", "AC-20"]
+  disa_stig: ["V-259772"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

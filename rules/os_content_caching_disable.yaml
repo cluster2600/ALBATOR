@@ -1,0 +1,16 @@
+title: "Disable Content Caching"
+id: "os_content_caching_disable"
+severity: "medium"
+discussion: "Content Caching stores Apple content locally to reduce bandwidth usage. While useful in managed environments, it can expose cached software updates and App Store content on the local network. CIS Benchmark Section 2.4.10 recommends disabling Content Caching on hardened systems."
+check: "/usr/bin/AssetCacheManagerUtil isActivated 2>&1 | /usr/bin/grep -c 'Content caching is not activated'"
+fix: "sudo /usr/bin/AssetCacheManagerUtil deactivate 2>/dev/null; true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92841-7"]
+  800-53r5: ["CM-7", "SC-7"]
+  disa_stig: ["V-259771"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

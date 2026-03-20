@@ -506,5 +506,99 @@ class TestNetworkRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestSystemPreferencesRules(unittest.TestCase):
+    """Tests for system preferences rule YAML files (experiment 4)."""
+
+    SYSPREF_RULE_IDS = [
+        "os_screen_sharing_disable",
+        "os_content_caching_disable",
+        "os_handoff_disable",
+        "os_remote_apple_events_disable",
+        "os_media_sharing_disable",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_screen_sharing_disable_rule(self):
+        rule = self._load_rule("os_screen_sharing_disable")
+        self.assertEqual(rule["id"], "os_screen_sharing_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("screensharing", rule["check"])
+        self.assertIn("launchctl", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_content_caching_disable_rule(self):
+        rule = self._load_rule("os_content_caching_disable")
+        self.assertEqual(rule["id"], "os_content_caching_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("AssetCacheManagerUtil", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_handoff_disable_rule(self):
+        rule = self._load_rule("os_handoff_disable")
+        self.assertEqual(rule["id"], "os_handoff_disable")
+        self.assertEqual(rule["severity"], "low")
+        self.assertIn("ActivityAdvertisingAllowed", rule["check"])
+        self.assertIn("ActivityAdvertisingAllowed", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_remote_apple_events_disable_rule(self):
+        rule = self._load_rule("os_remote_apple_events_disable")
+        self.assertEqual(rule["id"], "os_remote_apple_events_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("AEServer", rule["check"])
+        self.assertIn("launchctl", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_media_sharing_disable_rule(self):
+        rule = self._load_rule("os_media_sharing_disable")
+        self.assertEqual(rule["id"], "os_media_sharing_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("home-sharing-enabled", rule["check"])
+        self.assertIn("home-sharing-enabled", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_all_syspref_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for sp_id in self.SYSPREF_RULE_IDS:
+            self.assertIn(sp_id, rule_ids, f"{sp_id} not loaded by collect_rules")
+
+    def test_syspref_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.SYSPREF_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+            self.assertNotRegex(check, r'\bdeactivate\b',
+                                f"Check for {rule_id} contains deactivate")
+
+    def test_syspref_rules_have_required_schema_fields(self):
+        """All system preferences rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.SYSPREF_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

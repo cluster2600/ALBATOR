@@ -1,0 +1,16 @@
+title: "Disable Media Sharing"
+id: "os_media_sharing_disable"
+severity: "medium"
+discussion: "Media Sharing allows the Mac to share its media library with other devices on the local network. This exposes media content and increases the attack surface via network service discovery. CIS Benchmark Section 2.3.3.12 recommends disabling Media Sharing on hardened systems."
+check: "/usr/bin/defaults read com.apple.amp.mediasharingd home-sharing-enabled 2>/dev/null"
+fix: "/usr/bin/defaults write com.apple.amp.mediasharingd home-sharing-enabled -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92844-1"]
+  800-53r5: ["CM-7", "AC-3"]
+  disa_stig: ["V-259774"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

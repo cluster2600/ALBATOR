@@ -1,0 +1,16 @@
+title: "Disable Screen Sharing"
+id: "os_screen_sharing_disable"
+severity: "high"
+discussion: "Screen Sharing allows remote users to view and control the Mac. If not required for remote administration, this service should be disabled to reduce the attack surface. CIS Benchmark Section 2.3.3.1 recommends disabling Screen Sharing unless operationally required."
+check: "/bin/launchctl print-disabled system 2>/dev/null | /usr/bin/grep -c 'com.apple.screensharing.*=>.*disabled'"
+fix: "sudo /bin/launchctl disable system/com.apple.screensharing && sudo /bin/launchctl bootout system/com.apple.screensharing 2>/dev/null; true"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92840-9"]
+  800-53r5: ["CM-7", "AC-17"]
+  disa_stig: ["V-259770"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
