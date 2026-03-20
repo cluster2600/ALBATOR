@@ -1,0 +1,16 @@
+title: "Disable iCloud Desktop and Documents Sync"
+id: "os_icloud_documents_desktop_disable"
+severity: "high"
+discussion: "iCloud Desktop and Documents Folders automatically syncs the contents of the user's Desktop and Documents folders to iCloud Drive. This can lead to sensitive organizational data being stored in Apple's cloud infrastructure without explicit user awareness. CIS Benchmark Section 2.6.3 recommends disabling this feature to maintain control over where organizational data is stored."
+check: "/usr/bin/defaults read ~/Library/Preferences/com.apple.finder FXICloudDriveDesktop 2>/dev/null"
+fix: "/usr/bin/defaults write ~/Library/Preferences/com.apple.finder FXICloudDriveDesktop -bool false && /usr/bin/defaults write ~/Library/Preferences/com.apple.finder FXICloudDriveDocuments -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92862-3"]
+  800-53r5: ["SC-8", "AC-20", "SC-28"]
+  disa_stig: ["V-259792"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "icloud", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

@@ -788,5 +788,98 @@ class TestApplicationSecurityRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestICloudAndTimeRules(unittest.TestCase):
+    """Tests for iCloud & time/NTP rule YAML files (experiment 7)."""
+
+    ICLOUD_RULE_IDS = [
+        "os_icloud_keychain_disable",
+        "os_icloud_drive_disable",
+        "os_icloud_documents_desktop_disable",
+        "os_find_my_mac_enable",
+        "os_time_server_configure",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_icloud_keychain_disable_rule(self):
+        rule = self._load_rule("os_icloud_keychain_disable")
+        self.assertEqual(rule["id"], "os_icloud_keychain_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("allowCloudKeychainSync", rule["check"])
+        self.assertIn("allowCloudKeychainSync", rule["fix"])
+        self.assertIn("SC-8", rule["references"]["800-53r5"])
+        self.assertIn("icloud", rule["tags"])
+
+    def test_icloud_drive_disable_rule(self):
+        rule = self._load_rule("os_icloud_drive_disable")
+        self.assertEqual(rule["id"], "os_icloud_drive_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("allowCloudDocumentSync", rule["check"])
+        self.assertIn("allowCloudDocumentSync", rule["fix"])
+        self.assertIn("SC-8", rule["references"]["800-53r5"])
+        self.assertIn("icloud", rule["tags"])
+
+    def test_icloud_documents_desktop_disable_rule(self):
+        rule = self._load_rule("os_icloud_documents_desktop_disable")
+        self.assertEqual(rule["id"], "os_icloud_documents_desktop_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("FXICloudDriveDesktop", rule["check"])
+        self.assertIn("FXICloudDriveDesktop", rule["fix"])
+        self.assertIn("SC-8", rule["references"]["800-53r5"])
+        self.assertIn("icloud", rule["tags"])
+
+    def test_find_my_mac_enable_rule(self):
+        rule = self._load_rule("os_find_my_mac_enable")
+        self.assertEqual(rule["id"], "os_find_my_mac_enable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("FMMEnabled", rule["check"])
+        self.assertIn("FMMEnabled", rule["fix"])
+        self.assertIn("CM-6", rule["references"]["800-53r5"])
+        self.assertIn("icloud", rule["tags"])
+
+    def test_time_server_configure_rule(self):
+        rule = self._load_rule("os_time_server_configure")
+        self.assertEqual(rule["id"], "os_time_server_configure")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("getusingnetworktime", rule["check"])
+        self.assertIn("setusingnetworktime", rule["fix"])
+        self.assertIn("AU-8", rule["references"]["800-53r5"])
+        self.assertIn("time", rule["tags"])
+
+    def test_all_icloud_time_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for rule_id in self.ICLOUD_RULE_IDS:
+            self.assertIn(rule_id, rule_ids, f"{rule_id} not loaded by collect_rules")
+
+    def test_icloud_time_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.ICLOUD_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+
+    def test_icloud_time_rules_have_required_schema_fields(self):
+        """All iCloud/time rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.ICLOUD_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

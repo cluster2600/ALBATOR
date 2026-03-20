@@ -1,0 +1,16 @@
+title: "Disable iCloud Keychain Sync"
+id: "os_icloud_keychain_disable"
+severity: "medium"
+discussion: "iCloud Keychain syncs passwords, credit card information, and Wi-Fi credentials across Apple devices via iCloud. In managed or high-security environments, syncing credentials to cloud services increases the risk of data exposure if an iCloud account is compromised. CIS Benchmark Section 2.6.1 recommends disabling iCloud Keychain to keep sensitive credentials local to the device."
+check: "/usr/bin/profiles -P -o stdout 2>/dev/null | /usr/bin/grep -c 'allowCloudKeychainSync = 0'"
+fix: "sudo /usr/bin/profiles install -type configuration -payload 'com.apple.applicationaccess' -key 'allowCloudKeychainSync' -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92860-7"]
+  800-53r5: ["SC-8", "SC-28"]
+  disa_stig: ["V-259790"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "icloud", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

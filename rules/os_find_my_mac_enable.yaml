@@ -1,0 +1,16 @@
+title: "Enable Find My Mac"
+id: "os_find_my_mac_enable"
+severity: "medium"
+discussion: "Find My Mac helps locate, lock, or erase a lost or stolen Mac. In enterprise environments, enabling Find My Mac adds a layer of physical security by allowing administrators or users to remotely wipe a lost device, preventing unauthorized data access. CIS Benchmark Section 2.6.4 recommends enabling Find My Mac for asset protection and data loss prevention."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.FindMyMac FMMEnabled 2>/dev/null"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.FindMyMac FMMEnabled -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92863-1"]
+  800-53r5: ["CM-6", "MP-4"]
+  disa_stig: ["V-259793"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "icloud", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

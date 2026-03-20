@@ -1,0 +1,16 @@
+title: "Configure Time Server for NTP Synchronization"
+id: "os_time_server_configure"
+severity: "high"
+discussion: "Accurate time synchronization is critical for security logging, certificate validation, Kerberos authentication, and forensic analysis. macOS uses NTP to synchronize the system clock with a network time server. CIS Benchmark Section 2.5.1 recommends ensuring time synchronization is enabled and configured to use an authorized time server. Without proper time sync, audit logs become unreliable and time-based security controls may fail."
+check: "/usr/sbin/systemsetup -getusingnetworktime 2>/dev/null | /usr/bin/grep -c 'On'"
+fix: "sudo /usr/sbin/systemsetup -setusingnetworktime on && sudo /usr/sbin/systemsetup -setnetworktimeserver time.apple.com"
+references:
+  cci: ["CCI-001891"]
+  cce: ["CCE-92864-9"]
+  800-53r5: ["AU-8", "AU-8(1)"]
+  disa_stig: ["V-259794"]
+  srg: ["SRG-OS-000355-GPOS-00143"]
+odv: "missing"
+tags: ["stig", "security", "time", "ntp", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

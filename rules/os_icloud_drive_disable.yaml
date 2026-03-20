@@ -1,0 +1,16 @@
+title: "Disable iCloud Drive"
+id: "os_icloud_drive_disable"
+severity: "medium"
+discussion: "iCloud Drive allows users to store documents and data in Apple's cloud infrastructure. In environments subject to data residency or classification requirements, automatic cloud sync of files presents a data loss prevention risk. CIS Benchmark Section 2.6.2 recommends disabling iCloud Drive to prevent uncontrolled data exfiltration to cloud services."
+check: "/usr/bin/profiles -P -o stdout 2>/dev/null | /usr/bin/grep -c 'allowCloudDocumentSync = 0'"
+fix: "sudo /usr/bin/profiles install -type configuration -payload 'com.apple.applicationaccess' -key 'allowCloudDocumentSync' -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92861-5"]
+  800-53r5: ["SC-8", "AC-20"]
+  disa_stig: ["V-259791"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "icloud", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
