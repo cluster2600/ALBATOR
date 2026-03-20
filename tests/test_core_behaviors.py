@@ -2109,5 +2109,223 @@ class TestScanCLIIntegration(unittest.TestCase):
             self.assertIn(r["severity"], ("high", "critical"))
 
 
+class TestFixModule(unittest.TestCase):
+    """Tests for the fix module — remediation of non-compliant rules (experiment 18)."""
+
+    def setUp(self):
+        import fix as fix_mod
+        self.fix_mod = fix_mod
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = str(self.repo_root / "rules")
+        self.profiles_dir = str(self.repo_root / "config" / "profiles")
+
+    def test_run_fix_empty_command(self):
+        """run_fix with empty fix command should return failure."""
+        rule = {"id": "test", "fix": ""}
+        ok, detail = self.fix_mod.run_fix(rule)
+        self.assertFalse(ok)
+        self.assertIn("no fix command", detail)
+
+    def test_run_fix_with_passing_command(self):
+        """run_fix with a simple true command should succeed."""
+        rule = {"id": "test", "fix": "true"}
+        ok, detail = self.fix_mod.run_fix(rule)
+        self.assertTrue(ok)
+
+    def test_run_fix_with_failing_command(self):
+        """run_fix with false should fail."""
+        rule = {"id": "test", "fix": "false"}
+        ok, detail = self.fix_mod.run_fix(rule)
+        self.assertFalse(ok)
+
+    def test_run_fix_timeout(self):
+        """run_fix should respect timeout."""
+        rule = {"id": "test", "fix": "sleep 10"}
+        ok, detail = self.fix_mod.run_fix(rule, timeout=1)
+        self.assertFalse(ok)
+        self.assertIn("timed out", detail)
+
+    def test_fix_dry_run_returns_all_rules(self):
+        """fix --dry-run should return results for all 72 rules."""
+        result = self.fix_mod.fix(
+            rules_dir=self.rules_dir,
+            profiles_dir=self.profiles_dir,
+            dry_run=True,
+        )
+        self.assertEqual(result["rules_checked"], 72)
+        self.assertTrue(result["dry_run"])
+        # Every result should be compliant or would-fix or skipped
+        for r in result["results"]:
+            self.assertIn(r["status"], ("compliant", "would-fix", "skipped"))
+
+    def test_fix_dry_run_with_profile(self):
+        """fix --dry-run --profile cis_level1 should filter rules."""
+        result = self.fix_mod.fix(
+            rules_dir=self.rules_dir,
+            profiles_dir=self.profiles_dir,
+            profile_name="cis_level1",
+            dry_run=True,
+        )
+        self.assertLess(result["rules_checked"], 72)
+        self.assertEqual(result["profile"], "cis_level1")
+
+    def test_fix_dry_run_with_severity(self):
+        """fix --dry-run --severity high should only include high/critical."""
+        result = self.fix_mod.fix(
+            rules_dir=self.rules_dir,
+            profiles_dir=self.profiles_dir,
+            min_severity="high",
+            dry_run=True,
+        )
+        for r in result["results"]:
+            self.assertIn(r["severity"], ("high", "critical"))
+
+    def test_fix_results_have_required_keys(self):
+        """fix results dict should have all expected keys."""
+        result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=True)
+        for key in ("rules_checked", "already_compliant", "fixed", "fix_failed",
+                     "skipped", "dry_run", "profile", "results", "summary"):
+            self.assertIn(key, result, f"Missing key: {key}")
+
+    def test_fix_summary_fields(self):
+        """fix summary should have all expected counters."""
+        result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=True)
+        s = result["summary"]
+        for key in ("total", "already_compliant", "non_compliant", "fixed",
+                     "fix_failed", "skipped", "would_fix"):
+            self.assertIn(key, s, f"Missing summary key: {key}")
+        self.assertEqual(s["total"], result["rules_checked"])
+
+    def test_fix_invalid_profile_raises(self):
+        """fix with nonexistent profile should raise FileNotFoundError."""
+        with self.assertRaises(FileNotFoundError):
+            self.fix_mod.fix(
+                rules_dir=self.rules_dir,
+                profiles_dir=self.profiles_dir,
+                profile_name="nonexistent",
+                dry_run=True,
+            )
+
+    def test_fix_no_profiles_dir_with_profile_raises(self):
+        """fix with profile_name but no profiles_dir should raise ValueError."""
+        with self.assertRaises(ValueError):
+            self.fix_mod.fix(
+                rules_dir=self.rules_dir,
+                profile_name="cis_level1",
+                dry_run=True,
+            )
+
+    def test_fix_with_mock_checks_compliant(self):
+        """When all checks pass, all rules should be marked compliant."""
+        from unittest.mock import patch
+        with patch.object(self.fix_mod, "run_check", return_value=(True, "ok")):
+            result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=False)
+        self.assertEqual(result["already_compliant"], 72)
+        self.assertEqual(result["fixed"], 0)
+
+    def test_fix_with_mock_check_fail_and_fix_success(self):
+        """When check fails then fix+verify succeeds, rule should be marked fixed."""
+        from unittest.mock import patch, call
+        check_results = [(False, "not compliant"), (True, "ok")]
+        with patch.object(self.fix_mod, "run_check", side_effect=check_results), \
+             patch.object(self.fix_mod, "run_fix", return_value=(True, "applied")):
+            # Use a single rule
+            rules = self.fix_mod.load_rules(self.rules_dir)[:1]
+            with patch.object(self.fix_mod, "load_rules", return_value=rules):
+                result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=False)
+        self.assertEqual(result["fixed"], 1)
+
+    def test_fix_with_mock_fix_failure(self):
+        """When fix command fails, rule should be marked fix-failed."""
+        from unittest.mock import patch
+        with patch.object(self.fix_mod, "run_check", return_value=(False, "fail")), \
+             patch.object(self.fix_mod, "run_fix", return_value=(False, "permission denied")):
+            rules = self.fix_mod.load_rules(self.rules_dir)[:1]
+            with patch.object(self.fix_mod, "load_rules", return_value=rules):
+                result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=False)
+        self.assertEqual(result["fix_failed"], 1)
+        self.assertEqual(result["results"][0]["status"], "fix-failed")
+
+    def test_format_fix_report_contains_header(self):
+        """format_fix_report output should contain the report header."""
+        result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=True)
+        report = self.fix_mod.format_fix_report(result)
+        self.assertIn("Albator Remediation Report", report)
+        self.assertIn("DRY-RUN", report)
+
+    def test_format_fix_report_shows_would_fix(self):
+        """Dry-run report should show 'Would fix' count."""
+        result = self.fix_mod.fix(rules_dir=self.rules_dir, dry_run=True)
+        report = self.fix_mod.format_fix_report(result)
+        self.assertIn("Would fix:", report)
+
+
+class TestFixCLIIntegration(unittest.TestCase):
+    """CLI integration tests for the fix subcommand (experiment 18)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.cli = str(self.repo_root / "albator_cli.py")
+
+    def test_fix_dry_run_exits_zero(self):
+        """fix --dry-run should exit 0."""
+        result = subprocess.run(
+            ["python3", self.cli, "fix", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Albator Remediation Report", result.stdout)
+
+    def test_fix_dry_run_with_profile(self):
+        """fix --dry-run --profile cis_level1 should filter rules."""
+        result = subprocess.run(
+            ["python3", self.cli, "fix", "--dry-run", "--profile", "cis_level1"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Profile: cis_level1", result.stdout)
+
+    def test_fix_json_output(self):
+        """fix --dry-run --json-output should produce valid JSON."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "fix", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["command"], "fix")
+        self.assertTrue(data["success"])
+        self.assertEqual(data["rules_checked"], 72)
+
+    def test_fix_json_with_profile(self):
+        """fix --json-output --profile cis_level2 should include profile."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "fix", "--dry-run", "--profile", "cis_level2"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["profile"], "cis_level2")
+
+    def test_fix_invalid_profile_exits_2(self):
+        """fix with nonexistent profile should exit 2."""
+        result = subprocess.run(
+            ["python3", self.cli, "fix", "--dry-run", "--profile", "nonexistent"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 2)
+
+    def test_fix_severity_filter(self):
+        """fix --severity high should only include high/critical rules."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "fix", "--dry-run", "--severity", "high"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        for r in data["results"]:
+            self.assertIn(r["severity"], ("high", "critical"))
+
+
 if __name__ == "__main__":
     unittest.main()

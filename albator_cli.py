@@ -10,6 +10,7 @@ import os
 from main import BaselineGenerator
 from preflight import format_preflight_report, preflight_to_json, run_preflight
 from rule_handler import collect_rules
+from fix import fix, format_fix_report
 from scan import scan, format_scan_report
 from utils import parse_authors
 
@@ -301,6 +302,19 @@ def main():
     parser_scan.add_argument("--timeout", type=int, default=30,
                              help="Per-check timeout in seconds (default: 30)")
 
+    parser_fix = subparsers.add_parser("fix", help="Remediate non-compliant rules by running fix commands")
+    parser_fix.add_argument("--profile", type=str, default=None,
+                            help="Compliance profile to filter rules (e.g., cis_level1, cis_level2, stig)")
+    parser_fix.add_argument("--severity", type=str, default=None,
+                            choices=["low", "medium", "high", "critical"],
+                            help="Minimum severity level to include")
+    parser_fix.add_argument("--dry-run", action="store_true",
+                            help="Identify non-compliant rules without applying fixes")
+    parser_fix.add_argument("--check-timeout", type=int, default=30,
+                            help="Per-check timeout in seconds (default: 30)")
+    parser_fix.add_argument("--fix-timeout", type=int, default=60,
+                            help="Per-fix timeout in seconds (default: 60)")
+
     # Bash script commands
     bash_scripts = {
         "privacy": "privacy.sh",
@@ -368,6 +382,34 @@ def main():
         else:
             print(format_scan_report(result))
         sys.exit(0 if (result["failed"] == 0 or result["dry_run"]) else 1)
+
+    if args.command == "fix":
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        rules_dir = os.path.join(base_dir, "rules")
+        profiles_dir = os.path.join(base_dir, "config", "profiles")
+        try:
+            result = fix(
+                rules_dir=rules_dir,
+                profiles_dir=profiles_dir,
+                profile_name=args.profile,
+                min_severity=args.severity,
+                dry_run=args.dry_run,
+                check_timeout=args.check_timeout,
+                fix_timeout=args.fix_timeout,
+            )
+        except (FileNotFoundError, ValueError) as e:
+            if args.json_output:
+                _print_json({"command": "fix", "success": False, "error": str(e)})
+            else:
+                print(f"Error: {e}", file=sys.stderr)
+            sys.exit(2)
+        if args.json_output:
+            result["command"] = "fix"
+            result["success"] = result["fix_failed"] == 0
+            _print_json(result)
+        else:
+            print(format_fix_report(result))
+        sys.exit(0 if (result["fix_failed"] == 0 or result["dry_run"]) else 1)
 
     maybe_run_preflight(args.command, args, config, json_output=args.json_output)
 
