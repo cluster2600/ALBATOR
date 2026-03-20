@@ -1905,5 +1905,209 @@ class TestComprehensiveRuleValidation(unittest.TestCase):
         self.assertEqual(errors, [], "\n".join(errors))
 
 
+class TestScanModule(unittest.TestCase):
+    """Tests for the scan module — compliance auditing against YAML rules (experiment 17)."""
+
+    def setUp(self):
+        import scan as scan_mod
+        self.scan_mod = scan_mod
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = str(self.repo_root / "rules")
+        self.profiles_dir = str(self.repo_root / "config" / "profiles")
+
+    def test_load_rules_returns_all_72(self):
+        """load_rules should find all 72 rule files."""
+        rules = self.scan_mod.load_rules(self.rules_dir)
+        self.assertEqual(len(rules), 72)
+
+    def test_load_rules_each_has_id_and_check(self):
+        """Every loaded rule must have id and check fields."""
+        rules = self.scan_mod.load_rules(self.rules_dir)
+        for r in rules:
+            self.assertIn("id", r, f"Rule missing 'id': {r.get('_source')}")
+            self.assertIn("check", r, f"Rule missing 'check': {r.get('_source')}")
+
+    def test_load_profile_cis_level1(self):
+        """Loading cis_level1 profile should return a non-empty list of rule IDs."""
+        ids = self.scan_mod.load_profile(self.profiles_dir, "cis_level1")
+        self.assertIsInstance(ids, list)
+        self.assertGreater(len(ids), 50)
+
+    def test_load_profile_nonexistent_raises(self):
+        """Loading a nonexistent profile should raise FileNotFoundError."""
+        with self.assertRaises(FileNotFoundError):
+            self.scan_mod.load_profile(self.profiles_dir, "nonexistent_profile")
+
+    def test_filter_rules_by_profile(self):
+        """Filtering by cis_level1 should reduce the rule set."""
+        rules = self.scan_mod.load_rules(self.rules_dir)
+        profile_ids = self.scan_mod.load_profile(self.profiles_dir, "cis_level1")
+        filtered = self.scan_mod.filter_rules_by_profile(rules, profile_ids)
+        self.assertLess(len(filtered), len(rules))
+        self.assertEqual(len(filtered), len([r for r in rules if r["id"] in set(profile_ids)]))
+
+    def test_filter_rules_by_severity(self):
+        """Filtering by high severity should exclude low/medium rules."""
+        rules = self.scan_mod.load_rules(self.rules_dir)
+        high_rules = self.scan_mod.filter_rules_by_severity(rules, "high")
+        for r in high_rules:
+            self.assertIn(r["severity"], ("high", "critical"))
+
+    def test_scan_dry_run_returns_all_rules(self):
+        """Dry-run scan should list all rules without executing checks."""
+        result = self.scan_mod.scan(self.rules_dir, dry_run=True)
+        self.assertEqual(result["rules_scanned"], 72)
+        self.assertTrue(result["dry_run"])
+        self.assertEqual(result["passed"], 0)
+        self.assertEqual(result["failed"], 0)
+        for r in result["results"]:
+            self.assertEqual(r["status"], "dry-run")
+
+    def test_scan_with_profile_dry_run(self):
+        """Dry-run scan with profile should only include profile rules."""
+        result = self.scan_mod.scan(
+            self.rules_dir,
+            profiles_dir=self.profiles_dir,
+            profile_name="cis_level1",
+            dry_run=True,
+        )
+        self.assertLess(result["rules_scanned"], 72)
+        self.assertEqual(result["profile"], "cis_level1")
+
+    def test_scan_with_severity_filter_dry_run(self):
+        """Dry-run scan with severity filter should only include matching rules."""
+        result = self.scan_mod.scan(
+            self.rules_dir, min_severity="critical", dry_run=True
+        )
+        for r in result["results"]:
+            self.assertEqual(r["severity"], "critical")
+
+    def test_scan_summary_compliance_pct(self):
+        """Summary compliance percentage should be 0.0 in dry-run mode."""
+        result = self.scan_mod.scan(self.rules_dir, dry_run=True)
+        self.assertEqual(result["summary"]["compliance_pct"], 0.0)
+
+    def test_format_scan_report_contains_header(self):
+        """Formatted report should contain the header and rule IDs."""
+        result = self.scan_mod.scan(self.rules_dir, dry_run=True)
+        report = self.scan_mod.format_scan_report(result)
+        self.assertIn("Albator Compliance Scan Report", report)
+        self.assertIn("os_firewall_enable", report)
+
+    def test_run_check_with_passing_command(self):
+        """A check command that exits 0 should return (True, ...)."""
+        rule = {"check": "true"}
+        passed, detail = self.scan_mod.run_check(rule)
+        self.assertTrue(passed)
+
+    def test_run_check_with_failing_command(self):
+        """A check command that exits non-zero should return (False, ...)."""
+        rule = {"check": "false"}
+        passed, detail = self.scan_mod.run_check(rule)
+        self.assertFalse(passed)
+
+    def test_run_check_empty_command(self):
+        """An empty check command should return (False, ...)."""
+        rule = {"check": ""}
+        passed, detail = self.scan_mod.run_check(rule)
+        self.assertFalse(passed)
+        self.assertIn("empty", detail)
+
+    def test_run_check_timeout(self):
+        """A check that exceeds timeout should return (False, 'timed out')."""
+        rule = {"check": "sleep 60"}
+        passed, detail = self.scan_mod.run_check(rule, timeout=1)
+        self.assertFalse(passed)
+        self.assertIn("timed out", detail)
+
+    def test_scan_no_profile_dir_with_profile_raises(self):
+        """scan() with profile_name but no profiles_dir should raise ValueError."""
+        with self.assertRaises(ValueError):
+            self.scan_mod.scan(self.rules_dir, profile_name="cis_level1")
+
+    def test_scan_results_have_required_keys(self):
+        """Each result entry should have id, title, severity, status."""
+        result = self.scan_mod.scan(self.rules_dir, dry_run=True)
+        for r in result["results"]:
+            self.assertIn("id", r)
+            self.assertIn("title", r)
+            self.assertIn("severity", r)
+            self.assertIn("status", r)
+
+    def test_scan_with_real_checks_counts_correctly(self):
+        """Running scan with actual checks, pass+fail should equal total."""
+        # Use a tiny subset via severity filter to keep it fast
+        result = self.scan_mod.scan(self.rules_dir, min_severity="critical", dry_run=False, timeout=5)
+        total = result["rules_scanned"]
+        self.assertEqual(result["passed"] + result["failed"], total)
+
+
+class TestScanCLIIntegration(unittest.TestCase):
+    """Tests for 'albator_cli.py scan' CLI integration (experiment 17)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.cli = str(self.repo_root / "albator_cli.py")
+
+    def test_scan_dry_run_exits_zero(self):
+        """scan --dry-run should always exit 0."""
+        result = subprocess.run(
+            ["python3", self.cli, "scan", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Albator Compliance Scan Report", result.stdout)
+
+    def test_scan_dry_run_with_profile(self):
+        """scan --dry-run --profile cis_level1 should list fewer than 72 rules."""
+        result = subprocess.run(
+            ["python3", self.cli, "scan", "--dry-run", "--profile", "cis_level1"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Profile: cis_level1", result.stdout)
+
+    def test_scan_json_output(self):
+        """scan --dry-run --json-output should produce valid JSON."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "scan", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["command"], "scan")
+        self.assertTrue(data["success"])
+        self.assertEqual(data["rules_scanned"], 72)
+
+    def test_scan_json_with_profile(self):
+        """scan --json-output --profile cis_level2 should include profile in output."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "scan", "--dry-run", "--profile", "cis_level2"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["profile"], "cis_level2")
+
+    def test_scan_invalid_profile_exits_2(self):
+        """scan with nonexistent profile should exit 2."""
+        result = subprocess.run(
+            ["python3", self.cli, "scan", "--dry-run", "--profile", "nonexistent"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 2)
+
+    def test_scan_severity_filter(self):
+        """scan --severity high should only include high/critical rules."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "scan", "--dry-run", "--severity", "high"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        for r in data["results"]:
+            self.assertIn(r["severity"], ("high", "critical"))
+
+
 if __name__ == "__main__":
     unittest.main()

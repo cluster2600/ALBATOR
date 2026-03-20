@@ -10,6 +10,7 @@ import os
 from main import BaselineGenerator
 from preflight import format_preflight_report, preflight_to_json, run_preflight
 from rule_handler import collect_rules
+from scan import scan, format_scan_report
 from utils import parse_authors
 
 CONFIG_PATHS = ("config.yaml", os.path.join("config", "albator.yaml"))
@@ -289,6 +290,17 @@ def main():
     parser_preflight.add_argument("--enforce-min-version", action="store_true", help="Fail preflight when below minimum macOS version")
     subparsers.add_parser("doctor", help="Run consolidated diagnostics (preflight, config schema, deps, script perms)")
 
+    parser_scan = subparsers.add_parser("scan", help="Audit system against YAML security rules")
+    parser_scan.add_argument("--profile", type=str, default=None,
+                             help="Compliance profile to filter rules (e.g., cis_level1, cis_level2, stig)")
+    parser_scan.add_argument("--severity", type=str, default=None,
+                             choices=["low", "medium", "high", "critical"],
+                             help="Minimum severity level to include")
+    parser_scan.add_argument("--dry-run", action="store_true",
+                             help="List rules without running checks")
+    parser_scan.add_argument("--timeout", type=int, default=30,
+                             help="Per-check timeout in seconds (default: 30)")
+
     # Bash script commands
     bash_scripts = {
         "privacy": "privacy.sh",
@@ -329,6 +341,33 @@ def main():
 
     if args.command == "doctor":
         sys.exit(run_doctor(config, policy, bash_scripts, json_output=args.json_output))
+
+    if args.command == "scan":
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        rules_dir = os.path.join(base_dir, "rules")
+        profiles_dir = os.path.join(base_dir, "config", "profiles")
+        try:
+            result = scan(
+                rules_dir=rules_dir,
+                profiles_dir=profiles_dir,
+                profile_name=args.profile,
+                min_severity=args.severity,
+                dry_run=args.dry_run,
+                timeout=args.timeout,
+            )
+        except FileNotFoundError as e:
+            if args.json_output:
+                _print_json({"command": "scan", "success": False, "error": str(e)})
+            else:
+                print(f"Error: {e}", file=sys.stderr)
+            sys.exit(2)
+        if args.json_output:
+            result["command"] = "scan"
+            result["success"] = result["failed"] == 0 or result["dry_run"]
+            _print_json(result)
+        else:
+            print(format_scan_report(result))
+        sys.exit(0 if (result["failed"] == 0 or result["dry_run"]) else 1)
 
     maybe_run_preflight(args.command, args, config, json_output=args.json_output)
 
