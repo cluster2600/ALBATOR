@@ -81,9 +81,24 @@ func probeAutoUpdate() -> (enabled: Bool, raw: String) {
 }
 
 func probeScreenSaverPassword() -> (enabled: Bool, raw: String) {
-    let output = shellOutput("/usr/bin/defaults", "read", "com.apple.screensaver", "askForPassword") ?? "unknown"
-    let enabled = output.trimmingCharacters(in: .whitespacesAndNewlines) == "1"
-    return (enabled, output.trimmingCharacters(in: .whitespacesAndNewlines))
+    // macOS 26+ (Tahoe): com.apple.screensaver askForPassword no longer exists.
+    // Use sysadminctl -screenLock status instead — works without root.
+    let output = shellOutput("/usr/sbin/sysadminctl", "-screenLock", "status") ?? "unknown"
+    let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
+    // "screenLock delay is immediate" or "screenLock delay is <N> seconds" = enabled
+    // "screenLock is off" = disabled
+    let enabled = trimmed.lowercased().contains("delay is")
+    let summary: String
+    if trimmed.lowercased().contains("immediate") {
+        summary = "Password required immediately"
+    } else if trimmed.lowercased().contains("delay is") {
+        summary = "Password required after delay"
+    } else if trimmed.lowercased().contains("off") {
+        summary = "Screen lock disabled"
+    } else {
+        summary = trimmed
+    }
+    return (enabled, summary)
 }
 
 func probeAirDrop() -> (mode: String, raw: String) {
@@ -116,9 +131,10 @@ func shellOutput(_ args: String..., timeout: TimeInterval = 5) -> String? {
     process.executableURL = URL(fileURLWithPath: args[0])
     process.arguments = Array(args.dropFirst())
 
-    let pipe = Pipe()
-    process.standardOutput = pipe
-    process.standardError = Pipe()
+    let stdoutPipe = Pipe()
+    let stderrPipe = Pipe()
+    process.standardOutput = stdoutPipe
+    process.standardError = stderrPipe
     // Prevent commands from prompting for input
     process.standardInput = FileHandle.nullDevice
 
@@ -138,8 +154,15 @@ func shellOutput(_ args: String..., timeout: TimeInterval = 5) -> String? {
         return nil
     }
 
-    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    return String(data: data, encoding: .utf8)
+    // Return stdout if non-empty, otherwise fall back to stderr
+    // (some macOS tools like sysadminctl write to stderr)
+    let stdout = String(data: stdoutPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
+        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    if !stdout.isEmpty { return stdout }
+
+    let stderr = String(data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
+        .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return stderr.isEmpty ? nil : stderr
 }
 
 // MARK: - Commands
@@ -258,7 +281,7 @@ func cmdScan(verbose: Bool) {
     if remoteLogin.enabled { recommendations.append("Disable remote login: sudo systemsetup -setremotelogin off") }
     if bluetooth.enabled { recommendations.append("Disable Bluetooth sharing in System Settings > General > Sharing") }
     if !autoUpdate.enabled { recommendations.append("Enable automatic update checks: sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true") }
-    if !screenSaver.enabled { recommendations.append("Require password on screen lock: defaults write com.apple.screensaver askForPassword -int 1") }
+    if !screenSaver.enabled { recommendations.append("Require password on screen lock: sysadminctl -screenLock immediate") }
 
     if recommendations.isEmpty {
         print("  \(c(.boldGreen, "✔ No recommendations — system is well hardened"))")
