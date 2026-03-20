@@ -47,7 +47,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install test dependencies
-        run: pip install PyYAML
+        run: pip install PyYAML pytest
 
       - name: Run core behavior tests
         run: python -m pytest tests/test_core_behaviors.py -v
