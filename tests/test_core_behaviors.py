@@ -1609,5 +1609,211 @@ class TestPrivacyRollbackCommands(unittest.TestCase):
                          "Some record_rollback_change calls in firewall.sh lack a rollback_command argument")
 
 
+class TestComprehensiveRuleValidation(unittest.TestCase):
+    """Cross-cutting validation of ALL 72 rules for schema, safety, references, and profile coverage (experiment 15)."""
+
+    REQUIRED_SCHEMA_KEYS = [
+        "title", "id", "severity", "discussion", "check", "fix",
+        "references", "tags",
+    ]
+    VALID_SEVERITIES = {"low", "medium", "high", "critical"}
+    VALID_800_53_PREFIXES = {
+        "AC", "AU", "AT", "CM", "CP", "IA", "IR", "MA",
+        "MP", "PE", "PL", "PM", "PS", "RA", "SA", "SC",
+        "SI", "SR",
+    }
+    # Commands that should never appear in check (read-only) commands
+    CHECK_FORBIDDEN_PATTERNS = [
+        (r'\bsudo\b', "sudo"),
+        (r'\blaunchctl\s+load\b', "launchctl load"),
+        (r'\blaunchctl\s+unload\b', "launchctl unload"),
+        (r'\bdefaults\s+write\b', "defaults write"),
+        (r'\bdefaults\s+delete\b', "defaults delete"),
+        (r'\bchmod\b', "chmod"),
+        (r'\bchown\b', "chown"),
+        (r'\brm\s', "rm"),
+        (r'\bkill\b', "kill"),
+        (r'\bpmset\s+set\b', "pmset set"),
+        (r'\bpwpolicy\s+-.*setglobalpolicy\b', "pwpolicy setglobalpolicy"),
+    ]
+
+    def setUp(self):
+        import yaml
+        self.yaml = yaml
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+        self.profiles_dir = self.repo_root / "config" / "profiles"
+        self._rules_cache = {}
+
+    def _all_rule_files(self):
+        return sorted(self.rules_dir.glob("os_*.yaml"))
+
+    def _load_rule(self, path):
+        if path not in self._rules_cache:
+            with open(path) as f:
+                self._rules_cache[path] = self.yaml.safe_load(f)
+        return self._rules_cache[path]
+
+    def _load_profile(self, name):
+        with open(self.profiles_dir / f"{name}.yaml") as f:
+            return self.yaml.safe_load(f)
+
+    def test_all_rules_have_required_schema_fields(self):
+        """Every rule YAML must contain all mandatory keys."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            for key in self.REQUIRED_SCHEMA_KEYS:
+                if key not in rule:
+                    errors.append(f"{path.name}: missing '{key}'")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_rule_ids_match_filenames(self):
+        """The 'id' field must match the filename (sans .yaml)."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            expected_id = path.stem
+            if rule.get("id") != expected_id:
+                errors.append(f"{path.name}: id='{rule.get('id')}' != expected '{expected_id}'")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_rules_have_valid_severity(self):
+        """Severity must be one of: low, medium, high, critical."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            sev = rule.get("severity")
+            if sev not in self.VALID_SEVERITIES:
+                errors.append(f"{path.name}: invalid severity '{sev}'")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_rules_have_800_53_references(self):
+        """Every rule must have at least one NIST 800-53r5 reference."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            refs = rule.get("references", {})
+            controls = refs.get("800-53r5", [])
+            if not controls:
+                errors.append(f"{path.name}: no 800-53r5 references")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_800_53_references_use_valid_family_prefixes(self):
+        """All 800-53r5 references must start with a recognized control family prefix."""
+        import re
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            controls = rule.get("references", {}).get("800-53r5", [])
+            for ctrl in controls:
+                prefix = re.match(r'^([A-Z]+)', ctrl)
+                if not prefix or prefix.group(1) not in self.VALID_800_53_PREFIXES:
+                    errors.append(f"{path.name}: invalid 800-53 control '{ctrl}'")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_check_commands_are_read_only(self):
+        """Check commands must not contain destructive/mutating operations."""
+        import re
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            check = rule.get("check", "")
+            for pattern, label in self.CHECK_FORBIDDEN_PATTERNS:
+                if re.search(pattern, check):
+                    errors.append(f"{path.name}: check contains '{label}'")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_check_commands_are_non_empty(self):
+        """Every rule must have a non-empty check command."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            if not rule.get("check", "").strip():
+                errors.append(f"{path.name}: empty check command")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_fix_commands_are_non_empty(self):
+        """Every rule must have a non-empty fix command."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            if not rule.get("fix", "").strip():
+                errors.append(f"{path.name}: empty fix command")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_all_rules_have_at_least_one_tag(self):
+        """Every rule must have at least one tag."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            tags = rule.get("tags", [])
+            if not tags:
+                errors.append(f"{path.name}: no tags")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_every_rule_in_at_least_one_profile(self):
+        """Every rule file must appear in at least one compliance profile."""
+        all_ids = {p.stem for p in self._all_rule_files()}
+        profiled_ids = set()
+        for profile_name in ("cis_level1", "cis_level2", "stig"):
+            data = self._load_profile(profile_name)
+            profiled_ids.update(data["profile"]["rules"])
+        orphans = all_ids - profiled_ids
+        self.assertEqual(orphans, set(),
+                         f"Rules not in any profile: {orphans}")
+
+    def test_no_profile_references_nonexistent_rules(self):
+        """Profiles must not list rules that don't have YAML files."""
+        all_ids = {p.stem for p in self._all_rule_files()}
+        errors = []
+        for profile_name in ("cis_level1", "cis_level2", "stig"):
+            data = self._load_profile(profile_name)
+            for rule_id in data["profile"]["rules"]:
+                if rule_id not in all_ids:
+                    errors.append(f"{profile_name}: references nonexistent rule '{rule_id}'")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_rule_count_is_72(self):
+        """We expect exactly 72 rule files for 100% CIS coverage."""
+        count = len(self._all_rule_files())
+        self.assertEqual(count, 72, f"Expected 72 rules, found {count}")
+
+    def test_all_rules_have_discussion_of_minimum_length(self):
+        """Discussion field should be substantive (at least 20 characters)."""
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            disc = rule.get("discussion", "")
+            if len(disc) < 20:
+                errors.append(f"{path.name}: discussion too short ({len(disc)} chars)")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_no_duplicate_rule_ids_across_files(self):
+        """No two rule files should declare the same id."""
+        seen = {}
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            rid = rule.get("id")
+            if rid in seen:
+                errors.append(f"Duplicate id '{rid}' in {seen[rid]} and {path.name}")
+            seen[rid] = path.name
+        self.assertEqual(errors, [], "\n".join(errors))
+
+    def test_fix_commands_use_absolute_paths_for_system_binaries(self):
+        """Fix commands referencing common system tools should use absolute paths."""
+        import re
+        # Only check for bare 'defaults' at start of fix command (not within pipes)
+        errors = []
+        for path in self._all_rule_files():
+            rule = self._load_rule(path)
+            fix = rule.get("fix", "")
+            # Check if fix starts with bare 'defaults' (no path)
+            if re.match(r'^(sudo\s+)?defaults\s', fix):
+                errors.append(f"{path.name}: fix uses bare 'defaults' instead of /usr/bin/defaults")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+
 if __name__ == "__main__":
     unittest.main()
