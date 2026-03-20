@@ -1253,5 +1253,121 @@ class TestFinalGapRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestComplianceProfiles(unittest.TestCase):
+    """Tests for CIS Level 1, Level 2, and STIG compliance profiles (experiment 13)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.profiles_dir = self.repo_root / "config" / "profiles"
+        self.rules_dir = self.repo_root / "rules"
+        import yaml
+        self.yaml = yaml
+
+    def _load_profile(self, name):
+        path = self.profiles_dir / f"{name}.yaml"
+        self.assertTrue(path.exists(), f"Profile {name}.yaml not found")
+        with open(path) as f:
+            return self.yaml.safe_load(f)
+
+    def _all_rule_ids(self):
+        return sorted(
+            p.stem for p in self.rules_dir.glob("os_*.yaml")
+        )
+
+    def test_cis_level1_profile_exists_and_has_required_fields(self):
+        data = self._load_profile("cis_level1")
+        self.assertIn("profile", data)
+        p = data["profile"]
+        self.assertEqual(p["name"], "cis_level1")
+        self.assertEqual(p["level"], 1)
+        self.assertIn("rules", p)
+        self.assertIn("description", p)
+
+    def test_cis_level2_profile_exists_and_has_required_fields(self):
+        data = self._load_profile("cis_level2")
+        self.assertIn("profile", data)
+        p = data["profile"]
+        self.assertEqual(p["name"], "cis_level2")
+        self.assertEqual(p["level"], 2)
+        self.assertIn("rules", p)
+        self.assertIn("description", p)
+
+    def test_stig_profile_exists_and_has_required_fields(self):
+        data = self._load_profile("stig")
+        self.assertIn("profile", data)
+        p = data["profile"]
+        self.assertEqual(p["name"], "stig")
+        self.assertIn("rules", p)
+        self.assertIn("framework", p)
+        self.assertIn("DISA", p["framework"])
+
+    def test_cis_level1_rules_are_subset_of_level2(self):
+        l1 = set(self._load_profile("cis_level1")["profile"]["rules"])
+        l2 = set(self._load_profile("cis_level2")["profile"]["rules"])
+        missing = l1 - l2
+        self.assertEqual(missing, set(),
+                         f"L1 rules not in L2: {missing}")
+
+    def test_cis_level2_is_superset_with_more_rules(self):
+        l1 = self._load_profile("cis_level1")["profile"]["rules"]
+        l2 = self._load_profile("cis_level2")["profile"]["rules"]
+        self.assertGreater(len(l2), len(l1),
+                           "Level 2 should have more rules than Level 1")
+
+    def test_all_profile_rules_reference_existing_rule_files(self):
+        """Every rule listed in a profile must have a corresponding YAML file."""
+        all_ids = set(self._all_rule_ids())
+        for profile_name in ("cis_level1", "cis_level2", "stig"):
+            rules = self._load_profile(profile_name)["profile"]["rules"]
+            for rule_id in rules:
+                self.assertIn(rule_id, all_ids,
+                              f"{profile_name}: rule {rule_id} has no YAML file")
+
+    def test_cis_level2_covers_all_rules(self):
+        """Level 2 profile should include every os_* rule."""
+        all_ids = set(self._all_rule_ids())
+        l2_ids = set(self._load_profile("cis_level2")["profile"]["rules"])
+        missing = all_ids - l2_ids
+        self.assertEqual(missing, set(),
+                         f"Rules missing from L2 profile: {missing}")
+
+    def test_stig_covers_all_rules(self):
+        """STIG profile should include every os_* rule (all have DISA refs)."""
+        all_ids = set(self._all_rule_ids())
+        stig_ids = set(self._load_profile("stig")["profile"]["rules"])
+        missing = all_ids - stig_ids
+        self.assertEqual(missing, set(),
+                         f"Rules missing from STIG profile: {missing}")
+
+    def test_no_duplicate_rules_in_profiles(self):
+        """No profile should list the same rule twice."""
+        for profile_name in ("cis_level1", "cis_level2", "stig"):
+            rules = self._load_profile(profile_name)["profile"]["rules"]
+            self.assertEqual(len(rules), len(set(rules)),
+                             f"{profile_name} has duplicate rules")
+
+    def test_level2_only_rules_not_in_level1(self):
+        """Known L2-only controls must not appear in the L1 profile."""
+        l2_only = {
+            "os_diagnostic_reports_disable", "os_find_my_mac_enable",
+            "os_handoff_disable", "os_icloud_keychain_disable",
+            "os_ipv6_privacy_extensions", "os_location_services_enable",
+            "os_lockdown_enable", "os_managed_kext_policy",
+            "os_power_nap_disable", "os_safari_javascript_restrict",
+            "os_time_machine_auto_backup",
+        }
+        l1_rules = set(self._load_profile("cis_level1")["profile"]["rules"])
+        overlap = l2_only & l1_rules
+        self.assertEqual(overlap, set(),
+                         f"L2-only rules found in L1 profile: {overlap}")
+
+    def test_profile_rule_counts_match(self):
+        """Declared rule_count must match actual rules list length."""
+        for profile_name in ("cis_level1", "cis_level2", "stig"):
+            p = self._load_profile(profile_name)["profile"]
+            self.assertEqual(p["rule_count"], len(p["rules"]),
+                             f"{profile_name} rule_count mismatch")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,127 @@
+profile:
+  name: cis_level2
+  display_name: "CIS macOS Benchmark — Level 1 + Level 2"
+  description: >
+    All CIS Apple macOS Benchmark Level 1 and Level 2 controls.
+    Level 2 extends Level 1 with settings intended for environments
+    requiring heightened security. These may reduce system usability
+    or functionality and are recommended for high-security deployments.
+  benchmark: "CIS Apple macOS Benchmark v4.0"
+  level: 2
+  rule_count: 72
+  rules:
+    # ── Section 1 — Software Updates ──
+    - os_software_update_auto          # 1.1  L1
+    - os_software_update_download      # 1.2  L1
+    - os_software_update_critical_install  # 1.3  L1
+    - os_security_responses_install    # 1.5  L1
+
+    # ── Section 2.1 — Bluetooth ──
+    - os_bluetooth_disable             # 2.1.1  L1
+    - os_bluetooth_sharing_disable     # 2.1.2  L1
+
+    # ── Section 2.2 — Date & Time ──
+    - os_time_server_configure         # 2.2.1  L1
+
+    # ── Section 2.3 — Sharing ──
+    - os_screen_sharing_disable        # 2.3.2  L1
+    - os_file_sharing_smb_disable      # 2.3.3.1/2  L1
+    - os_printer_sharing_disable       # 2.3.3.3  L1
+    - os_ssh_disable                   # 2.3.3.4  L1
+    - os_remote_management_disable     # 2.3.3.5  L1
+    - os_remote_apple_events_disable   # 2.3.3.6  L1
+    - os_internet_sharing_disable      # 2.3.3.7  L1
+    - os_content_caching_disable       # 2.3.3.8  L1
+    - os_media_sharing_disable         # 2.3.3.9  L1
+    - os_dvd_sharing_disable           # 2.3.3.11  L1
+    - os_airdrop_disable               # 2.3.3.12  L1
+
+    # ── Section 2.4 — Siri ──
+    - os_siri_disable                  # 2.4.1  L1
+
+    # ── Section 2.5 — Privacy & Security ──
+    - os_filevault_enable              # 2.5.1  L1
+    - os_gatekeeper_enable             # 2.5.2  L1
+    - os_diagnostic_reports_disable    # 2.5.2.1  L2
+    - os_ad_tracking_disable           # 2.5.3  L1
+    - os_lockdown_enable               # 2.5.4  L2
+
+    # ── Section 2.6 — iCloud ──
+    - os_icloud_keychain_disable       # 2.6.1  L2
+    - os_location_services_enable      # 2.6.1.1  L2
+    - os_icloud_drive_disable          # 2.6.2  L1
+    - os_icloud_documents_desktop_disable  # 2.6.3  L1
+    - os_find_my_mac_enable            # 2.6.4  L2
+
+    # ── Section 2.7 — Time Machine ──
+    - os_time_machine_auto_backup      # 2.7.1  L2
+
+    # ── Section 2.8 — Handoff ──
+    - os_handoff_disable               # 2.8.1  L2
+
+    # ── Section 2.9 — Energy ──
+    - os_wake_network_access_disable   # 2.9.1  L1
+    - os_power_nap_disable             # 2.9.2  L2
+
+    # ── Section 2.10 — Peripherals ──
+    - os_usb_restricted_mode           # 2.10.1  L1
+
+    # ── Section 3 — Logging and Auditing ──
+    - os_auditd_enable                 # 3.1  L1
+    - os_firewall_stealth_mode         # 3.2  L1
+    - os_firewall_enable               # 3.3  L1
+    - os_audit_flags_configure         # 3.4  L1
+    - os_audit_retention_configure     # 3.5  L1
+    - os_audit_acls_configure          # 3.6  L1
+    - os_install_log_retention_configure  # 3.7  L1
+
+    # ── Section 4 — Network ──
+    - os_bonjour_disable               # 4.1  L1
+    - os_httpd_disable                 # 4.2  L1
+    - os_nfsd_disable                  # 4.3  L1
+    - os_wifi_disable                  # 4.4  L1
+    - os_ipv6_privacy_extensions       # 4.6  L2
+
+    # ── Section 5.1 — File System ──
+    - os_home_folder_permissions       # 5.1.1  L1
+    - os_sip_enable                    # 5.1.2  L1
+
+    # ── Section 5.2 — Password Policy ──
+    - os_password_min_length           # 5.2.1  L1
+    - os_password_complexity           # 5.2.2  L1
+    - os_password_history              # 5.2.3  L1
+    - os_password_max_age              # 5.2.4  L1
+    - os_password_lockout              # 5.2.5  L1
+
+    # ── Section 5.3 — Login Window ──
+    - os_login_window_display          # 5.3.1  L1
+    - os_password_hints_disable        # 5.3.2  L1
+    - os_guest_account_disable         # 5.3.3  L1
+    - os_login_window_banner           # 5.3.4  L1
+
+    # ── Section 5.4 — Account Settings ──
+    - os_auto_login_disable            # 5.4.1  L1
+    - os_root_disable                  # 5.4.2  L1
+    - os_fast_user_switching_disable   # 5.4.3  L1
+
+    # ── Section 5.5 — Screen Lock ──
+    - os_screensaver_password          # 5.5.1  L1
+    - os_require_password_wake         # 5.5.2  L1
+    - os_screensaver_timeout           # 5.5.3  L1
+
+    # ── Section 5.6 — Secure Keyboard ──
+    - os_keyboard_secure               # 5.6.1  L1
+
+    # ── Section 5.7 — Kernel Extensions ──
+    - os_managed_kext_policy           # 5.7.1  L2
+
+    # ── Section 6.1 — Finder ──
+    - os_show_filename_extensions      # 6.1.1  L1
+
+    # ── Section 6.2 — Safari ──
+    - os_safari_warn_fraudulent_sites  # 6.2.1  L1
+    - os_safari_open_safe_downloads_disable  # 6.2.2  L1
+    - os_safari_show_full_url          # 6.2.3  L1
+    - os_safari_auto_fill_disable      # 6.2.4  L1
+    - os_safari_popups_disable         # 6.2.5  L1
+    - os_safari_javascript_restrict    # 6.2.6  L2

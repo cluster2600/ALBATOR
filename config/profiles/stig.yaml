@@ -1,0 +1,96 @@
+profile:
+  name: stig
+  display_name: "DISA STIG for Apple macOS"
+  description: >
+    All rules mapped to DISA Security Technical Implementation Guide
+    (STIG) findings for Apple macOS. Each rule references a specific
+    V-ID (Vulnerability ID) from the macOS STIG. Use this profile for
+    DoD and federal compliance requirements.
+  framework: "DISA STIG Apple macOS"
+  rule_count: 72
+  rules:
+    # Access Control (AC)
+    - os_auto_login_disable            # V-259752
+    - os_guest_account_disable         # V-259747
+    - os_root_disable                  # V-259751
+    - os_fast_user_switching_disable   # V-259774
+    - os_login_window_display          # V-259772
+    - os_login_window_banner           # V-259775
+    - os_password_hints_disable        # V-259773
+    - os_screensaver_password          # V-259754
+    - os_require_password_wake         # V-259753
+    - os_screensaver_timeout           # V-259776
+    - os_screen_sharing_disable        # V-259770
+    - os_remote_management_disable     # V-259758
+    - os_remote_apple_events_disable   # V-259773
+    - os_ssh_disable                   # V-259757
+    - os_airdrop_disable               # V-259762
+    - os_bluetooth_disable             # V-259750
+    - os_wifi_disable                  # V-259760
+    - os_home_folder_permissions       # V-259790
+
+    # Audit & Accountability (AU)
+    - os_auditd_enable                 # V-259761
+    - os_audit_flags_configure         # V-259757
+    - os_audit_retention_configure     # V-259758
+    - os_audit_acls_configure          # V-259759
+    - os_install_log_retention_configure  # V-259760
+    - os_time_server_configure         # V-259794
+
+    # Configuration Management (CM)
+    - os_siri_disable                  # V-259764
+    - os_bluetooth_sharing_disable     # V-259771
+    - os_printer_sharing_disable       # V-259772
+    - os_file_sharing_smb_disable      # V-259773
+    - os_internet_sharing_disable      # V-259764
+    - os_content_caching_disable       # V-259771
+    - os_media_sharing_disable         # V-259774
+    - os_dvd_sharing_disable           # V-259775
+    - os_bonjour_disable               # V-259763
+    - os_httpd_disable                 # V-259760
+    - os_nfsd_disable                  # V-259761
+    - os_wake_network_access_disable   # V-259774
+    - os_handoff_disable               # V-259772
+    - os_power_nap_disable             # V-259783
+    - os_ad_tracking_disable           # V-259784
+    - os_diagnostic_reports_disable    # V-259780
+    - os_show_filename_extensions      # V-259784
+    - os_icloud_drive_disable          # V-259791
+    - os_icloud_documents_desktop_disable  # V-259792
+    - os_icloud_keychain_disable       # V-259790
+    - os_location_services_enable      # V-259781
+    - os_lockdown_enable               # V-259762
+    - os_managed_kext_policy           # V-259745
+    - os_ipv6_privacy_extensions       # V-259744
+    - os_safari_open_safe_downloads_disable  # V-259780
+    - os_safari_warn_fraudulent_sites  # V-259781
+    - os_safari_show_full_url          # V-259782
+    - os_safari_auto_fill_disable      # V-259783
+    - os_safari_popups_disable         # V-259787
+    - os_safari_javascript_restrict    # V-259746
+    - os_usb_restricted_mode           # V-259782
+    - os_keyboard_secure               # V-259759
+
+    # Contingency Planning (CP)
+    - os_time_machine_auto_backup      # V-259743
+    - os_find_my_mac_enable            # V-259793
+
+    # Identification & Authentication (IA)
+    - os_password_min_length           # V-259763
+    - os_password_complexity           # V-259764
+    - os_password_history              # V-259765
+    - os_password_max_age              # V-259766
+    - os_password_lockout              # V-259767
+
+    # System & Communications Protection (SC)
+    - os_firewall_enable               # V-259755
+    - os_firewall_stealth_mode         # V-259756
+    - os_filevault_enable              # V-259761
+
+    # System & Information Integrity (SI)
+    - os_software_update_auto          # V-259756
+    - os_software_update_download      # V-259740
+    - os_software_update_critical_install  # V-259741
+    - os_security_responses_install    # V-259742
+    - os_sip_enable                    # V-259748
+    - os_gatekeeper_enable             # V-259749
