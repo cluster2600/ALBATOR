@@ -11,6 +11,7 @@ import time
 
 from scan import load_rules, load_profile, filter_rules_by_profile, filter_rules_by_severity, run_check
 from odv import load_odv_defaults, get_effective_fix_command
+from exemptions import load_exemptions, get_exempt_ids, filter_rules_with_exemptions
 
 
 def run_fix(rule, timeout=60, odv_values=None):
@@ -38,7 +39,7 @@ def run_fix(rule, timeout=60, odv_values=None):
 
 def fix(rules_dir, profiles_dir=None, profile_name=None,
         min_severity=None, dry_run=False, check_timeout=30, fix_timeout=60,
-        odv_file=None):
+        odv_file=None, exempt_file=None):
     """Run compliance checks and fix non-compliant rules.
 
     Args:
@@ -71,11 +72,20 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
     if min_severity:
         rules = filter_rules_by_severity(rules, min_severity)
 
+    # Handle exemptions
+    exemptions = None
+    exempted_rules = []
+    if exempt_file:
+        exemptions = load_exemptions(exempt_file)
+        exempt_ids = get_exempt_ids(exemptions)
+        rules, exempted_rules = filter_rules_with_exemptions(rules, exempt_ids)
+
     results = []
     already_compliant = 0
     fixed_count = 0
     fix_failed_count = 0
     skipped_count = 0
+    exempt_count = len(exempted_rules)
 
     for rule in rules:
         entry = {
@@ -128,6 +138,22 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
 
         results.append(entry)
 
+    # Add exempted rules to results
+    for rule in exempted_rules:
+        ex_info = None
+        if exemptions:
+            ex_info = next((e for e in exemptions if e["rule_id"] == rule["id"]), None)
+        entry = {
+            "id": rule["id"],
+            "title": rule.get("title", ""),
+            "severity": rule.get("severity", "unknown"),
+            "status": "exempt",
+        }
+        if ex_info:
+            entry["exempt_reason"] = ex_info["reason"]
+            entry["exempt_approved_by"] = ex_info["approved_by"]
+        results.append(entry)
+
     total = len(rules)
     non_compliant = total - already_compliant
     would_fix = sum(1 for r in results if r["status"] == "would-fix")
@@ -138,6 +164,7 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
         "fixed": fixed_count,
         "fix_failed": fix_failed_count,
         "skipped": skipped_count,
+        "exempt": exempt_count,
         "dry_run": dry_run,
         "profile": profile_name,
         "results": results,
@@ -149,6 +176,7 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
             "fix_failed": fix_failed_count,
             "skipped": skipped_count,
             "would_fix": would_fix,
+            "exempt": exempt_count,
         },
     }
 
@@ -187,5 +215,7 @@ def format_fix_report(fix_result):
         parts.append(f"Fixed: {s['fixed']}")
         parts.append(f"Failed: {s['fix_failed']}")
     parts.append(f"Skipped: {s['skipped']}")
+    if s.get("exempt", 0) > 0:
+        parts.append(f"Exempt: {s['exempt']}")
     lines.append("  ".join(parts))
     return "\n".join(lines)

@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from scan import load_rules, load_profile, filter_rules_by_profile, \
     filter_rules_by_severity, run_check
 from odv import load_odv_defaults, get_effective_check_command
+from exemptions import load_exemptions, get_exempt_ids
 
 
 # ---------------------------------------------------------------------------
@@ -138,7 +139,8 @@ def _nist_families_from_rules(rules):
 # ---------------------------------------------------------------------------
 
 def generate_report(rules_dir, profiles_dir=None, profile_name=None,
-                    min_severity=None, dry_run=False, timeout=30, odv_file=None):
+                    min_severity=None, dry_run=False, timeout=30, odv_file=None,
+                    exempt_file=None):
     """Generate a comprehensive compliance report.
 
     Returns a dict with:
@@ -165,6 +167,13 @@ def generate_report(rules_dir, profiles_dir=None, profile_name=None,
     if min_severity:
         rules = filter_rules_by_severity(rules, min_severity)
 
+    # Load exemptions if provided
+    exempt_ids = set()
+    exemptions = None
+    if exempt_file:
+        exemptions = load_exemptions(exempt_file)
+        exempt_ids = get_exempt_ids(exemptions)
+
     # Index rules by ID for quick lookup
     rule_by_id = {r["id"]: r for r in rules}
 
@@ -173,6 +182,7 @@ def generate_report(rules_dir, profiles_dir=None, profile_name=None,
     passed = 0
     failed = 0
     not_applicable = 0
+    exempt_count = 0
 
     for cis_id, ctrl in CIS_CONTROLS.items():
         rule_id = ctrl["rule"]
@@ -189,6 +199,16 @@ def generate_report(rules_dir, profiles_dir=None, profile_name=None,
             entry["severity"] = "n/a"
             entry["detail"] = "rule not in selected scope"
             not_applicable += 1
+        elif rule_id in exempt_ids:
+            entry["status"] = "exempt"
+            entry["severity"] = rule.get("severity", "unknown")
+            ex_info = next((e for e in exemptions if e["rule_id"] == rule_id), None)
+            if ex_info:
+                entry["exempt_reason"] = ex_info["reason"]
+                entry["exempt_approved_by"] = ex_info["approved_by"]
+                if ex_info["expires"]:
+                    entry["exempt_expires"] = ex_info["expires"]
+            exempt_count += 1
         elif dry_run:
             entry["status"] = "dry-run"
             entry["severity"] = rule.get("severity", "unknown")
@@ -266,6 +286,7 @@ def generate_report(rules_dir, profiles_dir=None, profile_name=None,
             "passed": passed,
             "failed": failed,
             "not_applicable": not_applicable,
+            "exempt": exempt_count,
             "compliance_pct": compliance_pct,
         },
         "level_summary": level_summary,
@@ -301,6 +322,8 @@ def format_text_report(report):
                  f"({summ['passed']}/{summ['evaluated']} controls passed)")
     if summ["not_applicable"] > 0:
         lines.append(f"  ({summ['not_applicable']} controls not applicable to selected scope)")
+    if summ.get("exempt", 0) > 0:
+        lines.append(f"  ({summ['exempt']} controls exempt — accepted risk)")
     lines.append("")
 
     # Level breakdown
@@ -344,6 +367,8 @@ def format_text_report(report):
             marker = "PASS"
         elif status == "FAIL":
             marker = "FAIL"
+        elif status == "EXEMPT":
+            marker = "EXMT"
         elif status == "NOT_APPLICABLE":
             marker = "N/A "
         else:
@@ -352,6 +377,9 @@ def format_text_report(report):
         lines.append(f"    [{marker}] {cis_id:<10s} [{level_tag}] {ctrl['title']}")
         if ctrl.get("detail"):
             lines.append(f"           -> {ctrl['detail'][:100]}")
+        if ctrl.get("exempt_reason"):
+            lines.append(f"           -> Exempt: {ctrl['exempt_reason'][:100]}")
+            lines.append(f"              Approved by: {ctrl.get('exempt_approved_by', 'N/A')}")
 
     lines.append("")
 
@@ -367,9 +395,10 @@ def format_text_report(report):
 
     lines.append("")
     lines.append("=" * 60)
+    exempt_str = f", {summ['exempt']} exempt" if summ.get("exempt", 0) > 0 else ""
     lines.append(f"  Score: {summ['compliance_pct']}% — "
                  f"{summ['passed']} passed, {summ['failed']} failed, "
-                 f"{summ['not_applicable']} N/A")
+                 f"{summ['not_applicable']} N/A{exempt_str}")
     lines.append("=" * 60)
     return "\n".join(lines)
 

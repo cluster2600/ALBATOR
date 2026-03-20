@@ -11,6 +11,7 @@ import subprocess
 import yaml
 
 from odv import load_odv_defaults, get_effective_check_command
+from exemptions import load_exemptions, get_exempt_ids, filter_rules_with_exemptions
 
 
 def load_rules(rules_dir):
@@ -73,7 +74,8 @@ def run_check(rule, timeout=30, odv_values=None):
 
 
 def scan(rules_dir, profiles_dir=None, profile_name=None,
-         min_severity=None, dry_run=False, timeout=30, odv_file=None):
+         min_severity=None, dry_run=False, timeout=30, odv_file=None,
+         exempt_file=None):
     """Run a compliance scan and return structured results.
 
     Args:
@@ -104,6 +106,14 @@ def scan(rules_dir, profiles_dir=None, profile_name=None,
     if min_severity:
         rules = filter_rules_by_severity(rules, min_severity)
 
+    # Handle exemptions
+    exemptions = None
+    exempted_rules = []
+    if exempt_file:
+        exemptions = load_exemptions(exempt_file)
+        exempt_ids = get_exempt_ids(exemptions)
+        rules, exempted_rules = filter_rules_with_exemptions(rules, exempt_ids)
+
     results = []
     passed_count = 0
     failed_count = 0
@@ -130,7 +140,26 @@ def scan(rules_dir, profiles_dir=None, profile_name=None,
 
         results.append(entry)
 
+    # Add exempted rules to results with "exempt" status
+    for rule in exempted_rules:
+        ex_info = None
+        if exemptions:
+            ex_info = next((e for e in exemptions if e["rule_id"] == rule["id"]), None)
+        entry = {
+            "id": rule["id"],
+            "title": rule.get("title", ""),
+            "severity": rule.get("severity", "unknown"),
+            "status": "exempt",
+        }
+        if ex_info:
+            entry["exempt_reason"] = ex_info["reason"]
+            entry["exempt_approved_by"] = ex_info["approved_by"]
+            if ex_info["expires"]:
+                entry["exempt_expires"] = ex_info["expires"]
+        results.append(entry)
+
     total = len(rules)
+    exempt_count = len(exempted_rules)
     if dry_run:
         passed_count = 0
         failed_count = 0
@@ -140,6 +169,7 @@ def scan(rules_dir, profiles_dir=None, profile_name=None,
         "passed": passed_count,
         "failed": failed_count,
         "errors": error_count,
+        "exempt": exempt_count,
         "dry_run": dry_run,
         "profile": profile_name,
         "results": results,
@@ -147,6 +177,7 @@ def scan(rules_dir, profiles_dir=None, profile_name=None,
             "total": total,
             "passed": passed_count,
             "failed": failed_count,
+            "exempt": exempt_count,
             "compliance_pct": round(100.0 * passed_count / total, 1) if total > 0 else 0.0,
         },
     }
@@ -176,5 +207,6 @@ def format_scan_report(scan_result):
     lines.append("")
     lines.append("-" * 40)
     s = scan_result["summary"]
-    lines.append(f"Total: {s['total']}  Passed: {s['passed']}  Failed: {s['failed']}  Compliance: {s['compliance_pct']}%")
+    exempt_str = f"  Exempt: {s.get('exempt', 0)}" if s.get("exempt", 0) > 0 else ""
+    lines.append(f"Total: {s['total']}  Passed: {s['passed']}  Failed: {s['failed']}{exempt_str}  Compliance: {s['compliance_pct']}%")
     return "\n".join(lines)

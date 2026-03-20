@@ -3354,5 +3354,374 @@ class TestCLIODVFlag(unittest.TestCase):
         self.assertNotIn("unrecognized arguments", result.stderr)
 
 
+###############################################################################
+# Experiment 23 — Exemption / Exception Management
+###############################################################################
+
+from exemptions import load_exemptions, get_exempt_ids, filter_rules_with_exemptions, format_exemption_summary
+
+
+class TestExemptionsLoading(unittest.TestCase):
+    """Test exemptions.py loading and validation."""
+
+    def test_load_valid_exemptions(self):
+        """Valid exemptions file loads correctly."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_test_rule", "reason": "Business need", "approved_by": "CISO"},
+            ]}, f)
+            f.flush()
+            result = load_exemptions(f.name)
+        os.unlink(f.name)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["rule_id"], "os_test_rule")
+        self.assertEqual(result[0]["reason"], "Business need")
+        self.assertFalse(result[0]["expired"])
+        self.assertIsNone(result[0]["expires"])
+
+    def test_load_exemption_with_future_expiry(self):
+        """Exemption with future expiry is not expired."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_test", "reason": "Test", "approved_by": "Admin",
+                 "expires": "2099-12-31"},
+            ]}, f)
+            f.flush()
+            result = load_exemptions(f.name)
+        os.unlink(f.name)
+        self.assertFalse(result[0]["expired"])
+        self.assertEqual(result[0]["expires"], "2099-12-31")
+
+    def test_load_exemption_with_past_expiry(self):
+        """Exemption with past expiry is marked expired."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_test", "reason": "Test", "approved_by": "Admin",
+                 "expires": "2020-01-01"},
+            ]}, f)
+            f.flush()
+            result = load_exemptions(f.name)
+        os.unlink(f.name)
+        self.assertTrue(result[0]["expired"])
+
+    def test_load_missing_file_raises(self):
+        """Missing exemptions file raises FileNotFoundError."""
+        with self.assertRaises(FileNotFoundError):
+            load_exemptions("/nonexistent/exemptions.yaml")
+
+    def test_load_missing_top_level_key_raises(self):
+        """File without 'exemptions' key raises ValueError."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"rules": []}, f)
+            f.flush()
+            with self.assertRaises(ValueError):
+                load_exemptions(f.name)
+        os.unlink(f.name)
+
+    def test_load_missing_required_field_raises(self):
+        """Entry without required 'reason' raises ValueError."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_test", "approved_by": "Admin"},
+            ]}, f)
+            f.flush()
+            with self.assertRaises(ValueError):
+                load_exemptions(f.name)
+        os.unlink(f.name)
+
+    def test_load_duplicate_rule_id_raises(self):
+        """Duplicate rule_id raises ValueError."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_test", "reason": "A", "approved_by": "X"},
+                {"rule_id": "os_test", "reason": "B", "approved_by": "Y"},
+            ]}, f)
+            f.flush()
+            with self.assertRaises(ValueError):
+                load_exemptions(f.name)
+        os.unlink(f.name)
+
+    def test_load_bad_date_format_raises(self):
+        """Invalid date format in 'expires' raises ValueError."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_test", "reason": "Test", "approved_by": "Admin",
+                 "expires": "not-a-date"},
+            ]}, f)
+            f.flush()
+            with self.assertRaises(ValueError):
+                load_exemptions(f.name)
+        os.unlink(f.name)
+
+    def test_load_multiple_exemptions(self):
+        """Multiple valid exemptions load correctly."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"exemptions": [
+                {"rule_id": "os_a", "reason": "Reason A", "approved_by": "Admin"},
+                {"rule_id": "os_b", "reason": "Reason B", "approved_by": "CISO",
+                 "expires": "2099-06-30"},
+            ]}, f)
+            f.flush()
+            result = load_exemptions(f.name)
+        os.unlink(f.name)
+        self.assertEqual(len(result), 2)
+
+
+class TestExemptionFiltering(unittest.TestCase):
+    """Test exempt ID extraction and rule filtering."""
+
+    def test_get_exempt_ids_excludes_expired(self):
+        """Expired exemptions excluded by default."""
+        exemptions = [
+            {"rule_id": "os_a", "reason": "A", "approved_by": "X", "expires": None, "expired": False},
+            {"rule_id": "os_b", "reason": "B", "approved_by": "Y", "expires": "2020-01-01", "expired": True},
+        ]
+        ids = get_exempt_ids(exemptions)
+        self.assertEqual(ids, {"os_a"})
+
+    def test_get_exempt_ids_includes_expired_when_asked(self):
+        """Expired exemptions included with include_expired=True."""
+        exemptions = [
+            {"rule_id": "os_a", "reason": "A", "approved_by": "X", "expires": None, "expired": False},
+            {"rule_id": "os_b", "reason": "B", "approved_by": "Y", "expires": "2020-01-01", "expired": True},
+        ]
+        ids = get_exempt_ids(exemptions, include_expired=True)
+        self.assertEqual(ids, {"os_a", "os_b"})
+
+    def test_filter_rules_with_exemptions(self):
+        """Rules split correctly into active and exempted."""
+        rules = [
+            {"id": "os_a", "title": "A"},
+            {"id": "os_b", "title": "B"},
+            {"id": "os_c", "title": "C"},
+        ]
+        active, exempted = filter_rules_with_exemptions(rules, {"os_b"})
+        self.assertEqual([r["id"] for r in active], ["os_a", "os_c"])
+        self.assertEqual([r["id"] for r in exempted], ["os_b"])
+
+    def test_filter_empty_exempt_set(self):
+        """Empty exempt set returns all rules as active."""
+        rules = [{"id": "os_a", "title": "A"}]
+        active, exempted = filter_rules_with_exemptions(rules, set())
+        self.assertEqual(len(active), 1)
+        self.assertEqual(len(exempted), 0)
+
+
+class TestExemptionFormatting(unittest.TestCase):
+    """Test exemption summary formatting."""
+
+    def test_format_no_exemptions(self):
+        result = format_exemption_summary([])
+        self.assertEqual(result, "No exemptions loaded.")
+
+    def test_format_active_exemption(self):
+        exemptions = [
+            {"rule_id": "os_test", "reason": "Business need", "approved_by": "CISO",
+             "expires": "2099-12-31", "expired": False},
+        ]
+        result = format_exemption_summary(exemptions)
+        self.assertIn("[EXEMPT]", result)
+        self.assertIn("os_test", result)
+        self.assertIn("CISO", result)
+
+    def test_format_expired_exemption(self):
+        exemptions = [
+            {"rule_id": "os_old", "reason": "Was needed", "approved_by": "Admin",
+             "expires": "2020-01-01", "expired": True},
+        ]
+        result = format_exemption_summary(exemptions)
+        self.assertIn("[EXPIRED]", result)
+        self.assertIn("os_old", result)
+
+
+class TestScanWithExemptions(unittest.TestCase):
+    """Test scan module integration with exemptions."""
+
+    def test_scan_exempt_rules_not_counted_as_failures(self):
+        """Exempt rules should have status 'exempt' and not count as failures."""
+        from scan import scan
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+
+            # Create two rules: one will fail, one will be exempted
+            for name, check in [("os_pass", "true"), ("os_fail", "false"), ("os_exempt", "false")]:
+                rule = {"id": name, "title": name, "severity": "medium",
+                        "check": check, "fix": "echo fix", "odv": "none"}
+                with open(os.path.join(rules_dir, f"{name}.yaml"), "w") as f:
+                    yaml.dump(rule, f)
+
+            exempt_file = os.path.join(td, "exemptions.yaml")
+            with open(exempt_file, "w") as f:
+                yaml.dump({"exemptions": [
+                    {"rule_id": "os_exempt", "reason": "Test exempt", "approved_by": "Tester"},
+                ]}, f)
+
+            result = scan(rules_dir=rules_dir, exempt_file=exempt_file)
+            self.assertEqual(result["passed"], 1)
+            self.assertEqual(result["failed"], 1)
+            self.assertEqual(result["exempt"], 1)
+            exempt_results = [r for r in result["results"] if r["status"] == "exempt"]
+            self.assertEqual(len(exempt_results), 1)
+            self.assertEqual(exempt_results[0]["id"], "os_exempt")
+            self.assertEqual(exempt_results[0]["exempt_reason"], "Test exempt")
+
+    def test_scan_without_exempt_file_unchanged(self):
+        """Scan without --exempt-file works as before (backward compatible)."""
+        from scan import scan
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+            rule = {"id": "os_test", "title": "Test", "severity": "low",
+                    "check": "true", "fix": "echo fix", "odv": "none"}
+            with open(os.path.join(rules_dir, "os_test.yaml"), "w") as f:
+                yaml.dump(rule, f)
+            result = scan(rules_dir=rules_dir)
+            self.assertEqual(result["exempt"], 0)
+            self.assertEqual(result["passed"], 1)
+
+
+class TestFixWithExemptions(unittest.TestCase):
+    """Test fix module integration with exemptions."""
+
+    def test_fix_skips_exempt_rules(self):
+        """Exempt rules should not be fixed."""
+        from fix import fix as fix_fn
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+
+            rule = {"id": "os_exempt_fix", "title": "Exempt Fix", "severity": "medium",
+                    "check": "false", "fix": "echo fixing", "odv": "none"}
+            with open(os.path.join(rules_dir, "os_exempt_fix.yaml"), "w") as f:
+                yaml.dump(rule, f)
+
+            exempt_file = os.path.join(td, "exemptions.yaml")
+            with open(exempt_file, "w") as f:
+                yaml.dump({"exemptions": [
+                    {"rule_id": "os_exempt_fix", "reason": "Skip this", "approved_by": "Admin"},
+                ]}, f)
+
+            result = fix_fn(rules_dir=rules_dir, dry_run=True, exempt_file=exempt_file)
+            self.assertEqual(result["exempt"], 1)
+            exempt_results = [r for r in result["results"] if r["status"] == "exempt"]
+            self.assertEqual(len(exempt_results), 1)
+            # No would-fix entries for exempted rule
+            would_fix = [r for r in result["results"] if r["status"] == "would-fix"]
+            self.assertEqual(len(would_fix), 0)
+
+
+class TestReportWithExemptions(unittest.TestCase):
+    """Test report module integration with exemptions."""
+
+    def test_report_marks_exempt_controls(self):
+        """Report should mark exempted CIS controls as exempt."""
+        from report import generate_report, format_text_report
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+
+            # Create a rule that maps to CIS 2.1.1 (os_bluetooth_disable)
+            rule = {"id": "os_bluetooth_disable", "title": "Disable Bluetooth",
+                    "severity": "medium", "check": "false", "fix": "echo fix",
+                    "references": {"800-53r5": ["AC-18"]}, "odv": "none"}
+            with open(os.path.join(rules_dir, "os_bluetooth_disable.yaml"), "w") as f:
+                yaml.dump(rule, f)
+
+            exempt_file = os.path.join(td, "exemptions.yaml")
+            with open(exempt_file, "w") as f:
+                yaml.dump({"exemptions": [
+                    {"rule_id": "os_bluetooth_disable", "reason": "Wireless peripherals",
+                     "approved_by": "CISO", "expires": "2099-12-31"},
+                ]}, f)
+
+            result = generate_report(rules_dir=rules_dir, exempt_file=exempt_file)
+            self.assertGreater(result["summary"]["exempt"], 0)
+
+            # CIS 2.1.1 should be exempt
+            bt_ctrl = result["cis_controls"].get("2.1.1")
+            self.assertIsNotNone(bt_ctrl)
+            self.assertEqual(bt_ctrl["status"], "exempt")
+            self.assertEqual(bt_ctrl["exempt_reason"], "Wireless peripherals")
+
+            # Text report should show EXMT marker
+            text = format_text_report(result)
+            self.assertIn("EXMT", text)
+            self.assertIn("exempt", text.lower())
+
+
+class TestCLIExemptFlag(unittest.TestCase):
+    """Test CLI --exempt-file flag integration."""
+
+    def test_scan_cli_accepts_exempt_file(self):
+        """CLI scan subcommand should accept --exempt-file flag."""
+        result = subprocess.run(
+            [sys.executable, "-m", "albator_cli", "scan", "--dry-run",
+             "--exempt-file", "/nonexistent/exemptions.yaml"],
+            capture_output=True, text=True,
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+        )
+        self.assertNotIn("unrecognized arguments", result.stderr)
+
+    def test_fix_cli_accepts_exempt_file(self):
+        """CLI fix subcommand should accept --exempt-file flag."""
+        result = subprocess.run(
+            [sys.executable, "-m", "albator_cli", "fix", "--dry-run",
+             "--exempt-file", "/nonexistent/exemptions.yaml"],
+            capture_output=True, text=True,
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+        )
+        self.assertNotIn("unrecognized arguments", result.stderr)
+
+    def test_report_cli_accepts_exempt_file(self):
+        """CLI report subcommand should accept --exempt-file flag."""
+        result = subprocess.run(
+            [sys.executable, "-m", "albator_cli", "report", "--dry-run",
+             "--exempt-file", "/nonexistent/exemptions.yaml"],
+            capture_output=True, text=True,
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+        )
+        self.assertNotIn("unrecognized arguments", result.stderr)
+
+
+class TestExemptionExampleFile(unittest.TestCase):
+    """Validate the example exemptions file loads correctly."""
+
+    def test_example_exemptions_file_is_valid(self):
+        """config/exemptions_example.yaml should load without errors."""
+        base = os.path.join(os.path.dirname(__file__), "..")
+        path = os.path.join(base, "config", "exemptions_example.yaml")
+        if not os.path.exists(path):
+            self.skipTest("exemptions_example.yaml not found")
+        exemptions = load_exemptions(path)
+        self.assertGreater(len(exemptions), 0)
+        for ex in exemptions:
+            self.assertIn("rule_id", ex)
+            self.assertIn("reason", ex)
+            self.assertIn("approved_by", ex)
+
+    def test_example_exemptions_reference_real_rules(self):
+        """Exempted rule_ids in example file should match actual rule files."""
+        base = os.path.join(os.path.dirname(__file__), "..")
+        path = os.path.join(base, "config", "exemptions_example.yaml")
+        rules_dir = os.path.join(base, "rules")
+        if not os.path.exists(path):
+            self.skipTest("exemptions_example.yaml not found")
+
+        exemptions = load_exemptions(path)
+        import glob as glob_mod
+        rule_files = glob_mod.glob(os.path.join(rules_dir, "os_*.yaml"))
+        rule_ids = set()
+        for rf in rule_files:
+            with open(rf) as f:
+                data = yaml.safe_load(f)
+            if data and "id" in data:
+                rule_ids.add(data["id"])
+
+        for ex in exemptions:
+            self.assertIn(ex["rule_id"], rule_ids,
+                          f"Exempted rule '{ex['rule_id']}' does not match any rule file")
+
+
 if __name__ == "__main__":
     unittest.main()

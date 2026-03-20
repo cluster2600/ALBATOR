@@ -1,0 +1,35 @@
+# Albator Exemptions File — Document accepted-risk exceptions
+#
+# Use this file with --exempt-file to exclude specific rules from
+# scan/fix/report failure counts.  Exempted rules are shown separately
+# in reports so auditors can distinguish intentional exceptions from gaps.
+#
+# Required fields per entry:
+#   rule_id:     The ALBATOR rule ID (must match a rules/os_*.yaml file)
+#   reason:      Business justification for the exemption
+#   approved_by: Name/role of the person or team who approved it
+#
+# Optional fields:
+#   expires:     Expiration date in YYYY-MM-DD format.  After this date
+#                the exemption is marked EXPIRED and the rule reverts to
+#                normal enforcement.
+#
+# Usage:
+#   albator scan   --exempt-file config/exemptions.yaml --dry-run
+#   albator fix    --exempt-file config/exemptions.yaml --dry-run
+#   albator report --exempt-file config/exemptions.yaml --dry-run
+
+exemptions:
+  - rule_id: os_bluetooth_disable
+    reason: "Required for wireless peripherals in conference rooms"
+    approved_by: "Jane Smith, CISO"
+    expires: "2026-12-31"
+
+  - rule_id: os_siri_disable
+    reason: "Accessibility requirement for visually impaired staff"
+    approved_by: "ADA Compliance Team"
+
+  - rule_id: os_wifi_disable
+    reason: "All endpoints require Wi-Fi for network connectivity"
+    approved_by: "Network Architecture Team"
+    expires: "2027-06-30"
