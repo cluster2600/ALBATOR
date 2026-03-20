@@ -693,5 +693,100 @@ class TestLoginAuthRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestApplicationSecurityRules(unittest.TestCase):
+    """Tests for application security rule YAML files (experiment 6)."""
+
+    APP_RULE_IDS = [
+        "os_safari_open_safe_downloads_disable",
+        "os_safari_warn_fraudulent_sites",
+        "os_safari_show_full_url",
+        "os_safari_auto_fill_disable",
+        "os_show_filename_extensions",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_safari_open_safe_downloads_disable_rule(self):
+        rule = self._load_rule("os_safari_open_safe_downloads_disable")
+        self.assertEqual(rule["id"], "os_safari_open_safe_downloads_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("AutoOpenSafeDownloads", rule["check"])
+        self.assertIn("AutoOpenSafeDownloads", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("safari", rule["tags"])
+
+    def test_safari_warn_fraudulent_sites_rule(self):
+        rule = self._load_rule("os_safari_warn_fraudulent_sites")
+        self.assertEqual(rule["id"], "os_safari_warn_fraudulent_sites")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("WarnAboutFraudulentWebsites", rule["check"])
+        self.assertIn("WarnAboutFraudulentWebsites", rule["fix"])
+        self.assertIn("SC-18", rule["references"]["800-53r5"])
+        self.assertIn("safari", rule["tags"])
+
+    def test_safari_show_full_url_rule(self):
+        rule = self._load_rule("os_safari_show_full_url")
+        self.assertEqual(rule["id"], "os_safari_show_full_url")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("ShowFullURLInSmartSearchField", rule["check"])
+        self.assertIn("ShowFullURLInSmartSearchField", rule["fix"])
+        self.assertIn("SI-3", rule["references"]["800-53r5"])
+        self.assertIn("safari", rule["tags"])
+
+    def test_safari_auto_fill_disable_rule(self):
+        rule = self._load_rule("os_safari_auto_fill_disable")
+        self.assertEqual(rule["id"], "os_safari_auto_fill_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("AutoFillFromAddressBook", rule["check"])
+        self.assertIn("AutoFillFromAddressBook", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("safari", rule["tags"])
+
+    def test_show_filename_extensions_rule(self):
+        rule = self._load_rule("os_show_filename_extensions")
+        self.assertEqual(rule["id"], "os_show_filename_extensions")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("AppleShowAllExtensions", rule["check"])
+        self.assertIn("AppleShowAllExtensions", rule["fix"])
+        self.assertIn("SI-3", rule["references"]["800-53r5"])
+        self.assertIn("application", rule["tags"])
+
+    def test_all_app_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for app_id in self.APP_RULE_IDS:
+            self.assertIn(app_id, rule_ids, f"{app_id} not loaded by collect_rules")
+
+    def test_app_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.APP_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+            self.assertNotRegex(check, r'\bwrite\b',
+                                f"Check for {rule_id} contains write")
+
+    def test_app_rules_have_required_schema_fields(self):
+        """All application rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.APP_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

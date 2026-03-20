@@ -1,0 +1,16 @@
+title: "Disable Safari AutoFill for Contact Information"
+id: "os_safari_auto_fill_disable"
+severity: "medium"
+discussion: "Safari AutoFill automatically populates web forms with stored personal information. If an attacker gains access to a user session or crafts a malicious webpage, AutoFill data could be harvested without user awareness. CIS Benchmark Section 6.3.1 recommends disabling AutoFill to reduce exposure of personal data."
+check: "/usr/bin/defaults read ~/Library/Preferences/com.apple.Safari AutoFillFromAddressBook 2>/dev/null"
+fix: "/usr/bin/defaults write ~/Library/Preferences/com.apple.Safari AutoFillFromAddressBook -bool false && /usr/bin/defaults write ~/Library/Preferences/com.apple.Safari AutoFillCreditCardData -bool false && /usr/bin/defaults write ~/Library/Preferences/com.apple.Safari AutoFillPasswords -bool false && /usr/bin/defaults write ~/Library/Preferences/com.apple.Safari AutoFillMiscellaneousForms -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92853-2"]
+  800-53r5: ["CM-7", "SC-28"]
+  disa_stig: ["V-259783"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "application", "safari", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

@@ -1,0 +1,16 @@
+title: "Disable Safari Open Safe Downloads Automatically"
+id: "os_safari_open_safe_downloads_disable"
+severity: "high"
+discussion: "Safari can be configured to automatically open files after downloading. This feature may execute malicious code without user review. CIS Benchmark Section 6.3.3 recommends disabling automatic opening of safe files after download to prevent inadvertent execution of malicious content."
+check: "/usr/bin/defaults read ~/Library/Preferences/com.apple.Safari AutoOpenSafeDownloads 2>/dev/null"
+fix: "/usr/bin/defaults write ~/Library/Preferences/com.apple.Safari AutoOpenSafeDownloads -bool false"
+references:
+  cci: ["CCI-000381"]
+  cce: ["CCE-92850-8"]
+  800-53r5: ["CM-7", "SC-18"]
+  disa_stig: ["V-259780"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "application", "safari", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

@@ -1,0 +1,16 @@
+title: "Enable Show All Filename Extensions"
+id: "os_show_filename_extensions"
+severity: "medium"
+discussion: "Showing all filename extensions in Finder prevents social engineering attacks where malicious files are disguised with misleading names (e.g., document.pdf.app appearing as document.pdf). CIS Benchmark Section 6.2 recommends enabling this setting to ensure users can identify true file types before opening them."
+check: "/usr/bin/defaults read NSGlobalDomain AppleShowAllExtensions 2>/dev/null"
+fix: "/usr/bin/defaults write NSGlobalDomain AppleShowAllExtensions -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92854-0"]
+  800-53r5: ["SI-3", "CM-6"]
+  disa_stig: ["V-259784"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "application", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

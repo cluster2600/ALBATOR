@@ -1,0 +1,16 @@
+title: "Enable Safari Warn About Fraudulent Websites"
+id: "os_safari_warn_fraudulent_sites"
+severity: "high"
+discussion: "Safari includes a built-in fraud warning system that alerts users when they visit known phishing or fraudulent websites. CIS Benchmark Section 6.3.4 recommends ensuring this feature is enabled to protect users from social engineering attacks and credential theft."
+check: "/usr/bin/defaults read ~/Library/Preferences/com.apple.Safari WarnAboutFraudulentWebsites 2>/dev/null"
+fix: "/usr/bin/defaults write ~/Library/Preferences/com.apple.Safari WarnAboutFraudulentWebsites -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92851-6"]
+  800-53r5: ["SC-18", "SI-3"]
+  disa_stig: ["V-259781"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "application", "safari", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

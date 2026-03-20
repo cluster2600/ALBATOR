@@ -1,0 +1,16 @@
+title: "Enable Safari Show Full Website URL"
+id: "os_safari_show_full_url"
+severity: "medium"
+discussion: "Safari can display the full URL of websites in the address bar. Hiding the full URL can make it easier for phishing attacks to succeed by obscuring the true domain. CIS Benchmark Section 6.3.6 recommends showing the full website address to help users identify suspicious or fraudulent URLs."
+check: "/usr/bin/defaults read ~/Library/Preferences/com.apple.Safari ShowFullURLInSmartSearchField 2>/dev/null"
+fix: "/usr/bin/defaults write ~/Library/Preferences/com.apple.Safari ShowFullURLInSmartSearchField -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92852-4"]
+  800-53r5: ["SI-3", "SC-18"]
+  disa_stig: ["V-259782"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "application", "safari", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
