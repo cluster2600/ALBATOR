@@ -7,6 +7,10 @@ A comprehensive macOS security hardening toolkit for **macOS 26 Tahoe**. Combine
 [![Core Tests](https://github.com/cluster2600/ALBATOR/actions/workflows/core-tests.yml/badge.svg)](https://github.com/cluster2600/ALBATOR/actions/workflows/core-tests.yml)
 [![Release](https://github.com/cluster2600/ALBATOR/actions/workflows/release-artifacts.yml/badge.svg)](https://github.com/cluster2600/ALBATOR/releases/latest)
 
+| Dashboard | Compliance Checker |
+|---|---|
+| ![Dashboard](screenshots/dashboard.png) | ![Compliance](screenshots/compliance.png) |
+
 ## Features
 
 ### Swift CLI (`albator-swift`)
