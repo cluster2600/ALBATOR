@@ -339,6 +339,8 @@ def main():
                             help="Path to ODV overrides YAML file for customized thresholds")
     parser_fix.add_argument("--exempt-file", type=str, default=None,
                             help="Path to exemptions YAML file for accepted-risk exceptions")
+    parser_fix.add_argument("--dep-file", type=str, default=None,
+                            help="Path to rule_dependencies.yaml for fix ordering (default: config/rule_dependencies.yaml)")
 
     parser_rollback = subparsers.add_parser("rollback", help="List or apply rollback metadata to reverse hardening changes")
     parser_rollback.add_argument("--list", action="store_true", dest="list_mode",
@@ -512,6 +514,7 @@ def main():
                 fix_timeout=args.fix_timeout,
                 odv_file=args.odv_file,
                 exempt_file=args.exempt_file,
+                dep_file=args.dep_file,
             )
         except (FileNotFoundError, ValueError) as e:
             if args.json_output:

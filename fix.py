@@ -12,6 +12,7 @@ import time
 from scan import load_rules, load_profile, filter_rules_by_profile, filter_rules_by_severity, run_check
 from odv import load_odv_defaults, get_effective_fix_command
 from exemptions import load_exemptions, get_exempt_ids, filter_rules_with_exemptions
+from dependencies import load_dependency_graph, topological_sort
 
 
 def run_fix(rule, timeout=60, odv_values=None):
@@ -39,7 +40,7 @@ def run_fix(rule, timeout=60, odv_values=None):
 
 def fix(rules_dir, profiles_dir=None, profile_name=None,
         min_severity=None, dry_run=False, check_timeout=30, fix_timeout=60,
-        odv_file=None, exempt_file=None):
+        odv_file=None, exempt_file=None, dep_file=None):
     """Run compliance checks and fix non-compliant rules.
 
     Args:
@@ -51,10 +52,12 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
         check_timeout: Per-check timeout in seconds.
         fix_timeout: Per-fix timeout in seconds.
         odv_file: Optional path to ODV overrides YAML file.
+        dep_file: Optional path to rule_dependencies.yaml for ordering.
 
     Returns:
         dict with keys: rules_checked, already_compliant, fixed, fix_failed,
-                        skipped, dry_run, profile, results, summary.
+                        skipped, dry_run, profile, results, summary,
+                        dependency_warnings.
     """
     rules = load_rules(rules_dir)
 
@@ -79,6 +82,12 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
         exemptions = load_exemptions(exempt_file)
         exempt_ids = get_exempt_ids(exemptions)
         rules, exempted_rules = filter_rules_with_exemptions(rules, exempt_ids)
+
+    # Sort rules by dependency order so prerequisites are fixed first
+    dep_graph = load_dependency_graph(dep_file)
+    dep_warnings = []
+    if dep_graph:
+        rules, dep_warnings = topological_sort(rules, dep_graph)
 
     results = []
     already_compliant = 0
@@ -168,6 +177,7 @@ def fix(rules_dir, profiles_dir=None, profile_name=None,
         "dry_run": dry_run,
         "profile": profile_name,
         "results": results,
+        "dependency_warnings": dep_warnings,
         "summary": {
             "total": total,
             "already_compliant": already_compliant,
@@ -201,6 +211,9 @@ def format_fix_report(fix_result):
             lines.append(f"        {r['detail'][:120]}")
         if r.get("fix"):
             lines.append(f"        fix: {r['fix'][:120]}")
+
+    for w in fix_result.get("dependency_warnings", []):
+        lines.append(f"  WARNING: {w}")
 
     lines.append("")
     lines.append("-" * 40)

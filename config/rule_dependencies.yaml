@@ -1,0 +1,68 @@
+# Rule Dependency Graph for Albator Fix Operations
+#
+# Defines ordering constraints so prerequisites are applied before dependents.
+# Each entry specifies a rule_id and the list of rules it depends_on.
+# The fix module uses topological sort to ensure correct application order.
+#
+# Format:
+#   - rule_id: <dependent rule>
+#     depends_on: [<prerequisite rule>, ...]
+#     reason: <why this ordering matters>
+
+dependencies:
+  # Firewall stealth mode requires the firewall to be enabled first
+  - rule_id: os_firewall_stealth_mode
+    depends_on: [os_firewall_enable]
+    reason: "Stealth mode has no effect unless the application firewall is running"
+
+  # Audit subsystem: auditd must be running before configuring flags/retention/ACLs
+  - rule_id: os_audit_flags_configure
+    depends_on: [os_auditd_enable]
+    reason: "Audit flags require the audit daemon to be active"
+
+  - rule_id: os_audit_retention_configure
+    depends_on: [os_auditd_enable]
+    reason: "Retention policy requires the audit daemon to be active"
+
+  - rule_id: os_audit_acls_configure
+    depends_on: [os_auditd_enable]
+    reason: "Audit log ACLs require the audit daemon and log files to exist"
+
+  # Kernel extension policy requires SIP to be enabled
+  - rule_id: os_managed_kext_policy
+    depends_on: [os_sip_enable]
+    reason: "Kext policy enforcement relies on System Integrity Protection"
+
+  # iCloud Desktop/Documents is a subset of iCloud Drive
+  - rule_id: os_icloud_documents_desktop_disable
+    depends_on: [os_icloud_drive_disable]
+    reason: "Desktop & Documents sync is a sub-feature of iCloud Drive"
+
+  # Screensaver password requires screensaver timeout to be set
+  - rule_id: os_screensaver_password
+    depends_on: [os_screensaver_timeout]
+    reason: "Password prompt on wake only matters if screensaver activates"
+
+  # Password complexity rules should be set before max age / history
+  # to avoid locking users out with complexity they cannot meet
+  - rule_id: os_password_history
+    depends_on: [os_password_min_length, os_password_complexity]
+    reason: "History enforcement should follow complexity rules to avoid lockout"
+
+  - rule_id: os_password_max_age
+    depends_on: [os_password_min_length, os_password_complexity]
+    reason: "Forced rotation should follow complexity rules to avoid lockout"
+
+  - rule_id: os_password_lockout
+    depends_on: [os_password_min_length, os_password_complexity]
+    reason: "Lockout policy should follow complexity rules to avoid false lockouts"
+
+  # Login window banner requires login window display to be configured
+  - rule_id: os_login_window_banner
+    depends_on: [os_login_window_display]
+    reason: "Banner display depends on login window configuration"
+
+  # Gatekeeper should be on before checking app security specifics
+  - rule_id: os_safari_open_safe_downloads_disable
+    depends_on: [os_gatekeeper_enable]
+    reason: "Safari safe downloads check is complementary to Gatekeeper"

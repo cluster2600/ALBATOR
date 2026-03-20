@@ -4435,5 +4435,282 @@ class TestEvidenceCLIIntegration(unittest.TestCase):
             self.assertLessEqual(manifest["summary"]["total"], 72)
 
 
+###############################################################################
+# ── Experiment 26: Rule Dependency Ordering Tests ────────────────────────────
+###############################################################################
+
+from dependencies import (
+    load_dependency_graph,
+    topological_sort,
+    validate_dependency_graph,
+    get_dependency_order_summary,
+)
+
+
+class TestLoadDependencyGraph(unittest.TestCase):
+    """Tests for loading the dependency graph from YAML."""
+
+    def test_load_default_graph(self):
+        """Default config/rule_dependencies.yaml should load successfully."""
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dep_file = os.path.join(base, "config", "rule_dependencies.yaml")
+        graph = load_dependency_graph(dep_file)
+        self.assertIsInstance(graph, dict)
+        self.assertGreater(len(graph), 0)
+
+    def test_load_missing_file_returns_empty(self):
+        """Missing file should return empty dict, not raise."""
+        graph = load_dependency_graph("/nonexistent/path.yaml")
+        self.assertEqual(graph, {})
+
+    def test_load_custom_graph(self):
+        """Loading a custom dependency file should work."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            yaml.dump({"dependencies": [
+                {"rule_id": "b", "depends_on": ["a"]},
+            ]}, f)
+            f.flush()
+            graph = load_dependency_graph(f.name)
+        os.unlink(f.name)
+        self.assertEqual(graph, {"b": ["a"]})
+
+    def test_load_empty_yaml(self):
+        """Empty YAML file should return empty dict."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+            f.write("")
+            f.flush()
+            graph = load_dependency_graph(f.name)
+        os.unlink(f.name)
+        self.assertEqual(graph, {})
+
+
+class TestTopologicalSort(unittest.TestCase):
+    """Tests for dependency-aware rule ordering."""
+
+    def _make_rules(self, ids):
+        return [{"id": rid, "title": rid, "severity": "medium"} for rid in ids]
+
+    def test_simple_dependency(self):
+        """Rule B depends on A → A comes before B."""
+        rules = self._make_rules(["b", "a"])
+        graph = {"b": ["a"]}
+        sorted_rules, warnings = topological_sort(rules, graph)
+        ids = [r["id"] for r in sorted_rules]
+        self.assertLess(ids.index("a"), ids.index("b"))
+        self.assertEqual(warnings, [])
+
+    def test_chain_dependency(self):
+        """A → B → C chain should produce correct order."""
+        rules = self._make_rules(["c", "b", "a"])
+        graph = {"b": ["a"], "c": ["b"]}
+        sorted_rules, _ = topological_sort(rules, graph)
+        ids = [r["id"] for r in sorted_rules]
+        self.assertLess(ids.index("a"), ids.index("b"))
+        self.assertLess(ids.index("b"), ids.index("c"))
+
+    def test_multiple_dependencies(self):
+        """Rule with two deps should come after both."""
+        rules = self._make_rules(["c", "b", "a"])
+        graph = {"c": ["a", "b"]}
+        sorted_rules, _ = topological_sort(rules, graph)
+        ids = [r["id"] for r in sorted_rules]
+        self.assertLess(ids.index("a"), ids.index("c"))
+        self.assertLess(ids.index("b"), ids.index("c"))
+
+    def test_no_dependencies(self):
+        """Rules without dependencies should preserve original order."""
+        rules = self._make_rules(["x", "y", "z"])
+        sorted_rules, warnings = topological_sort(rules, {})
+        ids = [r["id"] for r in sorted_rules]
+        self.assertEqual(ids, ["x", "y", "z"])
+        self.assertEqual(warnings, [])
+
+    def test_empty_graph(self):
+        """Empty graph should return original order."""
+        rules = self._make_rules(["a", "b"])
+        sorted_rules, _ = topological_sort(rules, {})
+        self.assertEqual([r["id"] for r in sorted_rules], ["a", "b"])
+
+    def test_missing_dep_warns(self):
+        """Dependency on a rule not in the set should produce warning."""
+        rules = self._make_rules(["b"])
+        graph = {"b": ["a"]}  # "a" not in rules
+        sorted_rules, warnings = topological_sort(rules, graph)
+        self.assertEqual(len(sorted_rules), 1)
+        self.assertTrue(any("not in current rule set" in w for w in warnings))
+
+    def test_cycle_detection(self):
+        """Cycle should fall back to original order with warning."""
+        rules = self._make_rules(["a", "b"])
+        graph = {"a": ["b"], "b": ["a"]}
+        sorted_rules, warnings = topological_sort(rules, graph)
+        self.assertEqual(len(sorted_rules), 2)
+        self.assertTrue(any("cycle" in w for w in warnings))
+
+    def test_preserves_all_rules(self):
+        """All input rules should appear in output regardless of deps."""
+        rules = self._make_rules(["a", "b", "c", "d"])
+        graph = {"c": ["a"]}
+        sorted_rules, _ = topological_sort(rules, graph)
+        self.assertEqual(len(sorted_rules), 4)
+        self.assertEqual({r["id"] for r in sorted_rules}, {"a", "b", "c", "d"})
+
+
+class TestValidateDependencyGraph(unittest.TestCase):
+    """Tests for dependency graph validation."""
+
+    def test_valid_graph(self):
+        """Valid graph should return no errors."""
+        graph = {"b": ["a"]}
+        errors = validate_dependency_graph(graph, {"a", "b"})
+        self.assertEqual(errors, [])
+
+    def test_unknown_source(self):
+        """Source rule not in available set should be flagged."""
+        graph = {"unknown": ["a"]}
+        errors = validate_dependency_graph(graph, {"a"})
+        self.assertTrue(any("unknown" in e for e in errors))
+
+    def test_unknown_target(self):
+        """Target rule not in available set should be flagged."""
+        graph = {"a": ["unknown"]}
+        errors = validate_dependency_graph(graph, {"a"})
+        self.assertTrue(any("unknown" in e for e in errors))
+
+    def test_self_dependency(self):
+        """Rule depending on itself should be flagged."""
+        graph = {"a": ["a"]}
+        errors = validate_dependency_graph(graph, {"a"})
+        self.assertTrue(any("depends on itself" in e for e in errors))
+
+    def test_cycle_detected(self):
+        """Cycle in graph should be flagged."""
+        graph = {"a": ["b"], "b": ["a"]}
+        errors = validate_dependency_graph(graph, {"a", "b"})
+        self.assertTrue(any("cycle" in e for e in errors))
+
+
+class TestDependencyOrderSummary(unittest.TestCase):
+    """Tests for human-readable dependency order summary."""
+
+    def test_summary_format(self):
+        """Summary should list rules with dependency annotations."""
+        rules = [{"id": "a", "title": "A"}, {"id": "b", "title": "B"}]
+        graph = {"b": ["a"]}
+        lines = get_dependency_order_summary(rules, graph)
+        self.assertTrue(any("a" in line for line in lines))
+        self.assertTrue(any("b" in line and "after:" in line for line in lines))
+
+
+class TestRealDependencyGraph(unittest.TestCase):
+    """Validate the shipped rule_dependencies.yaml against real rules."""
+
+    def setUp(self):
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.dep_file = os.path.join(base, "config", "rule_dependencies.yaml")
+        self.rules_dir = os.path.join(base, "rules")
+
+    def test_all_dep_rules_exist(self):
+        """Every rule referenced in dependencies must exist as a YAML file."""
+        from scan import load_rules
+        graph = load_dependency_graph(self.dep_file)
+        rule_ids = {r["id"] for r in load_rules(self.rules_dir)}
+        errors = validate_dependency_graph(graph, rule_ids)
+        self.assertEqual(errors, [], f"Dependency graph errors: {errors}")
+
+    def test_firewall_stealth_after_enable(self):
+        """Firewall stealth mode must depend on firewall enable."""
+        graph = load_dependency_graph(self.dep_file)
+        self.assertIn("os_firewall_stealth_mode", graph)
+        self.assertIn("os_firewall_enable", graph["os_firewall_stealth_mode"])
+
+    def test_audit_rules_after_auditd(self):
+        """Audit config rules must depend on auditd enable."""
+        graph = load_dependency_graph(self.dep_file)
+        for rule_id in ["os_audit_flags_configure", "os_audit_retention_configure", "os_audit_acls_configure"]:
+            self.assertIn(rule_id, graph, f"{rule_id} missing from dependency graph")
+            self.assertIn("os_auditd_enable", graph[rule_id])
+
+    def test_topological_sort_real_rules(self):
+        """Topological sort of all real rules should produce no errors."""
+        from scan import load_rules
+        rules = load_rules(self.rules_dir)
+        graph = load_dependency_graph(self.dep_file)
+        sorted_rules, warnings = topological_sort(rules, graph)
+        self.assertEqual(len(sorted_rules), len(rules))
+        # No cycle warnings
+        self.assertFalse(any("cycle" in w for w in warnings))
+
+    def test_dep_ordering_respected_in_sort(self):
+        """In sorted output, prerequisites come before dependents."""
+        from scan import load_rules
+        rules = load_rules(self.rules_dir)
+        graph = load_dependency_graph(self.dep_file)
+        sorted_rules, _ = topological_sort(rules, graph)
+        id_positions = {r["id"]: i for i, r in enumerate(sorted_rules)}
+        for rule_id, deps in graph.items():
+            if rule_id in id_positions:
+                for dep in deps:
+                    if dep in id_positions:
+                        self.assertLess(
+                            id_positions[dep], id_positions[rule_id],
+                            f"{dep} should come before {rule_id}"
+                        )
+
+
+class TestFixWithDependencyOrdering(unittest.TestCase):
+    """Tests that fix module respects dependency ordering."""
+
+    def test_fix_result_has_dependency_warnings_key(self):
+        """Fix result dict should include dependency_warnings key."""
+        with tempfile.TemporaryDirectory() as tmp:
+            rules_dir = os.path.join(tmp, "rules")
+            os.makedirs(rules_dir)
+            rule = {
+                "id": "test_rule",
+                "title": "Test",
+                "severity": "low",
+                "check": "true",
+                "fix": "true",
+                "odv": "none",
+                "tags": [],
+            }
+            with open(os.path.join(rules_dir, "os_test_rule.yaml"), "w") as f:
+                yaml.dump(rule, f)
+            from fix import fix as run_fix
+            result = run_fix(rules_dir=rules_dir)
+            self.assertIn("dependency_warnings", result)
+
+    def test_fix_dry_run_shows_dependency_order(self):
+        """Fix with dependency-ordered rules should list prereqs first."""
+        with tempfile.TemporaryDirectory() as tmp:
+            rules_dir = os.path.join(tmp, "rules")
+            os.makedirs(rules_dir)
+            for rid in ["os_a.yaml", "os_b.yaml"]:
+                rule_id = rid.replace("os_", "").replace(".yaml", "")
+                rule = {
+                    "id": f"os_{rule_id}",
+                    "title": f"Rule {rule_id.upper()}",
+                    "severity": "medium",
+                    "check": "false",
+                    "fix": "true",
+                    "odv": "none",
+                    "tags": [],
+                }
+                with open(os.path.join(rules_dir, rid), "w") as f:
+                    yaml.dump(rule, f)
+
+            dep_file = os.path.join(tmp, "deps.yaml")
+            with open(dep_file, "w") as f:
+                yaml.dump({"dependencies": [
+                    {"rule_id": "os_b", "depends_on": ["os_a"]},
+                ]}, f)
+
+            from fix import fix as run_fix
+            result = run_fix(rules_dir=rules_dir, dry_run=True, dep_file=dep_file)
+            order = [r["id"] for r in result["results"]]
+            self.assertLess(order.index("os_a"), order.index("os_b"))
+
+
 if __name__ == "__main__":
     unittest.main()
