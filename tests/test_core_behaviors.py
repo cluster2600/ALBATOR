@@ -4110,5 +4110,330 @@ class TestBaselineCLIIntegration(unittest.TestCase):
             self.assertEqual(code, 0)
 
 
+###############################################################################
+# Experiment 25 — Evidence Collection Module Tests
+###############################################################################
+
+class TestEvidenceCollectSystemMetadata(unittest.TestCase):
+    """Tests for evidence.collect_system_metadata()."""
+
+    def test_returns_required_keys(self):
+        from evidence import collect_system_metadata
+        meta = collect_system_metadata()
+        for key in ["hostname", "platform", "architecture", "kernel",
+                     "collected_by", "collected_at", "collected_at_epoch"]:
+            self.assertIn(key, meta)
+
+    def test_collected_at_is_iso_format(self):
+        from evidence import collect_system_metadata
+        import datetime
+        meta = collect_system_metadata()
+        # Should parse without error
+        dt = datetime.datetime.fromisoformat(meta["collected_at"])
+        self.assertIsInstance(dt, datetime.datetime)
+
+    def test_collected_at_epoch_is_int(self):
+        from evidence import collect_system_metadata
+        meta = collect_system_metadata()
+        self.assertIsInstance(meta["collected_at_epoch"], int)
+
+    def test_hostname_not_empty(self):
+        from evidence import collect_system_metadata
+        meta = collect_system_metadata()
+        self.assertTrue(len(meta["hostname"]) > 0)
+
+
+class TestEvidenceCollectRuleEvidence(unittest.TestCase):
+    """Tests for evidence.collect_rule_evidence()."""
+
+    def test_passing_check_returns_compliant_true(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_pass", "title": "Test", "severity": "low",
+                "check": "true", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertTrue(ev["compliant"])
+        self.assertEqual(ev["exit_code"], 0)
+        self.assertEqual(ev["rule_id"], "test_pass")
+
+    def test_failing_check_returns_compliant_false(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_fail", "title": "Test", "severity": "high",
+                "check": "false", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertFalse(ev["compliant"])
+        self.assertNotEqual(ev["exit_code"], 0)
+
+    def test_captures_stdout(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_echo", "title": "Echo", "severity": "low",
+                "check": "echo hello_evidence", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertIn("hello_evidence", ev["stdout"])
+
+    def test_captures_stderr(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_stderr", "title": "Stderr", "severity": "low",
+                "check": "echo err_output >&2; false", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertIn("err_output", ev["stderr"])
+
+    def test_empty_check_command(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_empty", "title": "Empty", "severity": "low",
+                "check": "  ", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertFalse(ev["compliant"])
+        self.assertEqual(ev["exit_code"], -1)
+        self.assertIn("empty", ev.get("error", ""))
+
+    def test_timeout_returns_error(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_timeout", "title": "Slow", "severity": "low",
+                "check": "sleep 60", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=1)
+        self.assertFalse(ev["compliant"])
+        self.assertIn("timed out", ev.get("error", ""))
+
+    def test_duration_ms_is_positive(self):
+        from evidence import collect_rule_evidence
+        rule = {"id": "test_dur", "title": "Dur", "severity": "low",
+                "check": "true", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertGreaterEqual(ev["duration_ms"], 0)
+
+    def test_includes_references(self):
+        from evidence import collect_rule_evidence
+        refs = {"800-53r5": ["AC-2"], "cci": ["CCI-000366"]}
+        rule = {"id": "test_refs", "title": "Refs", "severity": "low",
+                "check": "true", "references": refs}
+        ev = collect_rule_evidence(rule, timeout=5)
+        self.assertEqual(ev["references"], refs)
+
+    def test_has_timestamp(self):
+        from evidence import collect_rule_evidence
+        import datetime
+        rule = {"id": "test_ts", "title": "TS", "severity": "low",
+                "check": "true", "references": {}}
+        ev = collect_rule_evidence(rule, timeout=5)
+        dt = datetime.datetime.fromisoformat(ev["timestamp"])
+        self.assertIsInstance(dt, datetime.datetime)
+
+
+class TestEvidenceSaveAndManifest(unittest.TestCase):
+    """Tests for evidence.save_evidence() and manifest generation."""
+
+    def _make_evidence_list(self, count=3):
+        items = []
+        for i in range(count):
+            items.append({
+                "rule_id": f"rule_{i}",
+                "rule_title": f"Rule {i}",
+                "severity": "medium",
+                "check_command": "true",
+                "references": {},
+                "compliant": i % 2 == 0,
+                "stdout": f"output {i}",
+                "stderr": "",
+                "exit_code": 0 if i % 2 == 0 else 1,
+                "duration_ms": 10,
+                "timestamp": "2026-03-20T00:00:00+00:00",
+            })
+        return items
+
+    def test_creates_evidence_dir(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence_out")
+            self.assertFalse(os.path.exists(ev_dir))
+            save_evidence(self._make_evidence_list(1), ev_dir)
+            self.assertTrue(os.path.isdir(ev_dir))
+
+    def test_creates_per_rule_files(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            save_evidence(self._make_evidence_list(3), ev_dir)
+            for i in range(3):
+                path = os.path.join(ev_dir, f"evidence_rule_{i}.json")
+                self.assertTrue(os.path.exists(path), f"Missing {path}")
+                data = json.load(open(path))
+                self.assertEqual(data["evidence"]["rule_id"], f"rule_{i}")
+                self.assertIn("system", data)
+
+    def test_creates_manifest(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            manifest_path = save_evidence(self._make_evidence_list(3), ev_dir)
+            self.assertTrue(manifest_path.endswith("evidence_manifest.json"))
+            manifest = json.load(open(manifest_path))
+            self.assertEqual(manifest["version"], 1)
+            self.assertEqual(manifest["summary"]["total"], 3)
+
+    def test_manifest_checksums_present(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            manifest_path = save_evidence(self._make_evidence_list(2), ev_dir)
+            manifest = json.load(open(manifest_path))
+            for artifact in manifest["artifacts"]:
+                self.assertIn("sha256", artifact)
+                self.assertEqual(len(artifact["sha256"]), 64)  # SHA-256 hex length
+
+    def test_manifest_compliance_counts(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            # 3 items: rule_0=compliant, rule_1=non-compliant, rule_2=compliant
+            manifest_path = save_evidence(self._make_evidence_list(3), ev_dir)
+            manifest = json.load(open(manifest_path))
+            self.assertEqual(manifest["summary"]["compliant"], 2)
+            self.assertEqual(manifest["summary"]["non_compliant"], 1)
+
+    def test_manifest_label(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            save_evidence(self._make_evidence_list(1), ev_dir, label="Q1-audit")
+            manifest = json.load(open(os.path.join(ev_dir, "evidence_manifest.json")))
+            self.assertEqual(manifest["label"], "Q1-audit")
+
+    def test_checksum_matches_file_content(self):
+        import hashlib
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            manifest_path = save_evidence(self._make_evidence_list(1), ev_dir)
+            manifest = json.load(open(manifest_path))
+            art = manifest["artifacts"][0]
+            filepath = os.path.join(ev_dir, art["file"])
+            with open(filepath) as f:
+                content = f.read()
+            computed = hashlib.sha256(content.encode("utf-8")).hexdigest()
+            self.assertEqual(art["sha256"], computed)
+
+    def test_empty_evidence_list(self):
+        from evidence import save_evidence
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "ev")
+            manifest_path = save_evidence([], ev_dir)
+            manifest = json.load(open(manifest_path))
+            self.assertEqual(manifest["summary"]["total"], 0)
+            self.assertEqual(manifest["summary"]["compliance_pct"], 0.0)
+
+
+class TestEvidenceFormatSummary(unittest.TestCase):
+    """Tests for evidence.format_evidence_summary()."""
+
+    def test_summary_contains_key_info(self):
+        from evidence import format_evidence_summary
+        manifest = {
+            "label": "test-run",
+            "collected_at": "2026-03-20T00:00:00",
+            "system": {"hostname": "testhost", "platform": "macOS", "collected_by": "admin"},
+            "summary": {"total": 5, "compliant": 4, "non_compliant": 1, "compliance_pct": 80.0},
+            "artifacts": [
+                {"rule_id": "r1", "compliant": True, "severity": "low"},
+                {"rule_id": "r2", "compliant": False, "severity": "high"},
+            ],
+        }
+        text = format_evidence_summary(manifest)
+        self.assertIn("test-run", text)
+        self.assertIn("testhost", text)
+        self.assertIn("80.0%", text)
+        self.assertIn("r2", text)  # non-compliant rule listed
+
+    def test_all_compliant_message(self):
+        from evidence import format_evidence_summary
+        manifest = {
+            "label": "", "collected_at": "", "system": {},
+            "summary": {"total": 1, "compliant": 1, "non_compliant": 0, "compliance_pct": 100.0},
+            "artifacts": [{"rule_id": "r1", "compliant": True, "severity": "low"}],
+        }
+        text = format_evidence_summary(manifest)
+        self.assertIn("All rules compliant", text)
+
+
+class TestEvidenceCLIIntegration(unittest.TestCase):
+    """Tests for --evidence-dir flag in scan CLI subcommand."""
+
+    def _run_cli(self, cli_args):
+        saved = sys.argv
+        sys.argv = ["albator_cli.py"] + cli_args
+        try:
+            albator_cli.main()
+        except SystemExit as e:
+            return int(e.code or 0)
+        finally:
+            sys.argv = saved
+        return 0
+
+    def test_scan_dry_run_ignores_evidence_dir(self):
+        """--evidence-dir with --dry-run should not create evidence files."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence")
+            code = self._run_cli(["scan", "--dry-run", "--evidence-dir", ev_dir])
+            self.assertEqual(code, 0)
+            # Evidence dir should NOT be created for dry-run
+            self.assertFalse(os.path.exists(os.path.join(ev_dir, "evidence_manifest.json")))
+
+    def test_scan_evidence_dir_creates_manifest(self):
+        """--evidence-dir without --dry-run should create evidence manifest."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence")
+            code = self._run_cli(["scan", "--evidence-dir", ev_dir, "--timeout", "5"])
+            # Don't assert exit code 0 — rules may fail on non-macOS
+            manifest_path = os.path.join(ev_dir, "evidence_manifest.json")
+            self.assertTrue(os.path.exists(manifest_path))
+            manifest = json.load(open(manifest_path))
+            self.assertIn("artifacts", manifest)
+            self.assertIn("summary", manifest)
+            self.assertGreater(manifest["summary"]["total"], 0)
+
+    def test_scan_evidence_with_label(self):
+        """--evidence-label should appear in evidence manifest."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence")
+            self._run_cli(["scan", "--evidence-dir", ev_dir, "--evidence-label", "Q1-2026", "--timeout", "5"])
+            manifest = json.load(open(os.path.join(ev_dir, "evidence_manifest.json")))
+            self.assertEqual(manifest["label"], "Q1-2026")
+
+    def test_scan_evidence_json_output_includes_evidence_path(self):
+        """--json-output with --evidence-dir should include evidence_dir in JSON."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence")
+            captured = io.StringIO()
+            saved_stdout = sys.stdout
+            sys.stdout = captured
+            try:
+                self._run_cli(["--json-output", "scan", "--evidence-dir", ev_dir, "--timeout", "5"])
+            finally:
+                sys.stdout = saved_stdout
+            output = captured.getvalue()
+            data = json.loads(output)
+            self.assertIn("evidence_dir", data)
+
+    def test_scan_evidence_per_rule_files_match_artifact_count(self):
+        """Number of evidence_*.json files should match manifest artifact count."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence")
+            self._run_cli(["scan", "--evidence-dir", ev_dir, "--timeout", "5"])
+            manifest = json.load(open(os.path.join(ev_dir, "evidence_manifest.json")))
+            expected = manifest["summary"]["total"]
+            evidence_files = [f for f in os.listdir(ev_dir)
+                              if f.startswith("evidence_") and f != "evidence_manifest.json"]
+            self.assertEqual(len(evidence_files), expected)
+
+    def test_scan_evidence_with_profile_filter(self):
+        """--evidence-dir with --profile should only collect evidence for profile rules."""
+        with tempfile.TemporaryDirectory() as tmp:
+            ev_dir = os.path.join(tmp, "evidence")
+            self._run_cli(["scan", "--evidence-dir", ev_dir, "--profile", "cis_level1", "--timeout", "5"])
+            manifest = json.load(open(os.path.join(ev_dir, "evidence_manifest.json")))
+            # cis_level1 has fewer rules than total (61 vs 72)
+            self.assertGreater(manifest["summary"]["total"], 0)
+            self.assertLessEqual(manifest["summary"]["total"], 72)
+
+
 if __name__ == "__main__":
     unittest.main()

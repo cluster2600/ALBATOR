@@ -21,6 +21,10 @@ from baseline import (
     save_baseline, load_baseline, list_baselines, compare_baselines,
     format_diff_report, format_baseline_list,
 )
+from evidence import (
+    collect_system_metadata, collect_rule_evidence, save_evidence,
+    format_evidence_summary,
+)
 from utils import parse_authors
 
 CONFIG_PATHS = ("config.yaml", os.path.join("config", "albator.yaml"))
@@ -314,6 +318,10 @@ def main():
                              help="Path to ODV overrides YAML file for customized thresholds")
     parser_scan.add_argument("--exempt-file", type=str, default=None,
                              help="Path to exemptions YAML file for accepted-risk exceptions")
+    parser_scan.add_argument("--evidence-dir", type=str, default=None,
+                             help="Directory to save per-rule evidence artifacts for audit compliance")
+    parser_scan.add_argument("--evidence-label", type=str, default=None,
+                             help="Human-readable label for the evidence collection (e.g., 'Q1-2026-audit')")
 
     parser_fix = subparsers.add_parser("fix", help="Remediate non-compliant rules by running fix commands")
     parser_fix.add_argument("--profile", type=str, default=None,
@@ -452,9 +460,38 @@ def main():
             else:
                 print(f"Error: {e}", file=sys.stderr)
             sys.exit(2)
+        # Collect evidence artifacts if --evidence-dir specified
+        if args.evidence_dir and not args.dry_run:
+            from scan import load_rules, load_profile, filter_rules_by_profile, filter_rules_by_severity
+            from odv import load_odv_defaults
+            from exemptions import load_exemptions, get_exempt_ids
+            ev_rules = load_rules(rules_dir)
+            ev_odv = load_odv_defaults(args.odv_file) if args.odv_file else None
+            if args.profile:
+                profile_ids = load_profile(profiles_dir, args.profile)
+                ev_rules = filter_rules_by_profile(ev_rules, profile_ids)
+            if args.severity:
+                ev_rules = filter_rules_by_severity(ev_rules, args.severity)
+            if args.exempt_file:
+                exemptions = load_exemptions(args.exempt_file)
+                exempt_ids = get_exempt_ids(exemptions)
+                ev_rules = [r for r in ev_rules if r["id"] not in exempt_ids]
+            sys_meta = collect_system_metadata()
+            evidence_list = [collect_rule_evidence(r, timeout=args.timeout, odv_values=ev_odv) for r in ev_rules]
+            manifest_path = save_evidence(evidence_list, args.evidence_dir,
+                                          system_metadata=sys_meta, label=args.evidence_label)
+            manifest = json.load(open(manifest_path))
+            if not args.json_output:
+                print("")
+                print(format_evidence_summary(manifest))
+                print(f"\nEvidence saved to: {args.evidence_dir}")
+
         if args.json_output:
             result["command"] = "scan"
             result["success"] = result["failed"] == 0 or result["dry_run"]
+            if args.evidence_dir and not args.dry_run:
+                result["evidence_dir"] = args.evidence_dir
+                result["evidence_manifest"] = manifest_path
             _print_json(result)
         else:
             print(format_scan_report(result))
