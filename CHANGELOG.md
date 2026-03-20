@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [3.4.0] — 2026-03-20
+
+### Added
+- **Swift CLI overhaul**: subcommands (`scan`, `json`, `monitor`, `report`, `logs`, `version`), coloured output, risk score bar, actionable recommendations.
+- **macOS Tahoe hardening probes**: BSI auto-patching, screen lock (sysadminctl), USB Restricted Mode, Safari Advanced Fingerprinting Protection, FileVault recovery key escrow, Lockdown Mode, hardware generation (Intel EOL warning).
+- **GUI — Tahoe Hardening view**: dedicated sidebar section with detailed cards, remediation commands, and deprecated API reference table.
+- **GUI — Vulnerability Scanner**: CVE checks against macOS version, listening port scan, unsigned/ad-hoc app detection, Intel-only binary detection, config-based vulnerability assessment.
+- **GUI — Compliance Checker**: live audit against CIS Level 1, CIS Level 2, and DISA STIG profiles. Runs 61–73 YAML rule check commands with pass/fail/error status, severity badges, compliance percentage bar, and expandable rows with NIST 800-53/STIG/CCI references.
+- **GUI — Network Scanner**: interface enumeration, listening TCP ports, ARP table, DNS servers, default gateway, Wi-Fi info, public IP detection.
+- **GUI — Reports**: full security report generation, quick snapshot export, saved report management with Finder integration.
+- **Codesigning and notarisation pipeline**: hardened runtime entitlements, Developer ID codesigning in CI, Apple notarytool integration via repo secrets.
+
+### Fixed
+- Fixed CI `core-tests` job missing PyYAML and pytest dependencies.
+- Fixed screen lock probe using deprecated `com.apple.screensaver` domain — now uses `sysadminctl -screenLock status` for macOS Tahoe.
+- Fixed shell probes hanging on commands requiring root — added timeouts and stdin nulling.
+- Fixed `shellOutput` not capturing stderr (broke sysadminctl, which writes to stderr).
+- Fixed FileVault recovery key probe reporting false warning when running without root.
+- Allowed mocked script smoke harness to continue-on-error in CI (macOS-only scripts on Ubuntu).
+
 ## [Unreleased]
 
 ### Added
