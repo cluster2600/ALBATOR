@@ -881,5 +881,98 @@ class TestICloudAndTimeRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestSharingServicesRules(unittest.TestCase):
+    """Tests for sharing & services rule YAML files (experiment 8)."""
+
+    SHARING_RULE_IDS = [
+        "os_bluetooth_sharing_disable",
+        "os_printer_sharing_disable",
+        "os_file_sharing_smb_disable",
+        "os_wake_network_access_disable",
+        "os_dvd_sharing_disable",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_bluetooth_sharing_disable_rule(self):
+        rule = self._load_rule("os_bluetooth_sharing_disable")
+        self.assertEqual(rule["id"], "os_bluetooth_sharing_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("PrefKeyServicesEnabled", rule["check"])
+        self.assertIn("PrefKeyServicesEnabled", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_printer_sharing_disable_rule(self):
+        rule = self._load_rule("os_printer_sharing_disable")
+        self.assertEqual(rule["id"], "os_printer_sharing_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("cupsctl", rule["check"])
+        self.assertIn("share_printers", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_file_sharing_smb_disable_rule(self):
+        rule = self._load_rule("os_file_sharing_smb_disable")
+        self.assertEqual(rule["id"], "os_file_sharing_smb_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("smbd", rule["check"])
+        self.assertIn("launchctl", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_wake_network_access_disable_rule(self):
+        rule = self._load_rule("os_wake_network_access_disable")
+        self.assertEqual(rule["id"], "os_wake_network_access_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("womp", rule["check"])
+        self.assertIn("pmset", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_dvd_sharing_disable_rule(self):
+        rule = self._load_rule("os_dvd_sharing_disable")
+        self.assertEqual(rule["id"], "os_dvd_sharing_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("ODSAgent", rule["check"])
+        self.assertIn("launchctl", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_all_sharing_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for rule_id in self.SHARING_RULE_IDS:
+            self.assertIn(rule_id, rule_ids, f"{rule_id} not loaded by collect_rules")
+
+    def test_sharing_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.SHARING_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+
+    def test_sharing_rules_have_required_schema_fields(self):
+        """All sharing rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.SHARING_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

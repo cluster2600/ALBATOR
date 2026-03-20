@@ -1,0 +1,16 @@
+title: "Disable Printer Sharing"
+id: "os_printer_sharing_disable"
+severity: "medium"
+discussion: "Printer Sharing allows other computers on the network to use printers connected to the Mac. This service should be disabled on systems that do not need to share printers, as it exposes a network-accessible service. CIS Benchmark Section 2.3.3.7 recommends disabling Printer Sharing."
+check: "/usr/sbin/cupsctl 2>/dev/null | /usr/bin/grep -c '_share_printers=0'"
+fix: "sudo /usr/sbin/cupsctl --no-share-printers && sudo /bin/launchctl disable system/org.cups.cupsd 2>/dev/null; true"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92842-5"]
+  800-53r5: ["CM-7", "AC-17"]
+  disa_stig: ["V-259772"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

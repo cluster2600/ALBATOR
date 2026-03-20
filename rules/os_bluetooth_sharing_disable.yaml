@@ -1,0 +1,16 @@
+title: "Disable Bluetooth Sharing"
+id: "os_bluetooth_sharing_disable"
+severity: "medium"
+discussion: "Bluetooth Sharing allows other Bluetooth-enabled devices to send files to and browse shared folders on the Mac. This service should be disabled unless specifically required, as it creates a vector for unauthorized file transfers. CIS Benchmark Section 2.3.3.8 recommends disabling Bluetooth Sharing."
+check: "/usr/bin/defaults -currentHost read com.apple.Bluetooth PrefKeyServicesEnabled 2>/dev/null"
+fix: "sudo /usr/bin/defaults -currentHost write com.apple.Bluetooth PrefKeyServicesEnabled -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92841-7"]
+  800-53r5: ["CM-7", "AC-18"]
+  disa_stig: ["V-259771"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

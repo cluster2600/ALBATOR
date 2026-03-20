@@ -1,0 +1,16 @@
+title: "Disable Wake for Network Access"
+id: "os_wake_network_access_disable"
+severity: "medium"
+discussion: "Wake for Network Access allows other users to access the Mac's shared resources even when it is in sleep mode, by waking it via a network packet (Wake-on-LAN). This increases the window of exposure for network services. CIS Benchmark Section 2.9 recommends disabling Wake for Network Access."
+check: "/usr/bin/pmset -g custom 2>/dev/null | /usr/bin/awk '/womp/ {print $2}'"
+fix: "sudo /usr/bin/pmset -a womp 0"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92844-1"]
+  800-53r5: ["CM-7", "SC-10"]
+  disa_stig: ["V-259774"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

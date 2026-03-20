@@ -1,0 +1,16 @@
+title: "Disable File Sharing (SMB)"
+id: "os_file_sharing_smb_disable"
+severity: "high"
+discussion: "File Sharing over SMB allows other computers on the network to access shared folders on the Mac. This service should be disabled unless specifically required for file serving, as SMB exposes a significant network attack surface. CIS Benchmark Section 2.3.3.9 recommends disabling File Sharing."
+check: "/bin/launchctl print-disabled system 2>/dev/null | /usr/bin/grep -c 'com.apple.smbd.*=>.*disabled'"
+fix: "sudo /bin/launchctl disable system/com.apple.smbd && sudo /bin/launchctl bootout system/com.apple.smbd 2>/dev/null; true"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92843-3"]
+  800-53r5: ["CM-7", "AC-3"]
+  disa_stig: ["V-259773"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

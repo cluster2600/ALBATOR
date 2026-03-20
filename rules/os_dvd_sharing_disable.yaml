@@ -1,0 +1,16 @@
+title: "Disable DVD/CD Sharing"
+id: "os_dvd_sharing_disable"
+severity: "medium"
+discussion: "DVD/CD Sharing allows users on other computers to remotely access the Mac's optical disc drive. This service should be disabled as it provides an unnecessary network-accessible resource and increases the attack surface. CIS Benchmark Section 2.3.3.2 recommends disabling DVD/CD Sharing."
+check: "/bin/launchctl print-disabled system 2>/dev/null | /usr/bin/grep -c 'com.apple.ODSAgent.*=>.*disabled'"
+fix: "sudo /bin/launchctl disable system/com.apple.ODSAgent && sudo /bin/launchctl bootout system/com.apple.ODSAgent 2>/dev/null; true"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92845-8"]
+  800-53r5: ["CM-7"]
+  disa_stig: ["V-259775"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
