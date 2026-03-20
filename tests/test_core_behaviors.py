@@ -3723,5 +3723,392 @@ class TestExemptionExampleFile(unittest.TestCase):
                           f"Exempted rule '{ex['rule_id']}' does not match any rule file")
 
 
+class TestBaselineSaveLoad(unittest.TestCase):
+    """Test baseline save and load operations."""
+
+    def _make_scan_result(self, passed=3, failed=1, rules=None):
+        if rules is None:
+            rules = []
+            for i in range(passed):
+                rules.append({"id": f"os_rule_{i}", "title": f"Rule {i}", "severity": "medium", "status": "pass"})
+            for i in range(failed):
+                rules.append({"id": f"os_fail_{i}", "title": f"Fail {i}", "severity": "high", "status": "fail", "detail": "non-compliant"})
+        total = passed + failed
+        return {
+            "rules_scanned": total,
+            "passed": passed,
+            "failed": failed,
+            "errors": 0,
+            "exempt": 0,
+            "dry_run": False,
+            "profile": None,
+            "results": rules,
+            "summary": {
+                "total": total,
+                "passed": passed,
+                "failed": failed,
+                "exempt": 0,
+                "compliance_pct": round(100.0 * passed / total, 1) if total > 0 else 0.0,
+            },
+        }
+
+    def test_save_creates_file(self):
+        from baseline import save_baseline
+        with tempfile.TemporaryDirectory() as tmp:
+            scan_result = self._make_scan_result()
+            path = save_baseline(scan_result, tmp)
+            self.assertTrue(os.path.exists(path))
+            self.assertTrue(path.endswith(".json"))
+            self.assertIn("baseline_", os.path.basename(path))
+
+    def test_save_with_label(self):
+        from baseline import save_baseline
+        with tempfile.TemporaryDirectory() as tmp:
+            scan_result = self._make_scan_result()
+            path = save_baseline(scan_result, tmp, label="pre-deploy")
+            self.assertIn("pre-deploy", os.path.basename(path))
+
+    def test_save_creates_directory(self):
+        from baseline import save_baseline
+        with tempfile.TemporaryDirectory() as tmp:
+            subdir = os.path.join(tmp, "nested", "baselines")
+            scan_result = self._make_scan_result()
+            path = save_baseline(scan_result, subdir)
+            self.assertTrue(os.path.exists(path))
+
+    def test_load_roundtrip(self):
+        from baseline import save_baseline, load_baseline
+        with tempfile.TemporaryDirectory() as tmp:
+            scan_result = self._make_scan_result()
+            path = save_baseline(scan_result, tmp)
+            loaded = load_baseline(path)
+            self.assertEqual(loaded["scan"]["passed"], 3)
+            self.assertEqual(loaded["scan"]["failed"], 1)
+            self.assertIn("timestamp", loaded)
+            self.assertEqual(loaded["version"], 1)
+
+    def test_load_missing_file_raises(self):
+        from baseline import load_baseline
+        with self.assertRaises(FileNotFoundError):
+            load_baseline("/nonexistent/baseline.json")
+
+    def test_load_invalid_json_raises(self):
+        from baseline import load_baseline
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            f.write('{"no_scan_key": true}')
+            f.flush()
+            try:
+                with self.assertRaises(ValueError):
+                    load_baseline(f.name)
+            finally:
+                os.unlink(f.name)
+
+
+class TestBaselineList(unittest.TestCase):
+    """Test baseline listing."""
+
+    def test_list_empty_directory(self):
+        from baseline import list_baselines
+        with tempfile.TemporaryDirectory() as tmp:
+            result = list_baselines(tmp)
+            self.assertEqual(result["count"], 0)
+            self.assertEqual(result["baselines"], [])
+
+    def test_list_nonexistent_directory(self):
+        from baseline import list_baselines
+        result = list_baselines("/nonexistent/dir")
+        self.assertEqual(result["count"], 0)
+
+    def test_list_finds_baselines(self):
+        from baseline import save_baseline, list_baselines
+        scan_result = {
+            "rules_scanned": 2, "passed": 1, "failed": 1, "errors": 0,
+            "exempt": 0, "dry_run": False, "profile": None,
+            "results": [
+                {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+                {"id": "r2", "title": "R2", "severity": "high", "status": "fail"},
+            ],
+            "summary": {"total": 2, "passed": 1, "failed": 1, "exempt": 0, "compliance_pct": 50.0},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            save_baseline(scan_result, tmp, label="first")
+            save_baseline(scan_result, tmp, label="second")
+            result = list_baselines(tmp)
+            self.assertEqual(result["count"], 2)
+            self.assertTrue(any("first" in b["filename"] for b in result["baselines"]))
+
+
+class TestBaselineCompare(unittest.TestCase):
+    """Test baseline comparison and drift detection."""
+
+    def _make_baseline(self, results, label="test"):
+        total = len(results)
+        passed = sum(1 for r in results if r["status"] == "pass")
+        failed = total - passed
+        return {
+            "version": 1,
+            "timestamp": "2026-03-20T10:00:00",
+            "label": label,
+            "scan": {
+                "rules_scanned": total,
+                "passed": passed,
+                "failed": failed,
+                "errors": 0,
+                "exempt": 0,
+                "dry_run": False,
+                "results": results,
+                "summary": {
+                    "total": total,
+                    "passed": passed,
+                    "failed": failed,
+                    "compliance_pct": round(100.0 * passed / total, 1) if total > 0 else 0.0,
+                },
+            },
+        }
+
+    def test_no_drift_identical(self):
+        from baseline import compare_baselines
+        results = [
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+            {"id": "r2", "title": "R2", "severity": "high", "status": "pass"},
+        ]
+        old = self._make_baseline(results, "old")
+        new = self._make_baseline(results, "new")
+        diff = compare_baselines(old, new)
+        self.assertFalse(diff["summary"]["has_drift"])
+        self.assertEqual(diff["summary"]["regressions"], 0)
+        self.assertEqual(diff["summary"]["resolved"], 0)
+        self.assertEqual(diff["summary"]["unchanged"], 2)
+
+    def test_regression_detected(self):
+        from baseline import compare_baselines
+        old = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "high", "status": "pass"},
+        ], "old")
+        new = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "high", "status": "fail", "detail": "broken"},
+        ], "new")
+        diff = compare_baselines(old, new)
+        self.assertTrue(diff["summary"]["has_drift"])
+        self.assertEqual(diff["summary"]["regressions"], 1)
+        self.assertEqual(diff["regressions"][0]["id"], "r1")
+
+    def test_resolved_detected(self):
+        from baseline import compare_baselines
+        old = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "high", "status": "fail"},
+        ], "old")
+        new = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "high", "status": "pass"},
+        ], "new")
+        diff = compare_baselines(old, new)
+        self.assertTrue(diff["summary"]["has_drift"])
+        self.assertEqual(diff["summary"]["resolved"], 1)
+
+    def test_new_rule_detected(self):
+        from baseline import compare_baselines
+        old = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+        ], "old")
+        new = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+            {"id": "r2", "title": "R2", "severity": "high", "status": "fail"},
+        ], "new")
+        diff = compare_baselines(old, new)
+        self.assertTrue(diff["summary"]["has_drift"])
+        self.assertEqual(diff["summary"]["new_rules"], 1)
+        self.assertEqual(diff["summary"]["new_failures"], 1)
+
+    def test_removed_rule_detected(self):
+        from baseline import compare_baselines
+        old = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+            {"id": "r2", "title": "R2", "severity": "high", "status": "pass"},
+        ], "old")
+        new = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+        ], "new")
+        diff = compare_baselines(old, new)
+        self.assertTrue(diff["summary"]["has_drift"])
+        self.assertEqual(diff["summary"]["removed_rules"], 1)
+
+    def test_compliance_delta(self):
+        from baseline import compare_baselines
+        old = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+            {"id": "r2", "title": "R2", "severity": "low", "status": "fail"},
+        ], "old")
+        new = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+            {"id": "r2", "title": "R2", "severity": "low", "status": "pass"},
+        ], "new")
+        diff = compare_baselines(old, new)
+        self.assertEqual(diff["summary"]["compliance_delta"], 50.0)
+
+    def test_mixed_drift_scenario(self):
+        from baseline import compare_baselines
+        old = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "pass"},
+            {"id": "r2", "title": "R2", "severity": "high", "status": "fail"},
+            {"id": "r3", "title": "R3", "severity": "medium", "status": "pass"},
+        ], "old")
+        new = self._make_baseline([
+            {"id": "r1", "title": "R1", "severity": "low", "status": "fail"},  # regression
+            {"id": "r2", "title": "R2", "severity": "high", "status": "pass"},  # resolved
+            {"id": "r4", "title": "R4", "severity": "low", "status": "pass"},  # new rule
+        ], "new")
+        diff = compare_baselines(old, new)
+        self.assertEqual(diff["summary"]["regressions"], 1)
+        self.assertEqual(diff["summary"]["resolved"], 1)
+        self.assertEqual(diff["summary"]["new_rules"], 1)
+        self.assertEqual(diff["summary"]["removed_rules"], 1)
+
+
+class TestBaselineFormatting(unittest.TestCase):
+    """Test baseline report formatting."""
+
+    def test_format_diff_report_no_drift(self):
+        from baseline import format_diff_report
+        diff = {
+            "old_meta": {"timestamp": "2026-03-19T10:00:00", "label": "before"},
+            "new_meta": {"timestamp": "2026-03-20T10:00:00", "label": "after"},
+            "summary": {
+                "has_drift": False, "regressions": 0, "resolved": 0,
+                "new_failures": 0, "new_rules": 0, "removed_rules": 0,
+                "unchanged": 5, "old_compliance_pct": 100.0,
+                "new_compliance_pct": 100.0, "compliance_delta": 0.0,
+            },
+            "regressions": [], "resolved": [], "new_failures": [],
+            "new_rules": [], "removed_rules": [], "unchanged": [],
+        }
+        report = format_diff_report(diff)
+        self.assertIn("No compliance drift detected", report)
+        self.assertIn("UNCHANGED", report)
+
+    def test_format_diff_report_with_regressions(self):
+        from baseline import format_diff_report
+        diff = {
+            "old_meta": {"timestamp": "2026-03-19T10:00:00", "label": "old"},
+            "new_meta": {"timestamp": "2026-03-20T10:00:00", "label": "new"},
+            "summary": {
+                "has_drift": True, "regressions": 1, "resolved": 0,
+                "new_failures": 0, "new_rules": 0, "removed_rules": 0,
+                "unchanged": 4, "old_compliance_pct": 100.0,
+                "new_compliance_pct": 80.0, "compliance_delta": -20.0,
+            },
+            "regressions": [{"id": "r1", "title": "R1", "severity": "high", "old_status": "pass", "new_status": "fail"}],
+            "resolved": [], "new_failures": [], "new_rules": [],
+            "removed_rules": [], "unchanged": [],
+        }
+        report = format_diff_report(diff)
+        self.assertIn("REGRESSIONS", report)
+        self.assertIn("DEGRADED", report)
+        self.assertIn("r1", report)
+
+    def test_format_baseline_list_empty(self):
+        from baseline import format_baseline_list
+        result = {"baselines_dir": "/tmp/test", "count": 0, "baselines": []}
+        report = format_baseline_list(result)
+        self.assertIn("No baselines saved yet", report)
+
+    def test_format_baseline_list_with_entries(self):
+        from baseline import format_baseline_list
+        result = {
+            "baselines_dir": "/tmp/test",
+            "count": 1,
+            "baselines": [{
+                "path": "/tmp/test/baseline_20260320.json",
+                "filename": "baseline_20260320.json",
+                "timestamp": "2026-03-20T10:00:00",
+                "label": "deploy",
+                "rules_scanned": 72,
+                "passed": 70,
+                "failed": 2,
+                "compliance_pct": 97.2,
+            }],
+        }
+        report = format_baseline_list(result)
+        self.assertIn("deploy", report)
+        self.assertIn("72", report)
+
+
+class TestBaselineCLIIntegration(unittest.TestCase):
+    """Test baseline CLI subcommand integration."""
+
+    def _run_cli(self, args_list):
+        sys_argv_backup = sys.argv
+        try:
+            sys.argv = ["albator_cli.py"] + args_list
+            albator_cli.main()
+        except SystemExit as e:
+            return e.code
+        finally:
+            sys.argv = sys_argv_backup
+        return 0
+
+    def test_baseline_list_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code = self._run_cli(["baseline", "--list", "--baselines-dir", tmp])
+            self.assertEqual(code, 0)
+
+    def test_baseline_list_json_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            captured = io.StringIO()
+            sys_argv_backup = sys.argv
+            try:
+                sys.argv = ["albator_cli.py", "--json-output", "baseline", "--list", "--baselines-dir", tmp]
+                with self.assertRaises(SystemExit) as ctx:
+                    with patch("sys.stdout", captured):
+                        albator_cli.main()
+                self.assertEqual(ctx.exception.code, 0)
+            finally:
+                sys.argv = sys_argv_backup
+
+    def test_baseline_save_dry_run(self):
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with tempfile.TemporaryDirectory() as tmp:
+            code = self._run_cli(["baseline", "--save", "--dry-run", "--baselines-dir", tmp])
+            self.assertEqual(code, 0)
+            # Check a file was created
+            import glob as glob_mod
+            files = glob_mod.glob(os.path.join(tmp, "baseline_*.json"))
+            self.assertEqual(len(files), 1)
+
+    def test_baseline_save_with_label(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code = self._run_cli(["baseline", "--save", "--dry-run", "--label", "test-label", "--baselines-dir", tmp])
+            self.assertEqual(code, 0)
+            import glob as glob_mod
+            files = glob_mod.glob(os.path.join(tmp, "baseline_*test-label*.json"))
+            self.assertEqual(len(files), 1)
+
+    def test_baseline_compare_missing_file(self):
+        code = self._run_cli(["baseline", "--compare", "/nonexistent/a.json", "/nonexistent/b.json"])
+        self.assertEqual(code, 2)
+
+    def test_baseline_compare_roundtrip(self):
+        from baseline import save_baseline
+        scan_result = {
+            "rules_scanned": 1, "passed": 1, "failed": 0, "errors": 0,
+            "exempt": 0, "dry_run": False, "profile": None,
+            "results": [{"id": "r1", "title": "R1", "severity": "low", "status": "pass"}],
+            "summary": {"total": 1, "passed": 1, "failed": 0, "exempt": 0, "compliance_pct": 100.0},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            p1 = save_baseline(scan_result, tmp, label="a")
+            p2 = save_baseline(scan_result, tmp, label="b")
+            code = self._run_cli(["baseline", "--compare", p1, p2])
+            self.assertEqual(code, 0)
+
+    def test_baseline_no_action_fails(self):
+        code = self._run_cli(["baseline"])
+        self.assertEqual(code, 2)
+
+    def test_baseline_save_with_profile(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code = self._run_cli(["baseline", "--save", "--dry-run", "--profile", "cis_level1", "--baselines-dir", tmp])
+            self.assertEqual(code, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -17,6 +17,10 @@ from rollback import (
 )
 from report import generate_report, format_text_report, format_csv_report
 from scan import scan, format_scan_report
+from baseline import (
+    save_baseline, load_baseline, list_baselines, compare_baselines,
+    format_diff_report, format_baseline_list,
+)
 from utils import parse_authors
 
 CONFIG_PATHS = ("config.yaml", os.path.join("config", "albator.yaml"))
@@ -361,6 +365,31 @@ def main():
     parser_report.add_argument("--exempt-file", type=str, default=None,
                                help="Path to exemptions YAML file for accepted-risk exceptions")
 
+    parser_baseline = subparsers.add_parser("baseline", help="Save, list, or compare compliance scan baselines for drift detection")
+    parser_baseline.add_argument("--save", action="store_true",
+                                 help="Run a scan and save the result as a baseline")
+    parser_baseline.add_argument("--label", type=str, default=None,
+                                 help="Human-readable label for the saved baseline (e.g., 'pre-deploy')")
+    parser_baseline.add_argument("--list", action="store_true", dest="list_mode",
+                                 help="List available saved baselines")
+    parser_baseline.add_argument("--compare", nargs=2, metavar=("OLD", "NEW"),
+                                 help="Compare two baseline files and show drift")
+    parser_baseline.add_argument("--baselines-dir", type=str, default=None,
+                                 help="Directory for baseline storage (default: $ALBATOR_BASELINES_DIR or ./baselines)")
+    parser_baseline.add_argument("--profile", type=str, default=None,
+                                 help="Compliance profile for --save scan")
+    parser_baseline.add_argument("--severity", type=str, default=None,
+                                 choices=["low", "medium", "high", "critical"],
+                                 help="Minimum severity for --save scan")
+    parser_baseline.add_argument("--dry-run", action="store_true",
+                                 help="Save a dry-run scan as baseline (no checks executed)")
+    parser_baseline.add_argument("--timeout", type=int, default=30,
+                                 help="Per-check timeout in seconds for --save (default: 30)")
+    parser_baseline.add_argument("--odv-file", type=str, default=None,
+                                 help="Path to ODV overrides YAML for --save scan")
+    parser_baseline.add_argument("--exempt-file", type=str, default=None,
+                                 help="Path to exemptions YAML for --save scan")
+
     # Bash script commands
     bash_scripts = {
         "privacy": "privacy.sh",
@@ -543,6 +572,89 @@ def main():
         else:
             print(format_text_report(result))
         sys.exit(0 if (result["summary"]["failed"] == 0 or result["metadata"]["dry_run"]) else 1)
+
+    if args.command == "baseline":
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        baselines_dir = (
+            args.baselines_dir
+            or os.environ.get("ALBATOR_BASELINES_DIR")
+            or os.path.join(base_dir, "baselines")
+        )
+
+        if args.list_mode:
+            result = list_baselines(baselines_dir)
+            if args.json_output:
+                result["command"] = "baseline"
+                result["success"] = True
+                _print_json(result)
+            else:
+                print(format_baseline_list(result))
+            sys.exit(0)
+
+        if args.compare:
+            old_path, new_path = args.compare
+            try:
+                old_bl = load_baseline(old_path)
+                new_bl = load_baseline(new_path)
+            except (FileNotFoundError, ValueError, json.JSONDecodeError) as e:
+                if args.json_output:
+                    _print_json({"command": "baseline", "success": False, "error": str(e)})
+                else:
+                    print(f"Error: {e}", file=sys.stderr)
+                sys.exit(2)
+            diff = compare_baselines(old_bl, new_bl)
+            if args.json_output:
+                diff["command"] = "baseline"
+                diff["success"] = diff["summary"]["regressions"] == 0
+                _print_json(diff)
+            else:
+                print(format_diff_report(diff))
+            sys.exit(0 if diff["summary"]["regressions"] == 0 else 1)
+
+        if args.save:
+            rules_dir = os.path.join(base_dir, "rules")
+            profiles_dir = os.path.join(base_dir, "config", "profiles")
+            try:
+                scan_result = scan(
+                    rules_dir=rules_dir,
+                    profiles_dir=profiles_dir,
+                    profile_name=args.profile,
+                    min_severity=args.severity,
+                    dry_run=args.dry_run,
+                    timeout=args.timeout,
+                    odv_file=args.odv_file,
+                    exempt_file=args.exempt_file,
+                )
+            except (FileNotFoundError, ValueError) as e:
+                if args.json_output:
+                    _print_json({"command": "baseline", "success": False, "error": str(e)})
+                else:
+                    print(f"Error: {e}", file=sys.stderr)
+                sys.exit(2)
+            saved_path = save_baseline(scan_result, baselines_dir, label=args.label)
+            if args.json_output:
+                _print_json({
+                    "command": "baseline",
+                    "success": True,
+                    "action": "save",
+                    "path": saved_path,
+                    "label": args.label or "",
+                    "scan_summary": scan_result.get("summary", {}),
+                })
+            else:
+                print(f"Baseline saved: {saved_path}")
+                s = scan_result.get("summary", {})
+                print(f"  Rules: {s.get('total', 0)}  Passed: {s.get('passed', 0)}  "
+                      f"Failed: {s.get('failed', 0)}  Compliance: {s.get('compliance_pct', 0)}%")
+            sys.exit(0)
+
+        # No action specified
+        if args.json_output:
+            _print_json({"command": "baseline", "success": False,
+                         "error": "Specify --save, --list, or --compare"})
+        else:
+            print("Error: Specify --save, --list, or --compare", file=sys.stderr)
+        sys.exit(2)
 
     maybe_run_preflight(args.command, args, config, json_output=args.json_output)
 
