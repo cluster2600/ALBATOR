@@ -61,6 +61,15 @@ public final class SecurityEngine: ObservableObject {
     @Published public var minimumBaselineVersion: String = SystemSecurityProbe.defaultBaselineVersion()
     @Published public var recentActivity: [SecurityActivity] = []
 
+    // Tahoe-specific statuses
+    @Published public var bsiStatus: SecurityStatus = .unknown
+    @Published public var lockdownModeStatus: SecurityStatus = .unknown
+    @Published public var usbRestrictedModeStatus: SecurityStatus = .unknown
+    @Published public var safariFingerprintStatus: SecurityStatus = .unknown
+    @Published public var fileVaultRecoveryKeyStatus: SecurityStatus = .unknown
+    @Published public var screenLockStatus: SecurityStatus = .unknown
+    @Published public var hardwareGeneration: HardwareGeneration = .unknown
+
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
@@ -117,6 +126,15 @@ public final class SecurityEngine: ObservableObject {
             self.sipStatus = snapshot.sipStatus
             self.baselineStatus = snapshot.baselineStatus
             self.securityDataStatus = snapshot.securityDataStatus
+            // Tahoe
+            self.bsiStatus = snapshot.bsiStatus
+            self.lockdownModeStatus = snapshot.lockdownModeStatus
+            self.usbRestrictedModeStatus = snapshot.usbRestrictedModeStatus
+            self.safariFingerprintStatus = snapshot.safariFingerprintStatus
+            self.fileVaultRecoveryKeyStatus = snapshot.fileVaultRecoveryKeyStatus
+            self.screenLockStatus = snapshot.screenLockStatus
+            self.hardwareGeneration = snapshot.hardwareGeneration
+
             self.riskScore = self.calculateRiskScore(from: snapshot)
             self.addActivity(
                 "Security snapshot updated",
@@ -131,12 +149,20 @@ public final class SecurityEngine: ObservableObject {
 
     private func calculateRiskScore(from snapshot: SystemSecuritySnapshot) -> Double {
         var score = 100.0
-        if snapshot.firewallStatus != .secure { score -= 20 }
-        if snapshot.fileVaultStatus != .secure { score -= 20 }
-        if snapshot.gatekeeperStatus != .secure { score -= 15 }
-        if snapshot.sipStatus != .secure { score -= 20 }
-        if snapshot.baselineStatus != .secure { score -= 10 }
-        if snapshot.securityDataStatus != .secure { score -= 15 }
+        // Core checks
+        if snapshot.firewallStatus != .secure { score -= 15 }
+        if snapshot.fileVaultStatus != .secure { score -= 15 }
+        if snapshot.gatekeeperStatus != .secure { score -= 12 }
+        if snapshot.sipStatus != .secure { score -= 15 }
+        if snapshot.baselineStatus != .secure { score -= 8 }
+        if snapshot.securityDataStatus != .secure { score -= 10 }
+        // Tahoe checks
+        if snapshot.bsiStatus == .warning { score -= 5 }
+        if snapshot.usbRestrictedModeStatus == .warning { score -= 5 }
+        if snapshot.safariFingerprintStatus == .warning { score -= 3 }
+        if snapshot.fileVaultRecoveryKeyStatus == .warning { score -= 5 }
+        if snapshot.screenLockStatus == .warning { score -= 5 }
+        if snapshot.hardwareGeneration == .intel { score -= 2 }
         return max(0, min(100, score))
     }
 

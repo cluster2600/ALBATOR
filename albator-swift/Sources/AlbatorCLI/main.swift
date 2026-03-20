@@ -80,27 +80,6 @@ func probeAutoUpdate() -> (enabled: Bool, raw: String) {
     return (enabled, output.trimmingCharacters(in: .whitespacesAndNewlines))
 }
 
-func probeScreenSaverPassword() -> (enabled: Bool, raw: String) {
-    // macOS 26+ (Tahoe): com.apple.screensaver askForPassword no longer exists.
-    // Use sysadminctl -screenLock status instead — works without root.
-    let output = shellOutput("/usr/sbin/sysadminctl", "-screenLock", "status") ?? "unknown"
-    let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
-    // "screenLock delay is immediate" or "screenLock delay is <N> seconds" = enabled
-    // "screenLock is off" = disabled
-    let enabled = trimmed.lowercased().contains("delay is")
-    let summary: String
-    if trimmed.lowercased().contains("immediate") {
-        summary = "Password required immediately"
-    } else if trimmed.lowercased().contains("delay is") {
-        summary = "Password required after delay"
-    } else if trimmed.lowercased().contains("off") {
-        summary = "Screen lock disabled"
-    } else {
-        summary = trimmed
-    }
-    return (enabled, summary)
-}
-
 func probeAirDrop() -> (mode: String, raw: String) {
     let output = shellOutput("/usr/bin/defaults", "read", "com.apple.NetworkBrowser", "DisableAirDrop") ?? "unknown"
     let disabled = output.trimmingCharacters(in: .whitespacesAndNewlines) == "1"
@@ -180,35 +159,7 @@ func printBanner() {
     print()
 }
 
-func cmdScan(verbose: Bool) {
-    printBanner()
-
-    let probe = SystemSecurityProbe.shared
-    let snapshot = probe.captureSnapshot(minimumBaselineVersion: SystemSecurityProbe.defaultBaselineVersion())
-
-    // System info
-    let info = systemInfo()
-    print(c(.boldWhite, "  System Information"))
-    print(c(.dim, "  ─────────────────────────────────────"))
-    print("  macOS        \(c(.boldWhite, snapshot.macosVersion))")
-    print("  Model        \(info.model)")
-    print("  Chip         \(info.chip)")
-    print("  Memory       \(info.memory)")
-    print()
-
-    // Core security checks
-    print(c(.boldWhite, "  Core Security Posture"))
-    print(c(.dim, "  ─────────────────────────────────────"))
-
-    let checks: [(String, SecurityStatus, String)] = [
-        ("Firewall", snapshot.firewallStatus, snapshot.details["firewall"] ?? ""),
-        ("FileVault", snapshot.fileVaultStatus, snapshot.details["filevault"] ?? ""),
-        ("Gatekeeper", snapshot.gatekeeperStatus, snapshot.details["gatekeeper"] ?? ""),
-        ("SIP", snapshot.sipStatus, snapshot.details["sip"] ?? ""),
-        ("Baseline (\(snapshot.minimumBaselineVersion))", snapshot.baselineStatus, "macOS \(snapshot.macosVersion)"),
-        ("Security Updates", snapshot.securityDataStatus, "ConfigData=\(snapshot.details["config_data_install"] ?? "?"), CriticalUpdate=\(snapshot.details["critical_update_install"] ?? "?")"),
-    ]
-
+func printChecks(_ checks: [(String, SecurityStatus, String)], verbose: Bool) {
     for (name, status, detail) in checks {
         let icon = statusIcon(status)
         let label = statusColor(status, status.rawValue.padding(toLength: 8, withPad: " ", startingAt: 0))
@@ -219,6 +170,55 @@ func cmdScan(verbose: Bool) {
             print(line)
         }
     }
+}
+
+func cmdScan(verbose: Bool) {
+    printBanner()
+
+    let snapshot = SystemSecurityProbe.shared.captureSnapshot(minimumBaselineVersion: SystemSecurityProbe.defaultBaselineVersion())
+
+    // System info
+    let info = systemInfo()
+    print(c(.boldWhite, "  System Information"))
+    print(c(.dim, "  ─────────────────────────────────────"))
+    print("  macOS        \(c(.boldWhite, snapshot.macosVersion))")
+    print("  Model        \(info.model)")
+    print("  Chip         \(info.chip)")
+    print("  Memory       \(info.memory)")
+    let hwLabel = snapshot.hardwareGeneration == .intel
+        ? c(.boldYellow, "Intel") + c(.dim, " (EOL — last supported macOS)")
+        : c(.boldGreen, snapshot.hardwareGeneration.rawValue)
+    print("  Hardware     \(hwLabel)")
+    print()
+
+    // Core security checks
+    print(c(.boldWhite, "  Core Security Posture"))
+    print(c(.dim, "  ─────────────────────────────────────"))
+
+    let coreChecks: [(String, SecurityStatus, String)] = [
+        ("Firewall", snapshot.firewallStatus, snapshot.details["firewall"] ?? ""),
+        ("FileVault", snapshot.fileVaultStatus, snapshot.details["filevault"] ?? ""),
+        ("Gatekeeper", snapshot.gatekeeperStatus, snapshot.details["gatekeeper"] ?? ""),
+        ("SIP", snapshot.sipStatus, snapshot.details["sip"] ?? ""),
+        ("Baseline (\(snapshot.minimumBaselineVersion))", snapshot.baselineStatus, "macOS \(snapshot.macosVersion)"),
+        ("Security Updates", snapshot.securityDataStatus, "ConfigData=\(snapshot.details["config_data_install"] ?? "?"), CriticalUpdate=\(snapshot.details["critical_update_install"] ?? "?")"),
+    ]
+    printChecks(coreChecks, verbose: verbose)
+    print()
+
+    // Tahoe-specific checks
+    print(c(.boldWhite, "  macOS Tahoe Hardening") + "  " + c(.blue, "[NEW]"))
+    print(c(.dim, "  ─────────────────────────────────────"))
+
+    let tahoeChecks: [(String, SecurityStatus, String)] = [
+        ("BSI Auto-Patch", snapshot.bsiStatus, "AutomaticallyInstallMacOSUpdates=\(snapshot.details["bsi_auto_install"] ?? "?")"),
+        ("Screen Lock", snapshot.screenLockStatus, snapshot.details["screen_lock"] ?? ""),
+        ("USB Restricted Mode", snapshot.usbRestrictedModeStatus, snapshot.details["usb_restricted_mode"] ?? ""),
+        ("Safari Anti-FP", snapshot.safariFingerprintStatus, "EnableEnhancedPrivacyInRegularBrowsing=\(snapshot.details["safari_afp"] ?? "?")"),
+        ("FV Recovery Key", snapshot.fileVaultRecoveryKeyStatus, "personal=\(snapshot.details["filevault_personal_key"] ?? "?"), institutional=\(snapshot.details["filevault_institutional_key"] ?? "?")"),
+        ("Lockdown Mode", snapshot.lockdownModeStatus, snapshot.details["lockdown_mode"] ?? ""),
+    ]
+    printChecks(tahoeChecks, verbose: verbose)
     print()
 
     // Extended checks
@@ -228,42 +228,37 @@ func cmdScan(verbose: Bool) {
     let remoteLogin = probeRemoteLogin()
     let bluetooth = probeBluetoothSharing()
     let autoUpdate = probeAutoUpdate()
-    let screenSaver = probeScreenSaverPassword()
     let airdrop = probeAirDrop()
 
-    let extended: [(String, Bool, String)] = [
-        ("Remote Login", !remoteLogin.enabled, remoteLogin.enabled ? "SSH enabled — exposed" : "Disabled"),
-        ("Bluetooth Sharing", !bluetooth.enabled, bluetooth.enabled ? "Sharing on" : "Disabled"),
-        ("Auto Updates", autoUpdate.enabled, autoUpdate.enabled ? "Enabled" : "Disabled"),
-        ("Screen Lock", screenSaver.enabled, screenSaver.enabled ? "Password required" : "No password on wake"),
-        ("AirDrop", airdrop.mode == "Disabled", airdrop.mode),
+    let extended: [(String, SecurityStatus, String)] = [
+        ("Remote Login", !remoteLogin.enabled ? .secure : .warning, remoteLogin.enabled ? "SSH enabled — exposed" : "Disabled"),
+        ("Bluetooth Sharing", !bluetooth.enabled ? .secure : .warning, bluetooth.enabled ? "Sharing on" : "Disabled"),
+        ("Auto Updates", autoUpdate.enabled ? .secure : .warning, autoUpdate.enabled ? "Enabled" : "Disabled"),
+        ("AirDrop", airdrop.mode == "Disabled" ? .secure : .warning, airdrop.mode),
     ]
-
-    for (name, secure, detail) in extended {
-        let status: SecurityStatus = secure ? .secure : .warning
-        let icon = statusIcon(status)
-        let label = statusColor(status, (secure ? "Secure" : "Warning").padding(toLength: 8, withPad: " ", startingAt: 0))
-        let line = "  \(icon) \(name.padding(toLength: 22, withPad: " ", startingAt: 0)) \(label)"
-        if verbose {
-            print("\(line)  \(c(.dim, detail))")
-        } else {
-            print(line)
-        }
-    }
+    printChecks(extended, verbose: verbose)
     print()
 
     // Risk score
     var score = 100.0
-    if snapshot.firewallStatus != .secure { score -= 20 }
-    if snapshot.fileVaultStatus != .secure { score -= 20 }
-    if snapshot.gatekeeperStatus != .secure { score -= 15 }
-    if snapshot.sipStatus != .secure { score -= 20 }
-    if snapshot.baselineStatus != .secure { score -= 10 }
-    if snapshot.securityDataStatus != .secure { score -= 15 }
-    if remoteLogin.enabled { score -= 5 }
+    // Core
+    if snapshot.firewallStatus != .secure { score -= 15 }
+    if snapshot.fileVaultStatus != .secure { score -= 15 }
+    if snapshot.gatekeeperStatus != .secure { score -= 12 }
+    if snapshot.sipStatus != .secure { score -= 15 }
+    if snapshot.baselineStatus != .secure { score -= 8 }
+    if snapshot.securityDataStatus != .secure { score -= 10 }
+    // Tahoe
+    if snapshot.bsiStatus == .warning { score -= 5 }
+    if snapshot.usbRestrictedModeStatus == .warning { score -= 5 }
+    if snapshot.safariFingerprintStatus == .warning { score -= 3 }
+    if snapshot.fileVaultRecoveryKeyStatus == .warning { score -= 5 }
+    if snapshot.screenLockStatus == .warning { score -= 5 }
+    if snapshot.hardwareGeneration == .intel { score -= 2 }
+    // Extended
+    if remoteLogin.enabled { score -= 4 }
     if bluetooth.enabled { score -= 3 }
-    if !autoUpdate.enabled { score -= 5 }
-    if !screenSaver.enabled { score -= 5 }
+    if !autoUpdate.enabled { score -= 4 }
     score = max(0, min(100, score))
 
     print(c(.boldWhite, "  Overall Risk Score"))
@@ -278,10 +273,17 @@ func cmdScan(verbose: Bool) {
     if snapshot.gatekeeperStatus != .secure { recommendations.append("Re-enable Gatekeeper: sudo spctl --master-enable") }
     if snapshot.sipStatus != .secure { recommendations.append("Re-enable SIP: boot to Recovery and run csrutil enable") }
     if snapshot.securityDataStatus != .secure { recommendations.append("Enable security data updates: sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true && sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true") }
+    // Tahoe
+    if snapshot.bsiStatus == .warning { recommendations.append("Enable BSI auto-patching: sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true") }
+    if snapshot.screenLockStatus == .warning { recommendations.append("Require password on screen lock: sysadminctl -screenLock immediate") }
+    if snapshot.usbRestrictedModeStatus == .warning { recommendations.append("Enable USB Restricted Mode in System Settings > Privacy & Security") }
+    if snapshot.safariFingerprintStatus == .warning { recommendations.append("Enable Safari anti-fingerprinting: defaults write com.apple.Safari EnableEnhancedPrivacyInRegularBrowsing -bool true") }
+    if snapshot.fileVaultRecoveryKeyStatus == .warning { recommendations.append("Generate FileVault recovery key: sudo fdesetup changerecovery -personal") }
+    if snapshot.hardwareGeneration == .intel { recommendations.append("Plan migration to Apple Silicon — macOS 26 Tahoe is the last release for Intel Macs") }
+    // Extended
     if remoteLogin.enabled { recommendations.append("Disable remote login: sudo systemsetup -setremotelogin off") }
     if bluetooth.enabled { recommendations.append("Disable Bluetooth sharing in System Settings > General > Sharing") }
     if !autoUpdate.enabled { recommendations.append("Enable automatic update checks: sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true") }
-    if !screenSaver.enabled { recommendations.append("Require password on screen lock: sysadminctl -screenLock immediate") }
 
     if recommendations.isEmpty {
         print("  \(c(.boldGreen, "✔ No recommendations — system is well hardened"))")
@@ -310,25 +312,26 @@ func cmdMonitor(interval: Int) async {
     print(c(.dim, "  Polling every \(interval)s — press Ctrl+C to stop"))
     print()
 
-    var iteration = 0
     while true {
-        iteration += 1
         let timestamp = ISO8601DateFormatter().string(from: Date())
         let snapshot = SystemSecurityProbe.shared.captureSnapshot(minimumBaselineVersion: SystemSecurityProbe.defaultBaselineVersion())
 
         var score = 100.0
-        if snapshot.firewallStatus != .secure { score -= 20 }
-        if snapshot.fileVaultStatus != .secure { score -= 20 }
-        if snapshot.gatekeeperStatus != .secure { score -= 15 }
-        if snapshot.sipStatus != .secure { score -= 20 }
-        if snapshot.baselineStatus != .secure { score -= 10 }
-        if snapshot.securityDataStatus != .secure { score -= 15 }
+        if snapshot.firewallStatus != .secure { score -= 15 }
+        if snapshot.fileVaultStatus != .secure { score -= 15 }
+        if snapshot.gatekeeperStatus != .secure { score -= 12 }
+        if snapshot.sipStatus != .secure { score -= 15 }
+        if snapshot.baselineStatus != .secure { score -= 8 }
+        if snapshot.securityDataStatus != .secure { score -= 10 }
+        if snapshot.bsiStatus == .warning { score -= 5 }
+        if snapshot.usbRestrictedModeStatus == .warning { score -= 5 }
+        if snapshot.screenLockStatus == .warning { score -= 5 }
         score = max(0, min(100, score))
 
-        let allSecure = [snapshot.firewallStatus, snapshot.fileVaultStatus, snapshot.gatekeeperStatus, snapshot.sipStatus, snapshot.baselineStatus, snapshot.securityDataStatus].allSatisfy { $0 == .secure }
+        let allSecure = [snapshot.firewallStatus, snapshot.fileVaultStatus, snapshot.gatekeeperStatus, snapshot.sipStatus, snapshot.baselineStatus, snapshot.securityDataStatus, snapshot.bsiStatus, snapshot.usbRestrictedModeStatus, snapshot.screenLockStatus].allSatisfy { $0 == .secure }
         let overallIcon = allSecure ? c(.boldGreen, "✔") : c(.boldYellow, "⚠")
 
-        print("  \(c(.dim, "[\(timestamp)]")) \(overallIcon) score=\(c(score >= 80 ? .green : .yellow, String(format: "%.0f%%", score)))  FW=\(statusIcon(snapshot.firewallStatus)) FV=\(statusIcon(snapshot.fileVaultStatus)) GK=\(statusIcon(snapshot.gatekeeperStatus)) SIP=\(statusIcon(snapshot.sipStatus)) BL=\(statusIcon(snapshot.baselineStatus)) SD=\(statusIcon(snapshot.securityDataStatus))")
+        print("  \(c(.dim, "[\(timestamp)]")) \(overallIcon) score=\(c(score >= 80 ? .green : .yellow, String(format: "%.0f%%", score)))  FW=\(statusIcon(snapshot.firewallStatus)) FV=\(statusIcon(snapshot.fileVaultStatus)) GK=\(statusIcon(snapshot.gatekeeperStatus)) SIP=\(statusIcon(snapshot.sipStatus)) BSI=\(statusIcon(snapshot.bsiStatus)) USB=\(statusIcon(snapshot.usbRestrictedModeStatus)) SL=\(statusIcon(snapshot.screenLockStatus))")
 
         try? await Task.sleep(nanoseconds: UInt64(interval) * 1_000_000_000)
     }
@@ -339,21 +342,25 @@ func cmdJSON() {
     let remoteLogin = probeRemoteLogin()
     let bluetooth = probeBluetoothSharing()
     let autoUpdate = probeAutoUpdate()
-    let screenSaver = probeScreenSaverPassword()
     let airdrop = probeAirDrop()
     let info = systemInfo()
 
     var score = 100.0
-    if snapshot.firewallStatus != .secure { score -= 20 }
-    if snapshot.fileVaultStatus != .secure { score -= 20 }
-    if snapshot.gatekeeperStatus != .secure { score -= 15 }
-    if snapshot.sipStatus != .secure { score -= 20 }
-    if snapshot.baselineStatus != .secure { score -= 10 }
-    if snapshot.securityDataStatus != .secure { score -= 15 }
-    if remoteLogin.enabled { score -= 5 }
+    if snapshot.firewallStatus != .secure { score -= 15 }
+    if snapshot.fileVaultStatus != .secure { score -= 15 }
+    if snapshot.gatekeeperStatus != .secure { score -= 12 }
+    if snapshot.sipStatus != .secure { score -= 15 }
+    if snapshot.baselineStatus != .secure { score -= 8 }
+    if snapshot.securityDataStatus != .secure { score -= 10 }
+    if snapshot.bsiStatus == .warning { score -= 5 }
+    if snapshot.usbRestrictedModeStatus == .warning { score -= 5 }
+    if snapshot.safariFingerprintStatus == .warning { score -= 3 }
+    if snapshot.fileVaultRecoveryKeyStatus == .warning { score -= 5 }
+    if snapshot.screenLockStatus == .warning { score -= 5 }
+    if snapshot.hardwareGeneration == .intel { score -= 2 }
+    if remoteLogin.enabled { score -= 4 }
     if bluetooth.enabled { score -= 3 }
-    if !autoUpdate.enabled { score -= 5 }
-    if !screenSaver.enabled { score -= 5 }
+    if !autoUpdate.enabled { score -= 4 }
     score = max(0, min(100, score))
 
     let formatter = ISO8601DateFormatter()
@@ -364,6 +371,7 @@ func cmdJSON() {
             "model": info.model,
             "chip": info.chip,
             "memory": info.memory,
+            "hardware_generation": snapshot.hardwareGeneration.rawValue,
         ],
         "core_checks": [
             "firewall": snapshot.firewallStatus.rawValue,
@@ -373,11 +381,18 @@ func cmdJSON() {
             "baseline": snapshot.baselineStatus.rawValue,
             "security_data_updates": snapshot.securityDataStatus.rawValue,
         ],
+        "tahoe_checks": [
+            "bsi_auto_patch": snapshot.bsiStatus.rawValue,
+            "screen_lock": snapshot.screenLockStatus.rawValue,
+            "usb_restricted_mode": snapshot.usbRestrictedModeStatus.rawValue,
+            "safari_fingerprint_protection": snapshot.safariFingerprintStatus.rawValue,
+            "filevault_recovery_key": snapshot.fileVaultRecoveryKeyStatus.rawValue,
+            "lockdown_mode": snapshot.lockdownModeStatus.rawValue,
+        ],
         "extended_checks": [
             "remote_login_disabled": !remoteLogin.enabled,
             "bluetooth_sharing_disabled": !bluetooth.enabled,
             "auto_updates_enabled": autoUpdate.enabled,
-            "screen_lock_enabled": screenSaver.enabled,
             "airdrop_disabled": airdrop.mode == "Disabled",
         ],
         "risk_score": score,
