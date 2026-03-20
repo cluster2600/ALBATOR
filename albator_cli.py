@@ -11,6 +11,10 @@ from main import BaselineGenerator
 from preflight import format_preflight_report, preflight_to_json, run_preflight
 from rule_handler import collect_rules
 from fix import fix, format_fix_report
+from rollback import (
+    apply_rollback, find_metadata_files, list_rollbacks,
+    format_rollback_list, format_rollback_report,
+)
 from scan import scan, format_scan_report
 from utils import parse_authors
 
@@ -315,6 +319,20 @@ def main():
     parser_fix.add_argument("--fix-timeout", type=int, default=60,
                             help="Per-fix timeout in seconds (default: 60)")
 
+    parser_rollback = subparsers.add_parser("rollback", help="List or apply rollback metadata to reverse hardening changes")
+    parser_rollback.add_argument("--list", action="store_true", dest="list_mode",
+                                 help="List available rollback metadata files")
+    parser_rollback.add_argument("--latest", action="store_true",
+                                 help="Use the most recent rollback metadata file")
+    parser_rollback.add_argument("--dry-run", action="store_true",
+                                 help="Show rollback operations without executing")
+    parser_rollback.add_argument("--timeout", type=int, default=30,
+                                 help="Per-command timeout in seconds (default: 30)")
+    parser_rollback.add_argument("--state-dir", type=str, default=None,
+                                 help="Directory containing rollback metadata (default: $ALBATOR_STATE_DIR or /tmp/albator_state)")
+    parser_rollback.add_argument("metadata_file", nargs="?", default=None,
+                                 help="Path to a specific rollback metadata JSON file")
+
     # Bash script commands
     bash_scripts = {
         "privacy": "privacy.sh",
@@ -410,6 +428,53 @@ def main():
         else:
             print(format_fix_report(result))
         sys.exit(0 if (result["fix_failed"] == 0 or result["dry_run"]) else 1)
+
+    if args.command == "rollback":
+        state_dir = args.state_dir or os.environ.get("ALBATOR_STATE_DIR", "/tmp/albator_state")
+
+        if args.list_mode:
+            result = list_rollbacks(state_dir)
+            if args.json_output:
+                result["command"] = "rollback"
+                result["success"] = True
+                _print_json(result)
+            else:
+                print(format_rollback_list(result))
+            sys.exit(0)
+
+        # Determine metadata file
+        meta_file = args.metadata_file
+        if args.latest or meta_file is None:
+            files = find_metadata_files(state_dir)
+            if not files:
+                if args.json_output:
+                    _print_json({"command": "rollback", "success": False,
+                                 "error": f"No rollback metadata files found in {state_dir}"})
+                else:
+                    print(f"Error: No rollback metadata files found in {state_dir}", file=sys.stderr)
+                sys.exit(2)
+            meta_file = files[0]
+
+        try:
+            result = apply_rollback(
+                metadata_path=meta_file,
+                dry_run=args.dry_run,
+                timeout=args.timeout,
+            )
+        except (FileNotFoundError, ValueError, json.JSONDecodeError) as e:
+            if args.json_output:
+                _print_json({"command": "rollback", "success": False, "error": str(e)})
+            else:
+                print(f"Error: {e}", file=sys.stderr)
+            sys.exit(2)
+
+        if args.json_output:
+            result["command"] = "rollback"
+            result["success"] = result["failed"] == 0
+            _print_json(result)
+        else:
+            print(format_rollback_report(result))
+        sys.exit(0 if result["failed"] == 0 else 1)
 
     maybe_run_preflight(args.command, args, config, json_output=args.json_output)
 

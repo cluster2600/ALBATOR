@@ -2327,5 +2327,301 @@ class TestFixCLIIntegration(unittest.TestCase):
             self.assertIn(r["severity"], ("high", "critical"))
 
 
+class TestRollbackModule(unittest.TestCase):
+    """Tests for the rollback Python module (experiment 19)."""
+
+    def setUp(self):
+        import rollback as rb_mod
+        self.rb = rb_mod
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _write_metadata(self, filename, data):
+        path = os.path.join(self.tmpdir, filename)
+        with open(path, "w") as f:
+            json.dump(data, f)
+        return path
+
+    def test_find_metadata_files_empty_dir(self):
+        """find_metadata_files returns empty list for dir with no metadata."""
+        self.assertEqual(self.rb.find_metadata_files(self.tmpdir), [])
+
+    def test_find_metadata_files_nonexistent_dir(self):
+        """find_metadata_files returns empty list for nonexistent dir."""
+        self.assertEqual(self.rb.find_metadata_files("/tmp/no_such_dir_abc123"), [])
+
+    def test_find_metadata_files_finds_rollback_json(self):
+        """find_metadata_files finds files matching *_rollback_*.json pattern."""
+        self._write_metadata("privacy_rollback_2026.json", {"script": "privacy.sh", "changes": []})
+        self._write_metadata("firewall_rollback_2026.json", {"script": "firewall.sh", "changes": []})
+        files = self.rb.find_metadata_files(self.tmpdir)
+        self.assertEqual(len(files), 2)
+
+    def test_load_metadata_file_not_found(self):
+        """load_metadata raises FileNotFoundError for missing file."""
+        with self.assertRaises(FileNotFoundError):
+            self.rb.load_metadata("/tmp/no_such_file.json")
+
+    def test_load_metadata_valid(self):
+        """load_metadata returns parsed dict for valid JSON."""
+        path = self._write_metadata("test_rollback_001.json", {"script": "test.sh", "changes": []})
+        data = self.rb.load_metadata(path)
+        self.assertEqual(data["script"], "test.sh")
+
+    def test_list_rollbacks_empty(self):
+        """list_rollbacks returns count=0 for empty dir."""
+        result = self.rb.list_rollbacks(self.tmpdir)
+        self.assertEqual(result["count"], 0)
+        self.assertEqual(result["files"], [])
+
+    def test_list_rollbacks_with_files(self):
+        """list_rollbacks returns summaries for each metadata file."""
+        self._write_metadata("priv_rollback_001.json", {
+            "script": "privacy.sh", "status": "completed", "changes": [{"component": "a", "detail": "b"}]
+        })
+        result = self.rb.list_rollbacks(self.tmpdir)
+        self.assertEqual(result["count"], 1)
+        self.assertEqual(result["files"][0]["script"], "privacy.sh")
+        self.assertEqual(result["files"][0]["changes"], 1)
+
+    def test_apply_rollback_empty_changes(self):
+        """apply_rollback with no changes should return 0 applied."""
+        path = self._write_metadata("test_rollback_empty.json", {"script": "test.sh", "changes": []})
+        result = self.rb.apply_rollback(path)
+        self.assertEqual(result["total_changes"], 0)
+        self.assertEqual(result["applied"], 0)
+        self.assertEqual(result["status"], "ok")
+
+    def test_apply_rollback_dry_run(self):
+        """apply_rollback dry_run should not execute commands."""
+        path = self._write_metadata("test_rollback_dry.json", {
+            "script": "privacy.sh",
+            "changes": [{
+                "component": "com.apple.test/Key",
+                "detail": "Set Key to 1",
+                "rollback_command": "echo rollback_executed"
+            }]
+        })
+        result = self.rb.apply_rollback(path, dry_run=True)
+        self.assertEqual(result["applied"], 1)
+        self.assertEqual(result["status"], "dry-run")
+        self.assertEqual(result["results"][0]["status"], "would-rollback")
+
+    def test_apply_rollback_executes_commands(self):
+        """apply_rollback should execute rollback commands."""
+        path = self._write_metadata("test_rollback_exec.json", {
+            "script": "test.sh",
+            "changes": [{
+                "component": "test/comp",
+                "detail": "test change",
+                "rollback_command": "true"
+            }]
+        })
+        result = self.rb.apply_rollback(path)
+        self.assertEqual(result["applied"], 1)
+        self.assertEqual(result["failed"], 0)
+        self.assertEqual(result["results"][0]["status"], "rolled-back")
+
+    def test_apply_rollback_failed_command(self):
+        """apply_rollback counts failed commands."""
+        path = self._write_metadata("test_rollback_fail.json", {
+            "script": "test.sh",
+            "changes": [{
+                "component": "test/comp",
+                "detail": "test change",
+                "rollback_command": "false"
+            }]
+        })
+        result = self.rb.apply_rollback(path)
+        self.assertEqual(result["failed"], 1)
+        self.assertEqual(result["status"], "failed")
+
+    def test_apply_rollback_skips_no_command(self):
+        """apply_rollback skips changes with no rollback command and no domain/key."""
+        path = self._write_metadata("test_rollback_skip.json", {
+            "script": "test.sh",
+            "changes": [{
+                "component": "plain_component",
+                "detail": "no command",
+                "rollback_command": ""
+            }]
+        })
+        result = self.rb.apply_rollback(path)
+        self.assertEqual(result["skipped"], 1)
+        self.assertEqual(result["results"][0]["status"], "skipped")
+
+    def test_apply_rollback_lifo_order(self):
+        """apply_rollback processes changes in reverse (LIFO) order."""
+        path = self._write_metadata("test_rollback_lifo.json", {
+            "script": "test.sh",
+            "changes": [
+                {"component": "first", "detail": "first", "rollback_command": "true"},
+                {"component": "second", "detail": "second", "rollback_command": "true"},
+                {"component": "third", "detail": "third", "rollback_command": "true"},
+            ]
+        })
+        result = self.rb.apply_rollback(path, dry_run=True)
+        components = [r["component"] for r in result["results"]]
+        self.assertEqual(components, ["third", "second", "first"])
+
+    def test_apply_rollback_fallback_defaults_delete(self):
+        """apply_rollback uses 'defaults delete domain key' fallback for domain/key components."""
+        path = self._write_metadata("test_rollback_fallback.json", {
+            "script": "test.sh",
+            "changes": [{
+                "component": "com.apple.test/SomeKey",
+                "detail": "set SomeKey",
+                "rollback_command": ""
+            }]
+        })
+        result = self.rb.apply_rollback(path, dry_run=True)
+        self.assertEqual(result["results"][0]["rollback_command"], "defaults delete com.apple.test SomeKey")
+        self.assertEqual(result["results"][0]["status"], "would-rollback")
+
+    def test_format_rollback_list_header(self):
+        """format_rollback_list includes header."""
+        result = self.rb.list_rollbacks(self.tmpdir)
+        output = self.rb.format_rollback_list(result)
+        self.assertIn("Albator Rollback Metadata", output)
+        self.assertIn("Files found: 0", output)
+
+    def test_format_rollback_report_header(self):
+        """format_rollback_report includes header and summary."""
+        path = self._write_metadata("test_rollback_fmt.json", {"script": "test.sh", "changes": []})
+        result = self.rb.apply_rollback(path, dry_run=True)
+        output = self.rb.format_rollback_report(result)
+        self.assertIn("Albator Rollback Report", output)
+        self.assertIn("Applied: 0", output)
+
+    def test_apply_rollback_timeout(self):
+        """apply_rollback handles command timeout."""
+        path = self._write_metadata("test_rollback_timeout.json", {
+            "script": "test.sh",
+            "changes": [{
+                "component": "test/comp",
+                "detail": "slow command",
+                "rollback_command": "sleep 60"
+            }]
+        })
+        result = self.rb.apply_rollback(path, timeout=1)
+        self.assertEqual(result["failed"], 1)
+        self.assertIn("timed out", result["results"][0]["error"])
+
+
+class TestRollbackCLIIntegration(unittest.TestCase):
+    """CLI integration tests for the rollback subcommand (experiment 19)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.cli = str(self.repo_root / "albator_cli.py")
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _write_metadata(self, filename, data):
+        path = os.path.join(self.tmpdir, filename)
+        with open(path, "w") as f:
+            json.dump(data, f)
+        return path
+
+    def test_rollback_list_exits_zero(self):
+        """rollback --list should always exit 0."""
+        result = subprocess.run(
+            ["python3", self.cli, "rollback", "--list", "--state-dir", self.tmpdir],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Albator Rollback Metadata", result.stdout)
+
+    def test_rollback_list_json(self):
+        """rollback --list --json-output should produce valid JSON."""
+        self._write_metadata("priv_rollback_001.json", {
+            "script": "privacy.sh", "status": "done", "changes": []
+        })
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "rollback", "--list", "--state-dir", self.tmpdir],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["command"], "rollback")
+        self.assertTrue(data["success"])
+        self.assertEqual(data["count"], 1)
+
+    def test_rollback_no_metadata_exits_2(self):
+        """rollback with no metadata files should exit 2."""
+        result = subprocess.run(
+            ["python3", self.cli, "rollback", "--state-dir", self.tmpdir],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 2)
+
+    def test_rollback_dry_run_exits_zero(self):
+        """rollback --dry-run should exit 0."""
+        self._write_metadata("test_rollback_001.json", {
+            "script": "test.sh",
+            "changes": [{"component": "x", "detail": "y", "rollback_command": "echo ok"}]
+        })
+        result = subprocess.run(
+            ["python3", self.cli, "rollback", "--dry-run", "--state-dir", self.tmpdir],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Albator Rollback Report", result.stdout)
+
+    def test_rollback_dry_run_json(self):
+        """rollback --dry-run --json-output should produce valid JSON."""
+        self._write_metadata("test_rollback_002.json", {
+            "script": "firewall.sh",
+            "changes": [{"component": "fw/rule", "detail": "add rule", "rollback_command": "true"}]
+        })
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "rollback", "--dry-run", "--state-dir", self.tmpdir],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["command"], "rollback")
+        self.assertTrue(data["success"])
+        self.assertEqual(data["status"], "dry-run")
+
+    def test_rollback_specific_file(self):
+        """rollback with explicit metadata file path should work."""
+        path = self._write_metadata("specific_rollback_001.json", {
+            "script": "encryption.sh",
+            "changes": [{"component": "enc/fv", "detail": "enable fv", "rollback_command": "true"}]
+        })
+        result = subprocess.run(
+            ["python3", self.cli, "rollback", "--dry-run", path],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("encryption.sh", result.stdout)
+
+    def test_rollback_invalid_file_exits_2(self):
+        """rollback with nonexistent file should exit 2."""
+        result = subprocess.run(
+            ["python3", self.cli, "rollback", "/tmp/nonexistent_metadata.json"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 2)
+
+    def test_rollback_json_no_metadata(self):
+        """rollback --json-output with no metadata should produce error JSON."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "rollback", "--state-dir", self.tmpdir],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 2)
+        data = json.loads(result.stdout)
+        self.assertFalse(data["success"])
+        self.assertIn("No rollback metadata", data["error"])
+
+
 if __name__ == "__main__":
     unittest.main()
