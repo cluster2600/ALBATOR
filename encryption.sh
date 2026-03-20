@@ -147,10 +147,10 @@ enable_filevault() {
     # Try different methods based on macOS version and configuration
     if sudo fdesetup enable -user "$(whoami)" 2>>"$LOG_FILE"; then
         show_success "FileVault enable command executed successfully"
-        record_rollback_change "filevault" "enabled via user-specific command"
+        record_rollback_change "filevault" "enabled via user-specific command" "sudo fdesetup disable"
     elif sudo fdesetup enable 2>>"$LOG_FILE"; then
         show_success "FileVault enable command executed successfully (fallback method)"
-        record_rollback_change "filevault" "enabled via fallback command"
+        record_rollback_change "filevault" "enabled via fallback command" "sudo fdesetup disable"
     else
         show_error "Failed to enable FileVault"
         ((errors++))

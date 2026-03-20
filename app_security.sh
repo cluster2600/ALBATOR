@@ -112,7 +112,7 @@ configure_gatekeeper() {
         
         if sudo spctl --master-enable 2>>"$LOG_FILE"; then
             show_success "Gatekeeper enabled successfully"
-            record_rollback_change "gatekeeper" "enabled"
+            record_rollback_change "gatekeeper" "enabled" "sudo spctl --master-disable"
         else
             show_error "Failed to enable Gatekeeper"
             ((errors++))
@@ -125,7 +125,7 @@ configure_gatekeeper() {
     # Enable assessment for all applications
     if sudo spctl --enable 2>>"$LOG_FILE"; then
         show_success "Gatekeeper assessment enabled for all applications"
-        record_rollback_change "gatekeeper_assessment" "enabled for all applications"
+        record_rollback_change "gatekeeper_assessment" "enabled for all applications" "sudo spctl --disable"
     else
         show_warning "Failed to enable Gatekeeper assessment"
         ((errors++))

@@ -1609,6 +1609,96 @@ class TestPrivacyRollbackCommands(unittest.TestCase):
                          "Some record_rollback_change calls in firewall.sh lack a rollback_command argument")
 
 
+class TestEncryptionRollbackCommands(unittest.TestCase):
+    """Verify encryption.sh records proper rollback commands (Track 3 — experiment 16)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+
+    def test_encryption_sh_rollback_calls_have_three_args(self):
+        """encryption.sh record_rollback_change calls should include a 3rd argument."""
+        encryption_path = self.repo_root / "encryption.sh"
+        content = encryption_path.read_text()
+        import re
+        calls = re.findall(r'record_rollback_change\s+"[^"]*"\s+"[^"]*"', content)
+        three_arg_calls = re.findall(
+            r'record_rollback_change\s+"[^"]*"\s+"[^"]*"\s+"[^"]*"', content
+        )
+        self.assertEqual(len(calls), len(three_arg_calls),
+                         "Some record_rollback_change calls in encryption.sh lack a rollback_command argument")
+
+    def test_encryption_sh_filevault_rollback_uses_fdesetup_disable(self):
+        """FileVault rollback should use 'fdesetup disable'."""
+        encryption_path = self.repo_root / "encryption.sh"
+        content = encryption_path.read_text()
+        import re
+        rollback_cmds = re.findall(
+            r'record_rollback_change\s+"filevault"\s+"[^"]*"\s+"([^"]*)"', content
+        )
+        self.assertGreater(len(rollback_cmds), 0, "No filevault rollback commands found")
+        for cmd in rollback_cmds:
+            self.assertIn("fdesetup disable", cmd,
+                          f"FileVault rollback should use fdesetup disable, got: {cmd}")
+
+
+class TestAppSecurityRollbackCommands(unittest.TestCase):
+    """Verify app_security.sh records proper rollback commands (Track 3 — experiment 16)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+
+    def test_app_security_sh_rollback_calls_have_three_args(self):
+        """app_security.sh record_rollback_change calls should include a 3rd argument."""
+        app_sec_path = self.repo_root / "app_security.sh"
+        content = app_sec_path.read_text()
+        import re
+        calls = re.findall(r'record_rollback_change\s+"[^"]*"\s+"[^"]*"', content)
+        three_arg_calls = re.findall(
+            r'record_rollback_change\s+"[^"]*"\s+"[^"]*"\s+"[^"]*"', content
+        )
+        self.assertEqual(len(calls), len(three_arg_calls),
+                         "Some record_rollback_change calls in app_security.sh lack a rollback_command argument")
+
+    def test_app_security_sh_gatekeeper_rollback_uses_spctl(self):
+        """Gatekeeper rollback should use spctl commands."""
+        app_sec_path = self.repo_root / "app_security.sh"
+        content = app_sec_path.read_text()
+        import re
+        rollback_cmds = re.findall(
+            r'record_rollback_change\s+"gatekeeper[^"]*"\s+"[^"]*"\s+"([^"]*)"', content
+        )
+        self.assertGreater(len(rollback_cmds), 0, "No gatekeeper rollback commands found")
+        for cmd in rollback_cmds:
+            self.assertIn("spctl", cmd,
+                          f"Gatekeeper rollback should use spctl, got: {cmd}")
+
+
+class TestAllScriptsHaveRollbackCommands(unittest.TestCase):
+    """Verify all 4 core scripts have proper rollback commands (Track 3 complete — experiment 16)."""
+
+    SCRIPTS = ["privacy.sh", "firewall.sh", "encryption.sh", "app_security.sh"]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+
+    def test_all_scripts_rollback_calls_have_three_args(self):
+        """Every record_rollback_change call in all core scripts must have 3 arguments."""
+        import re
+        errors = []
+        for script in self.SCRIPTS:
+            path = self.repo_root / script
+            if not path.exists():
+                continue
+            content = path.read_text()
+            calls = re.findall(r'record_rollback_change\s+"[^"]*"\s+"[^"]*"', content)
+            three_arg_calls = re.findall(
+                r'record_rollback_change\s+"[^"]*"\s+"[^"]*"\s+"[^"]*"', content
+            )
+            if len(calls) != len(three_arg_calls):
+                errors.append(f"{script}: {len(calls)} calls but only {len(three_arg_calls)} have rollback commands")
+        self.assertEqual(errors, [], "\n".join(errors))
+
+
 class TestComprehensiveRuleValidation(unittest.TestCase):
     """Cross-cutting validation of ALL 72 rules for schema, safety, references, and profile coverage (experiment 15)."""
 
