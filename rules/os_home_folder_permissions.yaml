@@ -10,7 +10,12 @@ references:
   800-53r5: ["AC-3", "MP-2"]
   disa_stig: ["V-259790"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv:
+  variable: "home_folder_permissions"
+  default: "700"
+  description: "Home folder permission mode (octal)"
+  cis_recommendation: "700"
+  type: "string"
 tags: ["stig", "security", "filesystem", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

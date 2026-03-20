@@ -10,7 +10,7 @@ references:
   800-53r5: ["IA-2", "IA-4"]
   disa_stig: ["V-259772"]
   srg: ["SRG-OS-000104-GPOS-00051"]
-odv: "missing"
+odv: "none"
 tags: ["stig", "security", "login", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

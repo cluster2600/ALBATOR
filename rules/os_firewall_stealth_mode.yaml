@@ -10,7 +10,7 @@ references:
   800-53r5: ["SC-7", "CM-7"]
   disa_stig: ["V-259756"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv: "none"
 tags: ["stig", "security", "firewall", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

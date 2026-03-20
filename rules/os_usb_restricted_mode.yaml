@@ -10,7 +10,7 @@ references:
   800-53r5: ["MP-7", "SC-41"]
   disa_stig: ["V-259782"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv: "none"
 tags: ["stig", "security", "peripheral", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

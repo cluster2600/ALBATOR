@@ -1,0 +1,35 @@
+# Organization-Defined Values (ODVs) for ALBATOR
+#
+# These values control the thresholds and parameters used in CIS Benchmark
+# compliance checks and fixes. Customize them to match your organization's
+# security policy. Rules that are simple boolean toggles (enable/disable)
+# do not have ODVs and are not listed here.
+#
+# Each value corresponds to one or more YAML rules in rules/. The rule's
+# `odv` field documents which variable it uses and the CIS recommendation.
+
+odv:
+  # --- Password Policy (CIS Section 5.2) ---
+  password_min_length: 15             # Minimum password length (CIS 5.2.1: 15)
+  password_max_age_days: 365          # Maximum password age in days (CIS 5.2.5: 365)
+  password_history_count: 15          # Number of previous passwords to remember (CIS 5.2.3: 15)
+  password_lockout_attempts: 5        # Failed login attempts before lockout (CIS 5.2.4: 5)
+
+  # --- Screen Saver & Session (CIS Section 2.3) ---
+  screensaver_timeout_seconds: 1200   # Inactivity timeout in seconds (CIS 2.3.1: 1200 = 20 min)
+
+  # --- Audit & Logging (CIS Section 3) ---
+  audit_retention_period: "7d"        # Audit log retention period (CIS 3.3: 7d)
+  audit_flags: "lo,ad,fd,fm,-all"     # Audit flags for audit_control (CIS 3.2: lo,ad,fd,fm,-all)
+  install_log_retention_days: 365     # Install.log TTL in days (CIS 3.5: 365)
+
+  # --- Network & Time (CIS Section 2.2 / 4) ---
+  ntp_server: "time.apple.com"        # NTP time server (CIS 2.2.1: time.apple.com)
+
+  # --- Login & Access (CIS Section 5) ---
+  login_banner_text: >-
+    This system is for authorized use only. By using this system, you consent
+    to monitoring and compliance with organizational policies.
+
+  # --- File System (CIS Section 6) ---
+  home_folder_permissions: "700"      # Home folder permission mode (CIS 6.1.3: 700)

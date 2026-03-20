@@ -10,7 +10,12 @@ references:
   800-53r5: ["AU-11"]
   disa_stig: ["V-259760"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv:
+  variable: "install_log_retention_days"
+  default: 365
+  description: "Install log retention period in days"
+  cis_recommendation: 365
+  type: "integer"
 tags: ["stig", "security", "audit"]
 result: "pass"
 mobileconfig: "missing"

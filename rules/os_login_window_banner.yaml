@@ -10,7 +10,12 @@ references:
   800-53r5: ["AC-8"]
   disa_stig: ["V-259775"]
   srg: ["SRG-OS-000023-GPOS-00006"]
-odv: "missing"
+odv:
+  variable: "login_banner_text"
+  default: "This system is for authorized use only. By using this system, you consent to monitoring and compliance with organizational policies."
+  description: "Login window banner message text"
+  cis_recommendation: "Organization-defined"
+  type: "string"
 tags: ["stig", "security", "login", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

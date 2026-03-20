@@ -10,7 +10,12 @@ references:
   800-53r5: ["AU-3", "AU-3(1)", "AU-12"]
   disa_stig: ["V-259757"]
   srg: ["SRG-OS-000037-GPOS-00015", "SRG-OS-000039-GPOS-00017", "SRG-OS-000458-GPOS-00203"]
-odv: "missing"
+odv:
+  variable: "audit_flags"
+  default: "lo,ad,fd,fm,-all"
+  description: "Audit flags for /etc/security/audit_control"
+  cis_recommendation: "lo,ad,fd,fm,-all"
+  type: "string"
 tags: ["stig", "security", "audit"]
 result: "pass"
 mobileconfig: "missing"

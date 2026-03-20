@@ -10,7 +10,7 @@ references:
   800-53r5: ["CP-9", "CP-10"]
   disa_stig: ["V-259743"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv: "none"
 tags: ["stig", "security", "backup", "cis_lvl2"]
 result: "pass"
 mobileconfig: "missing"

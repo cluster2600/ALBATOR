@@ -10,7 +10,7 @@ references:
   800-53r5: ["SC-8", "AC-20", "SC-28"]
   disa_stig: ["V-259792"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv: "none"
 tags: ["stig", "security", "icloud", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

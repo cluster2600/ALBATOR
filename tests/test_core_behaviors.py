@@ -2847,5 +2847,201 @@ class TestReportCLIIntegration(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
 
 
+class TestODVModule(unittest.TestCase):
+    """Tests for the Organization-Defined Values (ODV) module."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+        self.odv_defaults_path = self.repo_root / "config" / "odv_defaults.yaml"
+
+    def _load_all_rules(self):
+        import yaml
+        rules = []
+        for path in sorted(self.rules_dir.glob("os_*.yaml")):
+            with open(path) as f:
+                data = yaml.safe_load(f)
+            if data and "id" in data:
+                rules.append(data)
+        return rules
+
+    def test_odv_defaults_file_exists(self):
+        """config/odv_defaults.yaml must exist."""
+        self.assertTrue(self.odv_defaults_path.exists())
+
+    def test_load_odv_defaults_returns_dict(self):
+        """load_odv_defaults should return a dict of ODV values."""
+        from odv import load_odv_defaults
+        odv_values = load_odv_defaults(str(self.odv_defaults_path))
+        self.assertIsInstance(odv_values, dict)
+        self.assertGreater(len(odv_values), 0)
+
+    def test_load_odv_defaults_has_all_schema_variables(self):
+        """ODV defaults file must define all variables in the schema."""
+        from odv import load_odv_defaults, ODV_SCHEMA
+        odv_values = load_odv_defaults(str(self.odv_defaults_path))
+        for var_name in ODV_SCHEMA:
+            self.assertIn(var_name, odv_values, f"ODV defaults missing: {var_name}")
+
+    def test_validate_odv_defaults_no_errors(self):
+        """validate_odv_values should report no errors for the default config."""
+        from odv import load_odv_defaults, validate_odv_values
+        odv_values = load_odv_defaults(str(self.odv_defaults_path))
+        errors = validate_odv_values(odv_values)
+        self.assertEqual(errors, [], f"ODV validation errors: {errors}")
+
+    def test_validate_odv_catches_missing_variable(self):
+        """validate_odv_values should catch missing variables."""
+        from odv import validate_odv_values
+        errors = validate_odv_values({})
+        self.assertGreater(len(errors), 0)
+        self.assertTrue(any("missing" in e for e in errors))
+
+    def test_validate_odv_catches_wrong_type(self):
+        """validate_odv_values should catch type mismatches."""
+        from odv import load_odv_defaults, validate_odv_values
+        odv_values = load_odv_defaults(str(self.odv_defaults_path))
+        odv_values["password_min_length"] = "not_an_int"
+        errors = validate_odv_values(odv_values)
+        self.assertTrue(any("password_min_length" in e for e in errors))
+
+    def test_no_rules_have_odv_missing(self):
+        """No os_*.yaml rule should have odv='missing' anymore."""
+        rules = self._load_all_rules()
+        for rule in rules:
+            self.assertNotEqual(
+                rule.get("odv"), "missing",
+                f"Rule {rule['id']} still has odv='missing'"
+            )
+
+    def test_all_rules_have_odv_field(self):
+        """Every os_*.yaml rule must have an 'odv' field."""
+        rules = self._load_all_rules()
+        for rule in rules:
+            self.assertIn("odv", rule, f"Rule {rule['id']} is missing 'odv' field")
+
+    def test_boolean_rules_have_odv_none(self):
+        """Rules without tunable parameters should have odv='none'."""
+        from odv import extract_rule_odv
+        rules = self._load_all_rules()
+        none_count = sum(1 for r in rules if r.get("odv") == "none")
+        self.assertEqual(none_count, 61, f"Expected 61 boolean rules with odv='none', got {none_count}")
+
+    def test_tunable_rules_have_structured_odv(self):
+        """11 rules should have structured ODV with variable/default/type."""
+        from odv import extract_rule_odv
+        rules = self._load_all_rules()
+        tunable = [r for r in rules if extract_rule_odv(r) is not None]
+        self.assertEqual(len(tunable), 11, f"Expected 11 tunable rules, got {len(tunable)}")
+
+    def test_tunable_rules_odv_has_required_keys(self):
+        """Each tunable rule's ODV must have variable, default, description, type."""
+        from odv import extract_rule_odv
+        rules = self._load_all_rules()
+        for rule in rules:
+            odv_meta = extract_rule_odv(rule)
+            if odv_meta is None:
+                continue
+            for key in ("variable", "default", "description", "type"):
+                self.assertIn(
+                    key, odv_meta,
+                    f"Rule {rule['id']} ODV missing key: {key}"
+                )
+
+    def test_odv_variables_match_schema(self):
+        """All ODV variable names in rules must exist in ODV_SCHEMA."""
+        from odv import extract_rule_odv, ODV_SCHEMA
+        rules = self._load_all_rules()
+        for rule in rules:
+            odv_meta = extract_rule_odv(rule)
+            if odv_meta is None:
+                continue
+            self.assertIn(
+                odv_meta["variable"], ODV_SCHEMA,
+                f"Rule {rule['id']} uses unknown ODV variable: {odv_meta['variable']}"
+            )
+
+    def test_odv_variables_unique_across_rules(self):
+        """Each ODV variable should map to exactly one rule."""
+        from odv import extract_rule_odv
+        rules = self._load_all_rules()
+        seen = {}
+        for rule in rules:
+            odv_meta = extract_rule_odv(rule)
+            if odv_meta is None:
+                continue
+            var = odv_meta["variable"]
+            self.assertNotIn(
+                var, seen,
+                f"ODV variable '{var}' used by both '{seen.get(var)}' and '{rule['id']}'"
+            )
+            seen[var] = rule["id"]
+
+    def test_get_odv_value_uses_override(self):
+        """get_odv_value should prefer org override over rule default."""
+        from odv import get_odv_value
+        rule = {
+            "id": "test_rule",
+            "odv": {
+                "variable": "password_min_length",
+                "default": 15,
+                "description": "test",
+                "type": "integer",
+            }
+        }
+        val = get_odv_value(rule, {"password_min_length": 20})
+        self.assertEqual(val, 20)
+
+    def test_get_odv_value_falls_back_to_default(self):
+        """get_odv_value should fall back to rule default if no override."""
+        from odv import get_odv_value
+        rule = {
+            "id": "test_rule",
+            "odv": {
+                "variable": "password_min_length",
+                "default": 15,
+                "description": "test",
+                "type": "integer",
+            }
+        }
+        val = get_odv_value(rule, {})
+        self.assertEqual(val, 15)
+
+    def test_get_odv_value_returns_none_for_boolean_rule(self):
+        """get_odv_value should return None for rules with odv='none'."""
+        from odv import get_odv_value
+        rule = {"id": "test_rule", "odv": "none"}
+        self.assertIsNone(get_odv_value(rule))
+
+    def test_list_odv_rules_returns_11(self):
+        """list_odv_rules should return 11 tunable rules."""
+        from odv import list_odv_rules
+        rules = self._load_all_rules()
+        odv_list = list_odv_rules(rules)
+        self.assertEqual(len(odv_list), 11)
+        for entry in odv_list:
+            self.assertIn("rule_id", entry)
+            self.assertIn("variable", entry)
+            self.assertIn("default", entry)
+
+    def test_validate_rules_odv_consistency_no_errors(self):
+        """validate_rules_odv_consistency should report no errors for current rules."""
+        from odv import validate_rules_odv_consistency
+        rules = self._load_all_rules()
+        errors = validate_rules_odv_consistency(rules)
+        self.assertEqual(errors, [], f"ODV consistency errors: {errors}")
+
+    def test_load_odv_missing_file_raises(self):
+        """load_odv_defaults should raise FileNotFoundError for missing file."""
+        from odv import load_odv_defaults
+        with self.assertRaises(FileNotFoundError):
+            load_odv_defaults("/nonexistent/odv.yaml")
+
+    def test_odv_schema_covers_all_11_variables(self):
+        """ODV_SCHEMA should define exactly 11 variables."""
+        from odv import ODV_SCHEMA
+        self.assertEqual(len(ODV_SCHEMA), 11)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,12 @@ references:
   800-53r5: ["AU-8", "AU-8(1)"]
   disa_stig: ["V-259794"]
   srg: ["SRG-OS-000355-GPOS-00143"]
-odv: "missing"
+odv:
+  variable: "ntp_server"
+  default: "time.apple.com"
+  description: "NTP time server hostname"
+  cis_recommendation: "time.apple.com"
+  type: "string"
 tags: ["stig", "security", "time", "ntp", "cis_lvl1"]
 result: "pass"
 mobileconfig: "missing"

@@ -10,7 +10,12 @@ references:
   800-53r5: ["AU-11"]
   disa_stig: ["V-259758"]
   srg: ["SRG-OS-000480-GPOS-00227"]
-odv: "missing"
+odv:
+  variable: "audit_retention_period"
+  default: "7d"
+  description: "Audit log retention period (e.g., 7d, 30d, 1y)"
+  cis_recommendation: "7d"
+  type: "string"
 tags: ["stig", "security", "audit"]
 result: "pass"
 mobileconfig: "missing"
