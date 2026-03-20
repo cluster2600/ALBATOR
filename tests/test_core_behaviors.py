@@ -600,5 +600,98 @@ class TestSystemPreferencesRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestLoginAuthRules(unittest.TestCase):
+    """Tests for login & authentication rule YAML files (experiment 5)."""
+
+    LOGIN_RULE_IDS = [
+        "os_login_window_display",
+        "os_password_hints_disable",
+        "os_fast_user_switching_disable",
+        "os_login_window_banner",
+        "os_screensaver_timeout",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_login_window_display_rule(self):
+        rule = self._load_rule("os_login_window_display")
+        self.assertEqual(rule["id"], "os_login_window_display")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("SHOWFULLNAME", rule["check"])
+        self.assertIn("SHOWFULLNAME", rule["fix"])
+        self.assertIn("IA-2", rule["references"]["800-53r5"])
+        self.assertIn("login", rule["tags"])
+
+    def test_password_hints_disable_rule(self):
+        rule = self._load_rule("os_password_hints_disable")
+        self.assertEqual(rule["id"], "os_password_hints_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("RetriesUntilHint", rule["check"])
+        self.assertIn("RetriesUntilHint", rule["fix"])
+        self.assertIn("IA-6", rule["references"]["800-53r5"])
+        self.assertIn("login", rule["tags"])
+
+    def test_fast_user_switching_disable_rule(self):
+        rule = self._load_rule("os_fast_user_switching_disable")
+        self.assertEqual(rule["id"], "os_fast_user_switching_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("MultipleSessionEnabled", rule["check"])
+        self.assertIn("MultipleSessionEnabled", rule["fix"])
+        self.assertIn("AC-11", rule["references"]["800-53r5"])
+        self.assertIn("login", rule["tags"])
+
+    def test_login_window_banner_rule(self):
+        rule = self._load_rule("os_login_window_banner")
+        self.assertEqual(rule["id"], "os_login_window_banner")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("PolicyBanner", rule["check"])
+        self.assertIn("PolicyBanner", rule["fix"])
+        self.assertIn("AC-8", rule["references"]["800-53r5"])
+        self.assertIn("login", rule["tags"])
+
+    def test_screensaver_timeout_rule(self):
+        rule = self._load_rule("os_screensaver_timeout")
+        self.assertEqual(rule["id"], "os_screensaver_timeout")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("idleTime", rule["check"])
+        self.assertIn("idleTime", rule["fix"])
+        self.assertIn("AC-11", rule["references"]["800-53r5"])
+        self.assertIn("login", rule["tags"])
+
+    def test_all_login_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for login_id in self.LOGIN_RULE_IDS:
+            self.assertIn(login_id, rule_ids, f"{login_id} not loaded by collect_rules")
+
+    def test_login_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.LOGIN_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+
+    def test_login_rules_have_required_schema_fields(self):
+        """All login rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.LOGIN_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

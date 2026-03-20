@@ -1,0 +1,16 @@
+title: "Disable Fast User Switching"
+id: "os_fast_user_switching_disable"
+severity: "medium"
+discussion: "Fast user switching allows multiple users to be logged in simultaneously without logging out. This can lead to unauthorized access to data when users leave sessions active. CIS Benchmark Section 5.10 recommends disabling fast user switching on hardened systems to reduce the risk of unauthorized access."
+check: "/usr/bin/defaults read /Library/Preferences/.GlobalPreferences MultipleSessionEnabled 2>/dev/null | /usr/bin/grep -c '0'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92844-1"]
+  800-53r5: ["AC-11", "SC-23"]
+  disa_stig: ["V-259774"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "login", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

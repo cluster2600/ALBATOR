@@ -1,0 +1,16 @@
+title: "Set Screensaver Inactivity Timeout"
+id: "os_screensaver_timeout"
+severity: "medium"
+discussion: "The screensaver should activate after a defined period of inactivity to protect unattended systems. CIS Benchmark Section 2.3.1 recommends a maximum inactivity timeout of 20 minutes (1200 seconds). Combined with password-on-wake, this ensures unattended Macs are locked promptly."
+check: "/usr/bin/defaults -currentHost read com.apple.screensaver idleTime 2>/dev/null | /usr/bin/awk '{if ($1 <= 1200 && $1 > 0) print 1; else print 0}'"
+fix: "sudo /usr/bin/defaults -currentHost write com.apple.screensaver idleTime -int 1200"
+references:
+  cci: ["CCI-000057"]
+  cce: ["CCE-92846-6"]
+  800-53r5: ["AC-11", "AC-11(1)"]
+  disa_stig: ["V-259776"]
+  srg: ["SRG-OS-000029-GPOS-00010"]
+odv: "missing"
+tags: ["stig", "security", "login", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

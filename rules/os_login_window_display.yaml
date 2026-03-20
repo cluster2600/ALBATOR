@@ -1,0 +1,16 @@
+title: "Display Login Window as Name and Password"
+id: "os_login_window_display"
+severity: "medium"
+discussion: "The login window should be configured to show name and password fields rather than a list of users. Displaying a user list reveals valid usernames to potential attackers. CIS Benchmark Section 5.8 recommends configuring the login window to display name and password fields."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow SHOWFULLNAME 2>/dev/null | /usr/bin/grep -c '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92842-5"]
+  800-53r5: ["IA-2", "IA-4"]
+  disa_stig: ["V-259772"]
+  srg: ["SRG-OS-000104-GPOS-00051"]
+odv: "missing"
+tags: ["stig", "security", "login", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
