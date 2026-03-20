@@ -1,0 +1,16 @@
+title: "Disable Personalized Advertising"
+id: "os_ad_tracking_disable"
+severity: "low"
+discussion: "macOS allows Apple to deliver personalized advertisements based on user behavior. Limiting ad tracking reduces the amount of data shared with third parties and minimizes privacy exposure. CIS Benchmark Section 2.5.3 recommends disabling personalized ads to protect user privacy and reduce unnecessary data collection."
+check: "/usr/bin/defaults read /Users/$(/usr/bin/stat -f '%Su' /dev/console)/Library/Preferences/com.apple.Advertising allowApplePersonalizedAdvertising 2>/dev/null | /usr/bin/grep -q '0'"
+fix: "/usr/bin/defaults write /Users/$(/usr/bin/stat -f '%Su' /dev/console)/Library/Preferences/com.apple.Advertising allowApplePersonalizedAdvertising -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92854-0"]
+  800-53r5: ["CM-7", "AC-20"]
+  disa_stig: ["V-259784"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "privacy", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

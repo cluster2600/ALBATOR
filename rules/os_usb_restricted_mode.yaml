@@ -1,0 +1,16 @@
+title: "Enable USB Restricted Mode"
+id: "os_usb_restricted_mode"
+severity: "high"
+discussion: "USB Restricted Mode prevents USB accessories from connecting to a Mac that has been locked for over an hour. This mitigates USB-based attacks including juice-jacking and unauthorized data extraction through malicious USB devices. CIS Benchmark Section 2.10 recommends enabling USB Restricted Mode to limit the attack surface from external peripherals."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.security.smartcard USBRestrictedMode 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.security.smartcard USBRestrictedMode -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92852-4"]
+  800-53r5: ["MP-7", "SC-41"]
+  disa_stig: ["V-259782"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "peripheral", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

@@ -1,0 +1,16 @@
+title: "Disable Power Nap"
+id: "os_power_nap_disable"
+severity: "medium"
+discussion: "Power Nap allows the Mac to perform background tasks while sleeping, including checking email, calendar updates, and iCloud sync. This feature causes the system to wake periodically, which increases the attack surface by allowing network connections while the device appears to be asleep. CIS Benchmark Section 2.9.2 recommends disabling Power Nap to reduce the risk of unauthorized network activity during sleep."
+check: "/usr/bin/pmset -g | /usr/bin/grep -q 'powernap.*0'"
+fix: "sudo /usr/bin/pmset -a powernap 0"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92853-2"]
+  800-53r5: ["CM-7", "SC-15"]
+  disa_stig: ["V-259783"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "system_preferences", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

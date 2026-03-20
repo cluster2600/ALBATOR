@@ -1,0 +1,16 @@
+title: "Enable Location Services"
+id: "os_location_services_enable"
+severity: "medium"
+discussion: "Location Services must be enabled for Find My Mac and certain security features to function properly. CIS Benchmark Section 2.6.1.1 recommends ensuring Location Services is enabled so that device tracking and recovery features work. Disabling location services entirely can prevent critical security features from operating."
+check: "/usr/bin/defaults read /var/db/locationd/Library/Preferences/ByHost/com.apple.locationd LocationServicesEnabled 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /var/db/locationd/Library/Preferences/ByHost/com.apple.locationd LocationServicesEnabled -bool true; sudo /bin/launchctl kickstart -k system/com.apple.locationd"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92851-6"]
+  800-53r5: ["CM-6", "SC-15"]
+  disa_stig: ["V-259781"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "privacy", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

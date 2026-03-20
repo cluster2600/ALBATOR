@@ -974,5 +974,98 @@ class TestSharingServicesRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestPrivacyPeripheralRules(unittest.TestCase):
+    """Tests for privacy & peripheral security rule YAML files (experiment 9)."""
+
+    PRIVACY_RULE_IDS = [
+        "os_diagnostic_reports_disable",
+        "os_location_services_enable",
+        "os_usb_restricted_mode",
+        "os_power_nap_disable",
+        "os_ad_tracking_disable",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_diagnostic_reports_disable_rule(self):
+        rule = self._load_rule("os_diagnostic_reports_disable")
+        self.assertEqual(rule["id"], "os_diagnostic_reports_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("AutoSubmit", rule["check"])
+        self.assertIn("AutoSubmit", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("privacy", rule["tags"])
+
+    def test_location_services_enable_rule(self):
+        rule = self._load_rule("os_location_services_enable")
+        self.assertEqual(rule["id"], "os_location_services_enable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("LocationServicesEnabled", rule["check"])
+        self.assertIn("LocationServicesEnabled", rule["fix"])
+        self.assertIn("CM-6", rule["references"]["800-53r5"])
+        self.assertIn("privacy", rule["tags"])
+
+    def test_usb_restricted_mode_rule(self):
+        rule = self._load_rule("os_usb_restricted_mode")
+        self.assertEqual(rule["id"], "os_usb_restricted_mode")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("USBRestrictedMode", rule["check"])
+        self.assertIn("USBRestrictedMode", rule["fix"])
+        self.assertIn("MP-7", rule["references"]["800-53r5"])
+        self.assertIn("peripheral", rule["tags"])
+
+    def test_power_nap_disable_rule(self):
+        rule = self._load_rule("os_power_nap_disable")
+        self.assertEqual(rule["id"], "os_power_nap_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("powernap", rule["check"])
+        self.assertIn("pmset", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("system_preferences", rule["tags"])
+
+    def test_ad_tracking_disable_rule(self):
+        rule = self._load_rule("os_ad_tracking_disable")
+        self.assertEqual(rule["id"], "os_ad_tracking_disable")
+        self.assertEqual(rule["severity"], "low")
+        self.assertIn("allowApplePersonalizedAdvertising", rule["check"])
+        self.assertIn("allowApplePersonalizedAdvertising", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("privacy", rule["tags"])
+
+    def test_all_privacy_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for rule_id in self.PRIVACY_RULE_IDS:
+            self.assertIn(rule_id, rule_ids, f"{rule_id} not loaded by collect_rules")
+
+    def test_privacy_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.PRIVACY_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+
+    def test_privacy_rules_have_required_schema_fields(self):
+        """All privacy/peripheral rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.PRIVACY_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()
