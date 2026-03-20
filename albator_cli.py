@@ -15,6 +15,7 @@ from rollback import (
     apply_rollback, find_metadata_files, list_rollbacks,
     format_rollback_list, format_rollback_report,
 )
+from report import generate_report, format_text_report, format_csv_report
 from scan import scan, format_scan_report
 from utils import parse_authors
 
@@ -333,6 +334,21 @@ def main():
     parser_rollback.add_argument("metadata_file", nargs="?", default=None,
                                  help="Path to a specific rollback metadata JSON file")
 
+    parser_report = subparsers.add_parser("report", help="Generate comprehensive CIS Benchmark compliance report")
+    parser_report.add_argument("--profile", type=str, default=None,
+                               help="Compliance profile to filter rules (e.g., cis_level1, cis_level2, stig)")
+    parser_report.add_argument("--severity", type=str, default=None,
+                               choices=["low", "medium", "high", "critical"],
+                               help="Minimum severity level to include")
+    parser_report.add_argument("--dry-run", action="store_true",
+                               help="List controls without running checks")
+    parser_report.add_argument("--timeout", type=int, default=30,
+                               help="Per-check timeout in seconds (default: 30)")
+    parser_report.add_argument("--format", type=str, default="text",
+                               choices=["text", "json", "csv"],
+                               dest="output_format",
+                               help="Output format: text, json, or csv (default: text)")
+
     # Bash script commands
     bash_scripts = {
         "privacy": "privacy.sh",
@@ -475,6 +491,40 @@ def main():
         else:
             print(format_rollback_report(result))
         sys.exit(0 if result["failed"] == 0 else 1)
+
+    if args.command == "report":
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        rules_dir = os.path.join(base_dir, "rules")
+        profiles_dir = os.path.join(base_dir, "config", "profiles")
+        try:
+            result = generate_report(
+                rules_dir=rules_dir,
+                profiles_dir=profiles_dir,
+                profile_name=args.profile,
+                min_severity=args.severity,
+                dry_run=args.dry_run,
+                timeout=args.timeout,
+            )
+        except (FileNotFoundError, ValueError) as e:
+            if args.json_output or args.output_format == "json":
+                _print_json({"command": "report", "success": False, "error": str(e)})
+            else:
+                print(f"Error: {e}", file=sys.stderr)
+            sys.exit(2)
+
+        fmt = args.output_format
+        if args.json_output:
+            fmt = "json"
+
+        if fmt == "json":
+            result["command"] = "report"
+            result["success"] = result["summary"]["failed"] == 0 or result["metadata"]["dry_run"]
+            _print_json(result)
+        elif fmt == "csv":
+            print(format_csv_report(result))
+        else:
+            print(format_text_report(result))
+        sys.exit(0 if (result["summary"]["failed"] == 0 or result["metadata"]["dry_run"]) else 1)
 
     maybe_run_preflight(args.command, args, config, json_output=args.json_output)
 

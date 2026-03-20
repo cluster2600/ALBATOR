@@ -2623,5 +2623,229 @@ class TestRollbackCLIIntegration(unittest.TestCase):
         self.assertIn("No rollback metadata", data["error"])
 
 
+class TestReportModule(unittest.TestCase):
+    """Tests for the report module — comprehensive CIS Benchmark compliance reports (experiment 20)."""
+
+    def setUp(self):
+        import report as report_mod
+        self.report_mod = report_mod
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = str(self.repo_root / "rules")
+        self.profiles_dir = str(self.repo_root / "config" / "profiles")
+
+    def test_cis_controls_catalogue_has_77_entries(self):
+        """CIS_CONTROLS should have exactly 77 control entries (72 unique rules, some shared)."""
+        self.assertEqual(len(self.report_mod.CIS_CONTROLS), 77)
+
+    def test_cis_controls_all_reference_existing_rules(self):
+        """Every CIS control must reference a rule that exists on disk."""
+        from scan import load_rules
+        rules = load_rules(self.rules_dir)
+        rule_ids = {r["id"] for r in rules}
+        for cis_id, ctrl in self.report_mod.CIS_CONTROLS.items():
+            self.assertIn(ctrl["rule"], rule_ids,
+                          f"CIS {cis_id} references unknown rule {ctrl['rule']}")
+
+    def test_cis_controls_level_values(self):
+        """Every CIS control must have level 1 or 2."""
+        for cis_id, ctrl in self.report_mod.CIS_CONTROLS.items():
+            self.assertIn(ctrl["level"], (1, 2),
+                          f"CIS {cis_id} has invalid level {ctrl['level']}")
+
+    def test_cis_controls_level1_count(self):
+        """There should be 65 Level 1 control entries."""
+        l1 = [c for c in self.report_mod.CIS_CONTROLS.values() if c["level"] == 1]
+        self.assertEqual(len(l1), 65)
+
+    def test_cis_controls_level2_count(self):
+        """There should be 12 Level 2 control entries."""
+        l2 = [c for c in self.report_mod.CIS_CONTROLS.values() if c["level"] == 2]
+        self.assertEqual(len(l2), 12)
+
+    def test_generate_report_dry_run_returns_all_sections(self):
+        """Dry-run report should contain all expected top-level keys."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        for key in ("metadata", "summary", "level_summary", "sections",
+                     "cis_controls", "nist_families"):
+            self.assertIn(key, result, f"Missing key: {key}")
+
+    def test_generate_report_dry_run_summary(self):
+        """Dry-run report summary should have 0 passed/failed."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        self.assertEqual(result["summary"]["passed"], 0)
+        self.assertEqual(result["summary"]["failed"], 0)
+        self.assertTrue(result["metadata"]["dry_run"])
+
+    def test_generate_report_dry_run_77_controls(self):
+        """Dry-run report should list all 77 CIS control entries."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        self.assertEqual(len(result["cis_controls"]), 77)
+
+    def test_generate_report_sections_cover_1_through_6(self):
+        """Report should have sections 1 through 6."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        for sec in ("1", "2", "3", "4", "5", "6"):
+            self.assertIn(sec, result["sections"], f"Missing section {sec}")
+
+    def test_generate_report_with_profile(self):
+        """Report with cis_level1 profile should mark L2-only controls as N/A."""
+        result = self.report_mod.generate_report(
+            self.rules_dir,
+            profiles_dir=self.profiles_dir,
+            profile_name="cis_level1",
+            dry_run=True,
+        )
+        # cis_level1 should exclude some L2 controls
+        na_count = result["summary"]["not_applicable"]
+        self.assertGreater(na_count, 0,
+                           "cis_level1 profile should have some N/A controls")
+
+    def test_generate_report_nist_families_present(self):
+        """Report should include NIST 800-53 family coverage data."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        nist = result["nist_families"]
+        self.assertGreater(len(nist), 0)
+        # At minimum AC and AU families should be present
+        self.assertIn("AC", nist)
+        self.assertIn("AU", nist)
+
+    def test_generate_report_level_summary(self):
+        """Level summary should have level1 and level2 sub-dicts."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        ls = result["level_summary"]
+        self.assertIn("level1", ls)
+        self.assertIn("level2", ls)
+        for key in ("passed", "failed", "total", "compliance_pct"):
+            self.assertIn(key, ls["level1"])
+            self.assertIn(key, ls["level2"])
+
+    def test_format_text_report_contains_header(self):
+        """Text report should contain the expected header."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        text = self.report_mod.format_text_report(result)
+        self.assertIn("ALBATOR CIS macOS Benchmark Compliance Report", text)
+        self.assertIn("Overall Compliance", text)
+        self.assertIn("Level Breakdown", text)
+        self.assertIn("Section Breakdown", text)
+
+    def test_format_text_report_contains_sections(self):
+        """Text report should mention all 6 CIS sections."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        text = self.report_mod.format_text_report(result)
+        for sec_title in self.report_mod.CIS_SECTIONS.values():
+            self.assertIn(sec_title[:30], text)
+
+    def test_format_csv_report_has_header_row(self):
+        """CSV report should start with a header row."""
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        csv_out = self.report_mod.format_csv_report(result)
+        lines = csv_out.strip().splitlines()
+        self.assertTrue(lines[0].rstrip("\r").startswith("cis_id,title,level,rule_id,severity,status,detail"))
+        # Should have 77 data rows + 1 header
+        self.assertEqual(len(lines), 78)
+
+    def test_format_csv_report_parseable(self):
+        """CSV report should be parseable by csv.reader."""
+        import csv as csv_mod
+        result = self.report_mod.generate_report(self.rules_dir, dry_run=True)
+        csv_out = self.report_mod.format_csv_report(result)
+        reader = csv_mod.reader(io.StringIO(csv_out))
+        rows = list(reader)
+        self.assertEqual(len(rows), 78)  # header + 77 controls
+
+    def test_generate_report_with_severity_filter(self):
+        """Report with severity filter should reduce evaluated controls."""
+        result = self.report_mod.generate_report(
+            self.rules_dir, min_severity="critical", dry_run=True
+        )
+        # With critical filter, many controls should be N/A
+        self.assertGreater(result["summary"]["not_applicable"], 0)
+
+    def test_generate_report_nonexistent_profile_raises(self):
+        """Report with nonexistent profile should raise FileNotFoundError."""
+        with self.assertRaises(FileNotFoundError):
+            self.report_mod.generate_report(
+                self.rules_dir,
+                profiles_dir=self.profiles_dir,
+                profile_name="nonexistent",
+            )
+
+    def test_section_for_helper(self):
+        """_section_for should extract the top-level section number."""
+        self.assertEqual(self.report_mod._section_for("2.3.3.1"), "2")
+        self.assertEqual(self.report_mod._section_for("5.2.1"), "5")
+        self.assertEqual(self.report_mod._section_for("1.1"), "1")
+
+
+class TestReportCLIIntegration(unittest.TestCase):
+    """CLI integration tests for the report command (experiment 20)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.cli = str(self.repo_root / "albator_cli.py")
+
+    def test_report_dry_run_text(self):
+        """report --dry-run should produce text output and exit 0."""
+        result = subprocess.run(
+            ["python3", self.cli, "report", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("ALBATOR CIS macOS Benchmark Compliance Report", result.stdout)
+        self.assertIn("DRY-RUN", result.stdout)
+
+    def test_report_dry_run_json(self):
+        """report --dry-run --json-output should produce valid JSON."""
+        result = subprocess.run(
+            ["python3", self.cli, "--json-output", "report", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["command"], "report")
+        self.assertTrue(data["success"])
+        self.assertIn("summary", data)
+        self.assertIn("cis_controls", data)
+
+    def test_report_dry_run_csv(self):
+        """report --dry-run --format csv should produce CSV output."""
+        result = subprocess.run(
+            ["python3", self.cli, "report", "--dry-run", "--format", "csv"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        lines = result.stdout.strip().split("\n")
+        self.assertEqual(lines[0], "cis_id,title,level,rule_id,severity,status,detail")
+        self.assertEqual(len(lines), 78)
+
+    def test_report_with_profile_dry_run(self):
+        """report --profile cis_level1 --dry-run should filter to L1 rules."""
+        result = subprocess.run(
+            ["python3", self.cli, "report", "--profile", "cis_level1", "--dry-run"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("cis_level1", result.stdout)
+
+    def test_report_json_format_flag(self):
+        """report --format json should produce same output as --json-output."""
+        result = subprocess.run(
+            ["python3", self.cli, "report", "--dry-run", "--format", "json"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 0)
+        data = json.loads(result.stdout)
+        self.assertIn("summary", data)
+        self.assertIn("sections", data)
+
+    def test_report_nonexistent_profile_exits_2(self):
+        """report with nonexistent profile should exit 2."""
+        result = subprocess.run(
+            ["python3", self.cli, "report", "--profile", "nonexistent"],
+            capture_output=True, text=True, cwd=str(self.repo_root)
+        )
+        self.assertEqual(result.returncode, 2)
+
+
 if __name__ == "__main__":
     unittest.main()
