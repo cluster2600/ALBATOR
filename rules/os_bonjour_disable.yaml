@@ -1,0 +1,16 @@
+title: "Disable Bonjour Multicast Advertising"
+id: "os_bonjour_disable"
+severity: "medium"
+discussion: "Bonjour multicast advertising broadcasts service availability to the local network. This can expose information about running services and system capabilities to potential attackers on the same network. CIS recommends disabling Bonjour advertising to reduce network information leakage."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements 2>/dev/null"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92832-6"]
+  800-53r5: ["CM-7", "SC-7"]
+  disa_stig: ["V-259763"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "network", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

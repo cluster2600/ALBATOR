@@ -411,5 +411,100 @@ class TestPasswordPolicyRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestNetworkRules(unittest.TestCase):
+    """Tests for network hardening rule YAML files (experiment 3)."""
+
+    NETWORK_RULE_IDS = [
+        "os_httpd_disable",
+        "os_nfsd_disable",
+        "os_airdrop_disable",
+        "os_bonjour_disable",
+        "os_internet_sharing_disable",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_httpd_disable_rule(self):
+        rule = self._load_rule("os_httpd_disable")
+        self.assertEqual(rule["id"], "os_httpd_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("httpd", rule["check"])
+        self.assertIn("launchctl", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("network", rule["tags"])
+
+    def test_nfsd_disable_rule(self):
+        rule = self._load_rule("os_nfsd_disable")
+        self.assertEqual(rule["id"], "os_nfsd_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("nfsd", rule["check"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("network", rule["tags"])
+
+    def test_airdrop_disable_rule(self):
+        rule = self._load_rule("os_airdrop_disable")
+        self.assertEqual(rule["id"], "os_airdrop_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("DisableAirDrop", rule["check"])
+        self.assertIn("DisableAirDrop", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("network", rule["tags"])
+
+    def test_bonjour_disable_rule(self):
+        rule = self._load_rule("os_bonjour_disable")
+        self.assertEqual(rule["id"], "os_bonjour_disable")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("NoMulticastAdvertisements", rule["check"])
+        self.assertIn("NoMulticastAdvertisements", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("network", rule["tags"])
+
+    def test_internet_sharing_disable_rule(self):
+        rule = self._load_rule("os_internet_sharing_disable")
+        self.assertEqual(rule["id"], "os_internet_sharing_disable")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("com.apple.nat", rule["check"])
+        self.assertIn("AC-4", rule["references"]["800-53r5"])
+        self.assertIn("network", rule["tags"])
+
+    def test_all_network_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for net_id in self.NETWORK_RULE_IDS:
+            self.assertIn(net_id, rule_ids, f"{net_id} not loaded by collect_rules")
+
+    def test_network_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.NETWORK_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+            self.assertNotRegex(check, r'\bwrite\b',
+                                f"Check for {rule_id} contains write")
+            self.assertNotRegex(check, r'\bdisable\b',
+                                f"Check for {rule_id} contains disable")
+
+    def test_network_rules_have_required_schema_fields(self):
+        """All network rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.NETWORK_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

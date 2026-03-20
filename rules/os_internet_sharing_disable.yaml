@@ -1,0 +1,16 @@
+title: "Disable Internet Sharing"
+id: "os_internet_sharing_disable"
+severity: "high"
+discussion: "Internet Sharing allows the Mac to act as a network gateway, sharing its internet connection with other devices. This creates a rogue access point that can bypass network security controls. CIS recommends disabling Internet Sharing to prevent unauthorized network bridging."
+check: "/usr/bin/defaults read /Library/Preferences/SystemConfiguration/com.apple.nat NAT 2>/dev/null | /usr/bin/grep -c 'Enabled = 1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict Enabled -int 0"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92834-2"]
+  800-53r5: ["AC-4", "SC-7"]
+  disa_stig: ["V-259764"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "network", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

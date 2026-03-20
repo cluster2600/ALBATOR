@@ -1,0 +1,16 @@
+title: "Disable Built-in HTTP Server"
+id: "os_httpd_disable"
+severity: "high"
+discussion: "The built-in Apache HTTP server should be disabled unless required. Running unnecessary network services increases the attack surface. CIS recommends disabling the built-in web server on macOS systems that do not need to serve web content."
+check: "/bin/launchctl list 2>/dev/null | /usr/bin/grep -c org.apache.httpd"
+fix: "sudo /bin/launchctl disable system/org.apache.httpd; sudo /bin/launchctl bootout system/org.apache.httpd 2>/dev/null; sudo /usr/sbin/apachectl stop 2>/dev/null"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92826-8"]
+  800-53r5: ["CM-7"]
+  disa_stig: ["V-259760"]
+  srg: ["SRG-OS-000096-GPOS-00050"]
+odv: "missing"
+tags: ["stig", "security", "network", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

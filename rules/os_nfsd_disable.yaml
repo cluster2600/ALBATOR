@@ -1,0 +1,16 @@
+title: "Disable NFS Server"
+id: "os_nfsd_disable"
+severity: "high"
+discussion: "NFS server (nfsd) should be disabled unless the system is specifically configured as a file server. Running NFS exposes the system to network-based attacks and increases the attack surface. CIS recommends disabling NFS on systems that do not need to share files via this protocol."
+check: "/bin/launchctl list 2>/dev/null | /usr/bin/grep -c com.apple.nfsd"
+fix: "sudo /bin/launchctl disable system/com.apple.nfsd; sudo /sbin/nfsd stop 2>/dev/null"
+references:
+  cci: ["CCI-000382"]
+  cce: ["CCE-92828-4"]
+  800-53r5: ["CM-7"]
+  disa_stig: ["V-259761"]
+  srg: ["SRG-OS-000096-GPOS-00050"]
+odv: "missing"
+tags: ["stig", "security", "network", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

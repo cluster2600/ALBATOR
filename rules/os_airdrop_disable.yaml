@@ -1,0 +1,16 @@
+title: "Disable AirDrop"
+id: "os_airdrop_disable"
+severity: "medium"
+discussion: "AirDrop allows file sharing between nearby Apple devices over Bluetooth and Wi-Fi. In enterprise environments, AirDrop should be disabled to prevent unauthorized data exfiltration and reduce the wireless attack surface. CIS recommends disabling AirDrop on managed systems."
+check: "/usr/bin/defaults read com.apple.NetworkBrowser DisableAirDrop 2>/dev/null"
+fix: "sudo /usr/bin/defaults write com.apple.NetworkBrowser DisableAirDrop -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92830-0"]
+  800-53r5: ["CM-7", "AC-4"]
+  disa_stig: ["V-259762"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "network", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
