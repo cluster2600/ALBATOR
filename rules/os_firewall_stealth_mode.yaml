@@ -1,0 +1,16 @@
+title: "Enable Firewall Stealth Mode"
+id: "os_firewall_stealth_mode"
+severity: "high"
+discussion: "Firewall stealth mode prevents the system from responding to probing requests such as ICMP ping. This makes the system less visible on the network and reduces the attack surface. CIS Benchmark Section 3.2 requires stealth mode to be enabled to prevent network reconnaissance."
+check: "/usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode 2>/dev/null | /usr/bin/grep -q 'enabled'"
+fix: "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92813-6"]
+  800-53r5: ["SC-7", "CM-7"]
+  disa_stig: ["V-259756"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "firewall", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

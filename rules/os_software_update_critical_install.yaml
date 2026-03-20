@@ -1,0 +1,16 @@
+title: "Enable Automatic Installation of Critical Updates"
+id: "os_software_update_critical_install"
+severity: "critical"
+discussion: "Critical security updates address actively exploited vulnerabilities and must be installed promptly. CIS Benchmark Section 1.3 requires automatic installation of critical updates to minimize the window of exposure to known threats."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92801-1"]
+  800-53r5: ["SI-2", "SI-2(5)"]
+  disa_stig: ["V-259741"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "software_update", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

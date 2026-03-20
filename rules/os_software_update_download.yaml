@@ -1,0 +1,16 @@
+title: "Enable Automatic Software Update Download"
+id: "os_software_update_download"
+severity: "high"
+discussion: "Automatic download of software updates ensures that security patches are available for installation as soon as they are released by Apple. CIS Benchmark Section 1.2 requires automatic download to be enabled so critical fixes are not delayed by manual intervention."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92800-3"]
+  800-53r5: ["SI-2", "CM-6"]
+  disa_stig: ["V-259740"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "software_update", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

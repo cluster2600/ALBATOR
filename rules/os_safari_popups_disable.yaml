@@ -1,0 +1,16 @@
+title: "Enable Safari Pop-up Blocker"
+id: "os_safari_popups_disable"
+severity: "medium"
+discussion: "Pop-up windows are commonly used for phishing, malware distribution, and social engineering attacks. CIS Benchmark Section 6.3.5 requires Safari's built-in pop-up blocker to be enabled to prevent unwanted pop-up windows from being displayed."
+check: "/usr/bin/defaults read /Users/$(/usr/bin/stat -f '%Su' /dev/console)/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically 2>/dev/null | /usr/bin/grep -q '0'"
+fix: "/usr/bin/defaults write /Users/$(/usr/bin/stat -f '%Su' /dev/console)/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92857-3"]
+  800-53r5: ["CM-7", "SC-18"]
+  disa_stig: ["V-259787"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "safari", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"
