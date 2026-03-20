@@ -68,7 +68,9 @@ apply_firewall_setting() {
         
         if [[ "$current_value" == *"$expected_output"* ]]; then
             show_success "$description"
-            record_rollback_change "$setting_flag" "$description"
+            local rollback_value
+            if [[ "$setting_value" == "on" ]]; then rollback_value="off"; else rollback_value="on"; fi
+            record_rollback_change "$setting_flag" "$description" "sudo $FIREWALL_CMD $setting_flag $rollback_value"
             return 0
         else
             show_error "Failed to verify $description (expected: $expected_output, got: $current_value)"

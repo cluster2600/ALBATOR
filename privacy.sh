@@ -110,7 +110,20 @@ apply_setting() {
     
     if [[ "$current_value" == "$value" ]] || [[ "$current_value" == "1" && "$value" == "true" ]] || [[ "$current_value" == "0" && "$value" == "false" ]]; then
         show_success "$description"
-        record_rollback_change "$domain/$key" "$description"
+        local rollback_cmd
+        if [[ "$use_sudo" == "true" ]]; then
+            rollback_cmd="sudo defaults write $domain $key -$value_type $existing_value"
+        else
+            rollback_cmd="defaults write $domain $key -$value_type $existing_value"
+        fi
+        if [[ "$existing_value" == "MISSING" ]]; then
+            if [[ "$use_sudo" == "true" ]]; then
+                rollback_cmd="sudo defaults delete $domain $key"
+            else
+                rollback_cmd="defaults delete $domain $key"
+            fi
+        fi
+        record_rollback_change "$domain/$key" "$description" "$rollback_cmd"
         return 0
     else
         show_error "Failed to verify $description (expected: $value, got: $current_value)"
@@ -144,7 +157,7 @@ configure_system_setting() {
             current_value=$("${verification_parts[@]}" 2>/dev/null || echo "FAILED")
             if [[ "$current_value" == *"$expected_output"* ]]; then
                 show_success "$description"
-                record_rollback_change "$description" "system setting configured"
+                record_rollback_change "$description" "system setting configured" ""
                 return 0
             else
                 show_error "Failed to verify $description (expected: $expected_output, got: $current_value)"
@@ -176,7 +189,7 @@ disable_service() {
     if sudo launchctl list | grep -q "$service_name" 2>/dev/null; then
         if sudo launchctl unload -w "/System/Library/LaunchDaemons/$service_name.plist" 2>>"$LOG_FILE"; then
             show_success "$description disabled"
-            record_rollback_change "$service_name" "$description disabled"
+            record_rollback_change "$service_name" "$description disabled" "sudo launchctl load -w /System/Library/LaunchDaemons/$service_name.plist"
             return 0
         else
             show_error "Failed to disable $description"
@@ -223,7 +236,7 @@ configure_privacy() {
     if [[ "$DRY_RUN" != "true" ]]; then
         if sudo defaults write /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist ProgramArguments -array-add "-NoMulticastAdvertisements" 2>>"$LOG_FILE"; then
             show_success "mDNS multicast advertisements disabled"
-            record_rollback_change "com.apple.mDNSResponder" "disabled multicast advertisements"
+            record_rollback_change "com.apple.mDNSResponder" "disabled multicast advertisements" ""
         else
             show_error "Failed to disable mDNS multicast advertisements"
             ((errors++))

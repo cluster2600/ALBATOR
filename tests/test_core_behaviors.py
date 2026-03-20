@@ -1369,5 +1369,245 @@ class TestComplianceProfiles(unittest.TestCase):
                              f"{profile_name} rule_count mismatch")
 
 
+class TestRollbackApply(unittest.TestCase):
+    """Tests for rollback_apply.py (Track 3 — experiment 14)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rollback_script = self.repo_root / "rollback_apply.py"
+        self.assertTrue(self.rollback_script.exists(), "rollback_apply.py not found")
+
+    def _write_meta(self, tmpdir, data):
+        meta_path = os.path.join(tmpdir, "test_rollback.json")
+        with open(meta_path, "w") as f:
+            json.dump(data, f)
+        return meta_path
+
+    def test_dry_run_applies_no_commands(self):
+        """Dry-run should list rollback commands without executing."""
+        import rollback_apply
+        meta = {
+            "script": "test",
+            "changes": [
+                {"component": "com.apple.test/Key", "detail": "set key",
+                 "rollback_command": "echo rolled_back", "timestamp": "2026-01-01T00:00:00Z"}
+            ]
+        }
+        result = rollback_apply.apply_rollback(meta, dry_run=True)
+        self.assertEqual(result["applied_count"], 1)
+        self.assertEqual(result["failed_count"], 0)
+        self.assertTrue(result["applied"][0]["dry_run"])
+
+    def test_missing_rollback_command_falls_back_to_defaults_delete(self):
+        """If rollback_command is empty but component has domain/key, derive defaults delete."""
+        import rollback_apply
+        meta = {
+            "script": "test",
+            "changes": [
+                {"component": "com.apple.test/SomeKey", "detail": "set key",
+                 "rollback_command": "", "timestamp": "2026-01-01T00:00:00Z"}
+            ]
+        }
+        result = rollback_apply.apply_rollback(meta, dry_run=True)
+        self.assertEqual(result["applied_count"], 1)
+        self.assertIn("defaults delete", result["applied"][0]["command"])
+
+    def test_completely_missing_rollback_command_recorded_as_failure(self):
+        """If no rollback_command and no derivable fallback, record as failed."""
+        import rollback_apply
+        meta = {
+            "script": "test",
+            "changes": [
+                {"component": "no_slash", "detail": "something",
+                 "rollback_command": "", "timestamp": "2026-01-01T00:00:00Z"}
+            ]
+        }
+        result = rollback_apply.apply_rollback(meta, dry_run=True)
+        self.assertEqual(result["applied_count"], 0)
+        self.assertEqual(result["failed_count"], 1)
+        self.assertIn("missing rollback command", result["failed"][0]["reason"])
+
+    def test_changes_applied_in_reverse_order(self):
+        """Rollback must process changes in LIFO order."""
+        import rollback_apply
+        meta = {
+            "script": "test",
+            "changes": [
+                {"component": "dom/A", "detail": "first", "rollback_command": "echo A"},
+                {"component": "dom/B", "detail": "second", "rollback_command": "echo B"},
+                {"component": "dom/C", "detail": "third", "rollback_command": "echo C"},
+            ]
+        }
+        result = rollback_apply.apply_rollback(meta, dry_run=True)
+        self.assertEqual(result["applied_count"], 3)
+        # First applied should be the last change (reverse order)
+        self.assertEqual(result["applied"][0]["change"]["detail"], "third")
+        self.assertEqual(result["applied"][2]["change"]["detail"], "first")
+
+    def test_empty_changes_list(self):
+        """Rollback with no changes should succeed with zero counts."""
+        import rollback_apply
+        meta = {"script": "test", "changes": []}
+        result = rollback_apply.apply_rollback(meta, dry_run=False)
+        self.assertEqual(result["applied_count"], 0)
+        self.assertEqual(result["failed_count"], 0)
+        self.assertEqual(result["status"], "ok")
+
+    def test_cli_missing_file_returns_exit_code_2(self):
+        """CLI should exit 2 when metadata file does not exist."""
+        result = subprocess.run(
+            ["python3", str(self.rollback_script), "/nonexistent/file.json"],
+            capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 2)
+
+    def test_cli_dry_run_json_output(self):
+        """CLI with --dry-run --json should produce valid JSON output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            meta = {
+                "script": "cli_test",
+                "changes": [
+                    {"component": "com.test/Key", "detail": "test",
+                     "rollback_command": "echo ok", "timestamp": "2026-01-01T00:00:00Z"}
+                ]
+            }
+            meta_path = os.path.join(tmpdir, "test.json")
+            with open(meta_path, "w") as f:
+                json.dump(meta, f)
+            result = subprocess.run(
+                ["python3", str(self.rollback_script), "--dry-run", "--json", meta_path],
+                capture_output=True, text=True
+            )
+            self.assertEqual(result.returncode, 0)
+            output = json.loads(result.stdout)
+            self.assertEqual(output["applied_count"], 1)
+            self.assertEqual(output["script"], "cli_test")
+
+
+class TestRollbackShellScript(unittest.TestCase):
+    """Tests for rollback.sh shell wrapper (Track 3 — experiment 14)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rollback_sh = self.repo_root / "rollback.sh"
+        self.assertTrue(self.rollback_sh.exists(), "rollback.sh not found")
+
+    def test_rollback_sh_help_exits_zero(self):
+        result = subprocess.run(
+            ["bash", str(self.rollback_sh), "--help"],
+            capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Usage", result.stdout)
+
+    def test_rollback_sh_list_empty_state_dir(self):
+        """--list with empty state dir should exit non-zero."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            env = os.environ.copy()
+            env["ALBATOR_STATE_DIR"] = tmpdir
+            result = subprocess.run(
+                ["bash", str(self.rollback_sh), "--list"],
+                capture_output=True, text=True, env=env
+            )
+            self.assertNotEqual(result.returncode, 0)
+
+    def test_rollback_sh_dry_run_with_metadata(self):
+        """Dry-run should succeed with valid metadata and print commands."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            meta = {
+                "script": "privacy.sh",
+                "changes": [
+                    {"component": "com.apple.test/Key", "detail": "set key",
+                     "rollback_command": "echo rolled_back", "timestamp": "2026-01-01T00:00:00Z"}
+                ]
+            }
+            meta_path = os.path.join(tmpdir, "privacy.sh_rollback_20260101_000000.json")
+            with open(meta_path, "w") as f:
+                json.dump(meta, f)
+            env = os.environ.copy()
+            env["ALBATOR_STATE_DIR"] = tmpdir
+            result = subprocess.run(
+                ["bash", str(self.rollback_sh), "--dry-run", "--latest"],
+                capture_output=True, text=True, env=env
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("echo rolled_back", result.stdout)
+
+    def test_rollback_sh_json_output_mode(self):
+        """--json should produce parseable JSON output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            meta = {
+                "script": "firewall.sh",
+                "changes": [
+                    {"component": "--setstealthmode", "detail": "stealth",
+                     "rollback_command": "echo off", "timestamp": "2026-01-01T00:00:00Z"}
+                ]
+            }
+            meta_path = os.path.join(tmpdir, "firewall.sh_rollback_20260101_000000.json")
+            with open(meta_path, "w") as f:
+                json.dump(meta, f)
+            env = os.environ.copy()
+            env["ALBATOR_STATE_DIR"] = tmpdir
+            result = subprocess.run(
+                ["bash", str(self.rollback_sh), "--dry-run", "--json", "--latest"],
+                capture_output=True, text=True, env=env
+            )
+            self.assertEqual(result.returncode, 0)
+            # Extract the JSON block from output (skip log lines)
+            lines = result.stdout.strip().split("\n")
+            json_lines = []
+            in_json = False
+            for line in lines:
+                if line.strip().startswith("{"):
+                    in_json = True
+                if in_json:
+                    json_lines.append(line)
+                if in_json and line.strip().startswith("}"):
+                    break
+            json_str = "\n".join(json_lines)
+            output = json.loads(json_str)
+            self.assertEqual(output["script"], "firewall.sh")
+            self.assertEqual(output["applied"], 1)
+
+    def test_rollback_sh_nonexistent_file_exits_2(self):
+        result = subprocess.run(
+            ["bash", str(self.rollback_sh), "/nonexistent/file.json"],
+            capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 2)
+
+
+class TestPrivacyRollbackCommands(unittest.TestCase):
+    """Verify privacy.sh records proper rollback commands (Track 3)."""
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+
+    def test_privacy_sh_contains_rollback_commands_in_record_calls(self):
+        """privacy.sh record_rollback_change calls should include a 3rd argument."""
+        privacy_path = self.repo_root / "privacy.sh"
+        content = privacy_path.read_text()
+        import re
+        calls = re.findall(r'record_rollback_change\s+"[^"]*"\s+"[^"]*"', content)
+        # Every call should have a third argument (even if empty string)
+        three_arg_calls = re.findall(
+            r'record_rollback_change\s+"[^"]*"\s+"[^"]*"\s+"[^"]*"', content
+        )
+        self.assertEqual(len(calls), len(three_arg_calls),
+                         "Some record_rollback_change calls in privacy.sh lack a rollback_command argument")
+
+    def test_firewall_sh_contains_rollback_commands_in_record_calls(self):
+        """firewall.sh record_rollback_change calls should include a 3rd argument."""
+        firewall_path = self.repo_root / "firewall.sh"
+        content = firewall_path.read_text()
+        import re
+        calls = re.findall(r'record_rollback_change\s+"[^"]*"\s+"[^"]*"', content)
+        three_arg_calls = re.findall(
+            r'record_rollback_change\s+"[^"]*"\s+"[^"]*"\s+"[^"]*"', content
+        )
+        self.assertEqual(len(calls), len(three_arg_calls),
+                         "Some record_rollback_change calls in firewall.sh lack a rollback_command argument")
+
+
 if __name__ == "__main__":
     unittest.main()
