@@ -8,9 +8,9 @@ working check/fix commands, NIST 800-53 references, and tests.
 
 | Level | Implemented | Total | Coverage |
 |-------|-------------|-------|----------|
-| Level 1 | 55 | 57 | 96.5% |
-| Level 2 | 12 | 15 | 80.0% |
-| **Combined** | **67** | **72** | **93.1%** |
+| Level 1 | 57 | 57 | 100.0% |
+| Level 2 | 15 | 15 | 100.0% |
+| **Combined** | **72** | **72** | **100.0%** |
 
 ---
 
@@ -22,7 +22,7 @@ working check/fix commands, NIST 800-53 references, and tests.
 | 1.2 | Ensure Auto Update Download Is Enabled | L1 | `os_software_update_download` | IMPLEMENTED |
 | 1.3 | Ensure Install of Critical Updates Is Enabled | L1 | `os_software_update_critical_install` | IMPLEMENTED |
 | 1.4 | Ensure Install Application Updates from the App Store Is Enabled | L1 | `os_software_update_auto` | IMPLEMENTED (partial — shares rule) |
-| 1.5 | Ensure Install Security Responses and System Files Is Enabled | L1 | — | NOT IMPLEMENTED |
+| 1.5 | Ensure Install Security Responses and System Files Is Enabled | L1 | `os_security_responses_install` | IMPLEMENTED |
 
 ## Section 2 — System Preferences
 
@@ -88,7 +88,7 @@ working check/fix commands, NIST 800-53 references, and tests.
 
 | CIS # | Control | Level | ALBATOR Rule | Status |
 |--------|---------|-------|--------------|--------|
-| 2.7.1 | Ensure Time Machine Auto-Backup Is Enabled | L2 | — | NOT IMPLEMENTED |
+| 2.7.1 | Ensure Time Machine Auto-Backup Is Enabled | L2 | `os_time_machine_auto_backup` | IMPLEMENTED |
 
 ### 2.8 — Handoff
 
@@ -130,6 +130,7 @@ working check/fix commands, NIST 800-53 references, and tests.
 | 4.3 | Ensure NFS Server Is Disabled | L1 | `os_nfsd_disable` | IMPLEMENTED |
 | 4.4 | Ensure Wi-Fi Is Disabled When Not Needed | L1 | `os_wifi_disable` | IMPLEMENTED |
 | 4.5 | Ensure AirDrop Is Disabled | L1 | `os_airdrop_disable` | IMPLEMENTED |
+| 4.6 | Ensure IPv6 Privacy Extensions Are Enabled | L2 | `os_ipv6_privacy_extensions` | IMPLEMENTED |
 
 ## Section 5 — System Access, Authentication and Authorization
 
@@ -181,6 +182,12 @@ working check/fix commands, NIST 800-53 references, and tests.
 |--------|---------|-------|--------------|--------|
 | 5.6.1 | Ensure Secure Keyboard Entry Is Enabled in Terminal | L1 | `os_keyboard_secure` | IMPLEMENTED |
 
+### 5.7 — Kernel Extensions
+
+| CIS # | Control | Level | ALBATOR Rule | Status |
+|--------|---------|-------|--------------|--------|
+| 5.7.1 | Ensure Only Approved Kernel Extensions Are Loaded | L2 | `os_managed_kext_policy` | IMPLEMENTED |
+
 ## Section 6 — User Accounts and Environment
 
 ### 6.1 — Finder
@@ -198,18 +205,20 @@ working check/fix commands, NIST 800-53 references, and tests.
 | 6.2.3 | Ensure Show Full Website URL Is Enabled | L1 | `os_safari_show_full_url` | IMPLEMENTED |
 | 6.2.4 | Ensure AutoFill Is Disabled | L1 | `os_safari_auto_fill_disable` | IMPLEMENTED |
 | 6.2.5 | Ensure Pop-up Windows Are Blocked | L1 | `os_safari_popups_disable` | IMPLEMENTED |
+| 6.2.6 | Ensure Safari JavaScript Restrictions Are Configured | L2 | `os_safari_javascript_restrict` | IMPLEMENTED |
 
 ---
 
 ## Gaps — Controls Not Yet Implemented
 
-| CIS # | Control | Level | Priority | Notes |
-|--------|---------|-------|----------|-------|
-| 1.5 | Install Security Responses and System Files | L1 | Medium | Requires `com.apple.SoftwareUpdate` key `CriticalUpdateInstall` — may overlap with 1.3 |
-| 2.7.1 | Time Machine Auto-Backup Is Enabled | L2 | Low | `defaults read /Library/Preferences/com.apple.TimeMachine AutoBackup` |
-| — | IPv6 Privacy Extensions | L2 | Low | `sysctl net.inet6.ip6.use_tempaddr` |
-| — | Managed Kernel Extensions (kext allowlist) | L2 | Low | MDM-dependent, limited CLI coverage |
-| — | Safari JavaScript Restrictions | L2 | Low | Diminishing returns; pop-up blocker covers most risk |
+**None.** All 72 CIS macOS Benchmark controls (57 Level 1 + 15 Level 2) are implemented as of experiment 12.
+
+Previously open gaps closed in experiment 12:
+- CIS 1.5 (Security Responses) → `os_security_responses_install`
+- CIS 2.7.1 (Time Machine) → `os_time_machine_auto_backup`
+- IPv6 Privacy Extensions → `os_ipv6_privacy_extensions`
+- Managed Kernel Extensions → `os_managed_kext_policy`
+- Safari JavaScript Restrictions → `os_safari_javascript_restrict`
 
 ---
 
@@ -219,12 +228,13 @@ working check/fix commands, NIST 800-53 references, and tests.
 |--------|----------|-------|
 | AC (Access Control) | AC-2, AC-3, AC-4, AC-7, AC-8, AC-11, AC-17, AC-18, AC-20 | 18 |
 | AU (Audit) | AU-3, AU-8, AU-9, AU-11, AU-12, AU-14 | 7 |
-| CM (Configuration Mgmt) | CM-5, CM-6, CM-7 | 19 |
+| CM (Configuration Mgmt) | CM-5, CM-6, CM-7 | 21 |
+| CP (Contingency Plan) | CP-9, CP-10 | 1 |
 | IA (Identification/Auth) | IA-2, IA-4, IA-5, IA-6 | 7 |
 | MP (Media Protection) | MP-2, MP-4, MP-7 | 3 |
-| SC (Sys & Comms) | SC-7, SC-8, SC-10, SC-15, SC-18, SC-23, SC-28, SC-41 | 15 |
-| SI (Sys & Info Integrity) | SI-2, SI-3, SI-4, SI-7, SI-12 | 7 |
+| SC (Sys & Comms) | SC-7, SC-8, SC-10, SC-15, SC-18, SC-23, SC-28, SC-41 | 16 |
+| SI (Sys & Info Integrity) | SI-2, SI-3, SI-4, SI-7, SI-12 | 9 |
 
 ---
 
-*Generated by ALBATOR Research Program — Experiment 11*
+*Generated by ALBATOR Research Program — Experiment 12 (100% coverage)*

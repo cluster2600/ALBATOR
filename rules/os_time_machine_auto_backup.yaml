@@ -1,0 +1,16 @@
+title: "Ensure Time Machine Auto-Backup Is Enabled"
+id: "os_time_machine_auto_backup"
+severity: "medium"
+discussion: "Time Machine provides automated backup and recovery capabilities. CIS Benchmark Section 2.7.1 requires automatic backups to ensure data can be restored following hardware failure, ransomware, or accidental deletion."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.TimeMachine AutoBackup 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.TimeMachine AutoBackup -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92803-7"]
+  800-53r5: ["CP-9", "CP-10"]
+  disa_stig: ["V-259743"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "backup", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

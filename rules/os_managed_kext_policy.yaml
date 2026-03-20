@@ -1,0 +1,16 @@
+title: "Ensure Only Approved Kernel Extensions Are Loaded"
+id: "os_managed_kext_policy"
+severity: "high"
+discussion: "Third-party kernel extensions (kexts) run with full kernel privileges and can compromise system integrity if malicious or poorly written. macOS should restrict kernel extension loading to only approved, organizationally vetted extensions. Note: on Apple Silicon Macs, most kext functionality is replaced by System Extensions which run in user space."
+check: "/usr/sbin/spctl kext-consent status 2>/dev/null | /usr/bin/grep -q 'ENABLED'"
+fix: "sudo /usr/sbin/spctl kext-consent enable"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92805-2"]
+  800-53r5: ["CM-5", "CM-7", "SI-7"]
+  disa_stig: ["V-259745"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "kernel", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

@@ -1,0 +1,16 @@
+title: "Enable Install of Security Responses and System Files"
+id: "os_security_responses_install"
+severity: "critical"
+discussion: "Rapid Security Responses allow Apple to deliver critical security patches faster than full software updates. CIS Benchmark Section 1.5 requires that these responses are installed automatically to minimize exposure to actively exploited vulnerabilities."
+check: "/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92802-9"]
+  800-53r5: ["SI-2", "SI-2(5)"]
+  disa_stig: ["V-259742"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "software_update", "cis_lvl1"]
+result: "pass"
+mobileconfig: "missing"

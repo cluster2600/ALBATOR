@@ -1160,5 +1160,98 @@ class TestFinalCoverageRules(unittest.TestCase):
                           f"{rule_id} missing 800-53r5 reference")
 
 
+class TestFinalGapRules(unittest.TestCase):
+    """Tests for the 5 remaining CIS gap rules (experiment 12)."""
+
+    GAP_RULE_IDS = [
+        "os_security_responses_install",
+        "os_time_machine_auto_backup",
+        "os_ipv6_privacy_extensions",
+        "os_managed_kext_policy",
+        "os_safari_javascript_restrict",
+    ]
+
+    def setUp(self):
+        self.repo_root = pathlib.Path(__file__).resolve().parents[1]
+        self.rules_dir = self.repo_root / "rules"
+
+    def _load_rule(self, rule_id):
+        import yaml
+        rule_path = self.rules_dir / f"{rule_id}.yaml"
+        self.assertTrue(rule_path.exists(), f"Rule file {rule_id}.yaml not found")
+        with open(rule_path) as f:
+            return yaml.safe_load(f)
+
+    def test_security_responses_install_rule(self):
+        rule = self._load_rule("os_security_responses_install")
+        self.assertEqual(rule["id"], "os_security_responses_install")
+        self.assertEqual(rule["severity"], "critical")
+        self.assertIn("ConfigDataInstall", rule["check"])
+        self.assertIn("ConfigDataInstall", rule["fix"])
+        self.assertIn("SI-2", rule["references"]["800-53r5"])
+        self.assertIn("cis_lvl1", rule["tags"])
+
+    def test_time_machine_auto_backup_rule(self):
+        rule = self._load_rule("os_time_machine_auto_backup")
+        self.assertEqual(rule["id"], "os_time_machine_auto_backup")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("TimeMachine", rule["check"])
+        self.assertIn("AutoBackup", rule["check"])
+        self.assertIn("CP-9", rule["references"]["800-53r5"])
+        self.assertIn("backup", rule["tags"])
+
+    def test_ipv6_privacy_extensions_rule(self):
+        rule = self._load_rule("os_ipv6_privacy_extensions")
+        self.assertEqual(rule["id"], "os_ipv6_privacy_extensions")
+        self.assertEqual(rule["severity"], "medium")
+        self.assertIn("use_tempaddr", rule["check"])
+        self.assertIn("use_tempaddr", rule["fix"])
+        self.assertIn("SC-7", rule["references"]["800-53r5"])
+        self.assertIn("network", rule["tags"])
+
+    def test_managed_kext_policy_rule(self):
+        rule = self._load_rule("os_managed_kext_policy")
+        self.assertEqual(rule["id"], "os_managed_kext_policy")
+        self.assertEqual(rule["severity"], "high")
+        self.assertIn("kext-consent", rule["check"])
+        self.assertIn("kext-consent", rule["fix"])
+        self.assertIn("CM-5", rule["references"]["800-53r5"])
+        self.assertIn("kernel", rule["tags"])
+
+    def test_safari_javascript_restrict_rule(self):
+        rule = self._load_rule("os_safari_javascript_restrict")
+        self.assertEqual(rule["id"], "os_safari_javascript_restrict")
+        self.assertEqual(rule["severity"], "low")
+        self.assertIn("JavaScriptCanOpenWindowsAutomatically", rule["check"])
+        self.assertIn("JavaScriptCanOpenWindowsAutomatically", rule["fix"])
+        self.assertIn("CM-7", rule["references"]["800-53r5"])
+        self.assertIn("safari", rule["tags"])
+
+    def test_all_gap_rules_loaded_by_collect_rules(self):
+        rules = RuleHandler.collect_rules(root_dir=str(self.repo_root))
+        rule_ids = [r.rule_id for r in rules]
+        for rule_id in self.GAP_RULE_IDS:
+            self.assertIn(rule_id, rule_ids, f"{rule_id} not loaded by collect_rules")
+
+    def test_gap_rules_check_commands_are_read_only(self):
+        """Check commands must not contain sudo or mutating commands."""
+        for rule_id in self.GAP_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            check = rule["check"]
+            self.assertNotRegex(check, r'\bsudo\b',
+                                f"Check for {rule_id} contains sudo")
+
+    def test_gap_rules_have_required_schema_fields(self):
+        """All gap rules must have the standard YAML schema fields."""
+        required_keys = ["title", "id", "severity", "discussion", "check", "fix",
+                         "references", "tags"]
+        for rule_id in self.GAP_RULE_IDS:
+            rule = self._load_rule(rule_id)
+            for key in required_keys:
+                self.assertIn(key, rule, f"{rule_id} missing field: {key}")
+            self.assertIn("800-53r5", rule["references"],
+                          f"{rule_id} missing 800-53r5 reference")
+
+
 if __name__ == "__main__":
     unittest.main()

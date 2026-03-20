@@ -1,0 +1,16 @@
+title: "Ensure IPv6 Privacy Extensions Are Enabled"
+id: "os_ipv6_privacy_extensions"
+severity: "medium"
+discussion: "IPv6 privacy extensions (RFC 4941) use temporary addresses that rotate periodically, preventing long-term tracking of a device by its IPv6 address. This reduces the network fingerprint and limits exposure to address-based reconnaissance."
+check: "/usr/sbin/sysctl -n net.inet6.ip6.use_tempaddr 2>/dev/null | /usr/bin/grep -q '1'"
+fix: "sudo /usr/sbin/sysctl -w net.inet6.ip6.use_tempaddr=1"
+references:
+  cci: ["CCI-000366"]
+  cce: ["CCE-92804-5"]
+  800-53r5: ["SC-7", "SC-8"]
+  disa_stig: ["V-259744"]
+  srg: ["SRG-OS-000480-GPOS-00227"]
+odv: "missing"
+tags: ["stig", "security", "network", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"

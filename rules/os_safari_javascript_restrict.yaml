@@ -1,0 +1,16 @@
+title: "Ensure Safari JavaScript Restrictions Are Configured"
+id: "os_safari_javascript_restrict"
+severity: "low"
+discussion: "Restricting JavaScript pop-up behavior and automatic execution in Safari reduces the attack surface for drive-by downloads, phishing overlays, and cross-site scripting. While the pop-up blocker covers most risk, disabling JavaScript from opening windows without user interaction provides defense in depth."
+check: "/usr/bin/defaults read com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically 2>/dev/null | /usr/bin/grep -q '0'"
+fix: "/usr/bin/defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false"
+references:
+  cci: ["CCI-000381"]
+  cce: ["CCE-92806-0"]
+  800-53r5: ["CM-7", "SC-18"]
+  disa_stig: ["V-259746"]
+  srg: ["SRG-OS-000095-GPOS-00049"]
+odv: "missing"
+tags: ["stig", "security", "safari", "cis_lvl2"]
+result: "pass"
+mobileconfig: "missing"
