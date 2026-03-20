@@ -4,6 +4,7 @@ severity: "high"
 discussion: "The audit system must be configured to record access, modification, and deletion events. The flags lo,ad,fd,fm,-all ensure login/logout, administrative, file deletion, file attribute modification, and failed events are audited."
 check: "/usr/bin/grep -q '^flags:.*lo' /etc/security/audit_control && /usr/bin/grep -q '^flags:.*ad' /etc/security/audit_control && /usr/bin/grep -q '^flags:.*fd' /etc/security/audit_control && /usr/bin/grep -q '^flags:.*fm' /etc/security/audit_control && /usr/bin/grep -q '^flags:.*-all' /etc/security/audit_control"
 fix: "sudo /usr/bin/sed -i '' 's/^flags:.*/flags:lo,ad,fd,fm,-all/' /etc/security/audit_control; sudo /usr/sbin/audit -s"
+fix_odv: "sudo /usr/bin/sed -i '' 's/^flags:.*/flags:{ODV_VALUE}/' /etc/security/audit_control; sudo /usr/sbin/audit -s"
 references:
   cci: ["CCI-000130", "CCI-000135", "CCI-000169", "CCI-000172"]
   cce: ["CCE-92830-0"]

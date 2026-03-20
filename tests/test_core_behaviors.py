@@ -3,9 +3,11 @@ import json
 import os
 import pathlib
 import subprocess
+import sys
 import tempfile
 import unittest
 import io
+import yaml
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -3041,6 +3043,315 @@ class TestODVModule(unittest.TestCase):
         """ODV_SCHEMA should define exactly 11 variables."""
         from odv import ODV_SCHEMA
         self.assertEqual(len(ODV_SCHEMA), 11)
+
+
+class TestODVSubstitution(unittest.TestCase):
+    """Tests for ODV-aware command substitution (experiment 22)."""
+
+    def test_substitute_odv_command_replaces_placeholder(self):
+        """substitute_odv_command should replace {ODV_VALUE} with the effective value."""
+        from odv import substitute_odv_command
+        rule = {
+            "id": "test_rule",
+            "odv": {"variable": "password_min_length", "default": 15,
+                    "description": "test", "type": "integer"},
+        }
+        cmd = "sudo /usr/bin/pwpolicy -setglobalpolicy 'minChars={ODV_VALUE}'"
+        result = substitute_odv_command(cmd, rule, {"password_min_length": 20})
+        self.assertEqual(result, "sudo /usr/bin/pwpolicy -setglobalpolicy 'minChars=20'")
+
+    def test_substitute_odv_command_uses_default_when_no_override(self):
+        """substitute_odv_command should use rule default when no org override."""
+        from odv import substitute_odv_command
+        rule = {
+            "id": "test_rule",
+            "odv": {"variable": "password_min_length", "default": 15,
+                    "description": "test", "type": "integer"},
+        }
+        cmd = "sudo pwpolicy 'minChars={ODV_VALUE}'"
+        result = substitute_odv_command(cmd, rule, {})
+        self.assertEqual(result, "sudo pwpolicy 'minChars=15'")
+
+    def test_substitute_odv_command_no_placeholder_passthrough(self):
+        """Commands without {ODV_VALUE} should pass through unchanged."""
+        from odv import substitute_odv_command
+        rule = {"id": "test_rule", "odv": "none"}
+        cmd = "sudo launchctl disable system/com.apple.screensharing"
+        result = substitute_odv_command(cmd, rule, None)
+        self.assertEqual(result, cmd)
+
+    def test_substitute_odv_command_boolean_rule_no_change(self):
+        """Boolean rules (odv=none) should not be modified even with placeholder."""
+        from odv import substitute_odv_command
+        rule = {"id": "test_rule", "odv": "none"}
+        cmd = "echo {ODV_VALUE}"
+        result = substitute_odv_command(cmd, rule, None)
+        self.assertEqual(result, cmd)
+
+    def test_substitute_odv_command_string_value(self):
+        """substitute_odv_command should handle string ODV values."""
+        from odv import substitute_odv_command
+        rule = {
+            "id": "test_rule",
+            "odv": {"variable": "ntp_server", "default": "time.apple.com",
+                    "description": "test", "type": "string"},
+        }
+        cmd = "sudo systemsetup -setnetworktimeserver {ODV_VALUE}"
+        result = substitute_odv_command(cmd, rule, {"ntp_server": "ntp.example.com"})
+        self.assertEqual(result, "sudo systemsetup -setnetworktimeserver ntp.example.com")
+
+    def test_get_effective_check_command_prefers_odv_template(self):
+        """get_effective_check_command should use check_odv when ODV values provided."""
+        from odv import get_effective_check_command
+        rule = {
+            "id": "test_rule",
+            "check": "grep 'ttl=365' /etc/asl/com.apple.install",
+            "check_odv": "grep 'ttl={ODV_VALUE}' /etc/asl/com.apple.install",
+            "odv": {"variable": "install_log_retention_days", "default": 365,
+                    "description": "test", "type": "integer"},
+        }
+        result = get_effective_check_command(rule, {"install_log_retention_days": 730})
+        self.assertEqual(result, "grep 'ttl=730' /etc/asl/com.apple.install")
+
+    def test_get_effective_check_command_falls_back_without_odv(self):
+        """get_effective_check_command should use check when no ODV values."""
+        from odv import get_effective_check_command
+        rule = {
+            "id": "test_rule",
+            "check": "grep 'ttl=365' /etc/asl/com.apple.install",
+            "check_odv": "grep 'ttl={ODV_VALUE}' /etc/asl/com.apple.install",
+            "odv": {"variable": "install_log_retention_days", "default": 365,
+                    "description": "test", "type": "integer"},
+        }
+        result = get_effective_check_command(rule, None)
+        self.assertEqual(result, "grep 'ttl=365' /etc/asl/com.apple.install")
+
+    def test_get_effective_fix_command_prefers_odv_template(self):
+        """get_effective_fix_command should use fix_odv when ODV values provided."""
+        from odv import get_effective_fix_command
+        rule = {
+            "id": "test_rule",
+            "fix": "sudo chmod 700 /Users/foo",
+            "fix_odv": "sudo chmod {ODV_VALUE} /Users/foo",
+            "odv": {"variable": "home_folder_permissions", "default": "700",
+                    "description": "test", "type": "string"},
+        }
+        result = get_effective_fix_command(rule, {"home_folder_permissions": "750"})
+        self.assertEqual(result, "sudo chmod 750 /Users/foo")
+
+    def test_get_effective_fix_command_falls_back_without_odv(self):
+        """get_effective_fix_command should use fix when no ODV values."""
+        from odv import get_effective_fix_command
+        rule = {
+            "id": "test_rule",
+            "fix": "sudo chmod 700 /Users/foo",
+            "fix_odv": "sudo chmod {ODV_VALUE} /Users/foo",
+            "odv": {"variable": "home_folder_permissions", "default": "700",
+                    "description": "test", "type": "string"},
+        }
+        result = get_effective_fix_command(rule, None)
+        self.assertEqual(result, "sudo chmod 700 /Users/foo")
+
+
+class TestODVAwareRules(unittest.TestCase):
+    """Validate all 11 ODV-tunable rules have proper fix_odv templates (experiment 22)."""
+
+    def _load_all_rules(self):
+        import yaml
+        rules = []
+        rules_dir = os.path.join(os.path.dirname(__file__), "..", "rules")
+        import glob as globmod
+        for path in sorted(globmod.glob(os.path.join(rules_dir, "os_*.yaml"))):
+            with open(path) as f:
+                data = yaml.safe_load(f)
+            if data:
+                rules.append(data)
+        return rules
+
+    def test_all_odv_tunable_rules_have_fix_odv(self):
+        """Every rule with structured ODV metadata must have a fix_odv template."""
+        from odv import extract_rule_odv
+        rules = self._load_all_rules()
+        missing = []
+        for rule in rules:
+            odv_meta = extract_rule_odv(rule)
+            if odv_meta is not None:
+                if "fix_odv" not in rule:
+                    missing.append(rule["id"])
+        self.assertEqual(missing, [], f"Rules with ODV but no fix_odv: {missing}")
+
+    def test_all_fix_odv_templates_contain_placeholder(self):
+        """Every fix_odv template must contain {ODV_VALUE} placeholder."""
+        from odv import extract_rule_odv
+        rules = self._load_all_rules()
+        errors = []
+        for rule in rules:
+            if "fix_odv" in rule:
+                if "{ODV_VALUE}" not in rule["fix_odv"]:
+                    errors.append(f"{rule['id']}: fix_odv missing {{ODV_VALUE}}")
+        self.assertEqual(errors, [], f"Template errors: {errors}")
+
+    def test_check_odv_templates_contain_placeholder(self):
+        """Every check_odv template must contain {ODV_VALUE} placeholder."""
+        rules = self._load_all_rules()
+        errors = []
+        for rule in rules:
+            if "check_odv" in rule:
+                if "{ODV_VALUE}" not in rule["check_odv"]:
+                    errors.append(f"{rule['id']}: check_odv missing {{ODV_VALUE}}")
+        self.assertEqual(errors, [], f"Template errors: {errors}")
+
+    def test_fix_odv_count_matches_odv_rules(self):
+        """There should be exactly 11 rules with fix_odv templates."""
+        rules = self._load_all_rules()
+        count = sum(1 for r in rules if "fix_odv" in r)
+        self.assertEqual(count, 11, f"Expected 11 fix_odv templates, found {count}")
+
+    def test_check_odv_templates_exist_for_easy_rules(self):
+        """Screensaver timeout and install log retention should have check_odv."""
+        rules = self._load_all_rules()
+        rule_by_id = {r["id"]: r for r in rules}
+        self.assertIn("check_odv", rule_by_id["os_screensaver_timeout"])
+        self.assertIn("check_odv", rule_by_id["os_install_log_retention_configure"])
+
+    def test_odv_substitution_produces_valid_commands(self):
+        """Substituting ODV defaults into fix_odv should produce non-empty commands."""
+        from odv import substitute_odv_command, extract_rule_odv
+        rules = self._load_all_rules()
+        for rule in rules:
+            if "fix_odv" in rule:
+                result = substitute_odv_command(rule["fix_odv"], rule, None)
+                self.assertTrue(len(result.strip()) > 0,
+                                f"{rule['id']}: fix_odv produced empty command")
+                self.assertNotIn("{ODV_VALUE}", result,
+                                 f"{rule['id']}: fix_odv still has placeholder after substitution")
+
+
+class TestScanODVIntegration(unittest.TestCase):
+    """Test scan module with ODV overrides (experiment 22)."""
+
+    def test_scan_accepts_odv_file_parameter(self):
+        """scan() should accept odv_file parameter without error."""
+        from scan import scan
+        with tempfile.TemporaryDirectory() as td:
+            # Create a minimal rule
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+            rule = {
+                "id": "test_rule", "title": "Test", "severity": "low",
+                "check": "true", "fix": "true", "odv": "none",
+            }
+            with open(os.path.join(rules_dir, "os_test.yaml"), "w") as f:
+                yaml.dump(rule, f)
+
+            result = scan(rules_dir=rules_dir, dry_run=True, odv_file=None)
+            self.assertEqual(result["rules_scanned"], 1)
+
+    def test_scan_dry_run_uses_odv_template(self):
+        """In dry-run with ODV overrides, scan should show the ODV-substituted check command."""
+        from scan import scan
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+            rule = {
+                "id": "os_test_odv", "title": "Test ODV", "severity": "medium",
+                "check": "echo default=365",
+                "check_odv": "echo default={ODV_VALUE}",
+                "fix": "true",
+                "odv": {"variable": "install_log_retention_days", "default": 365,
+                        "description": "test", "type": "integer"},
+            }
+            with open(os.path.join(rules_dir, "os_test_odv.yaml"), "w") as f:
+                yaml.dump(rule, f)
+
+            # Create ODV file
+            odv_file = os.path.join(td, "odv.yaml")
+            with open(odv_file, "w") as f:
+                yaml.dump({"odv": {"install_log_retention_days": 730}}, f)
+
+            result = scan(rules_dir=rules_dir, dry_run=True, odv_file=odv_file)
+            self.assertEqual(result["results"][0]["check"], "echo default=730")
+
+
+class TestFixODVIntegration(unittest.TestCase):
+    """Test fix module with ODV overrides (experiment 22)."""
+
+    def test_fix_accepts_odv_file_parameter(self):
+        """fix() should accept odv_file parameter without error."""
+        from fix import fix
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+            rule = {
+                "id": "test_rule", "title": "Test", "severity": "low",
+                "check": "true", "fix": "true", "odv": "none",
+            }
+            with open(os.path.join(rules_dir, "os_test.yaml"), "w") as f:
+                yaml.dump(rule, f)
+
+            result = fix(rules_dir=rules_dir, dry_run=True, odv_file=None)
+            self.assertEqual(result["rules_checked"], 1)
+
+    def test_fix_dry_run_uses_odv_template(self):
+        """In dry-run mode, fix should show ODV-substituted fix command."""
+        from fix import fix
+        with tempfile.TemporaryDirectory() as td:
+            rules_dir = os.path.join(td, "rules")
+            os.makedirs(rules_dir)
+            rule = {
+                "id": "os_test_odv", "title": "Test ODV", "severity": "medium",
+                "check": "false",  # always non-compliant
+                "fix": "echo minChars=15",
+                "fix_odv": "echo minChars={ODV_VALUE}",
+                "odv": {"variable": "password_min_length", "default": 15,
+                        "description": "test", "type": "integer"},
+            }
+            with open(os.path.join(rules_dir, "os_test_odv.yaml"), "w") as f:
+                yaml.dump(rule, f)
+
+            odv_file = os.path.join(td, "odv.yaml")
+            with open(odv_file, "w") as f:
+                yaml.dump({"odv": {"password_min_length": 20}}, f)
+
+            result = fix(rules_dir=rules_dir, dry_run=True, odv_file=odv_file)
+            would_fix = [r for r in result["results"] if r["status"] == "would-fix"]
+            self.assertEqual(len(would_fix), 1)
+            self.assertIn("minChars=20", would_fix[0]["fix"])
+
+
+class TestCLIODVFlag(unittest.TestCase):
+    """Test CLI --odv-file flag integration (experiment 22)."""
+
+    def test_scan_cli_accepts_odv_file(self):
+        """CLI scan subcommand should accept --odv-file flag."""
+        result = subprocess.run(
+            [sys.executable, "-m", "albator_cli", "scan", "--dry-run",
+             "--odv-file", "/nonexistent/odv.yaml"],
+            capture_output=True, text=True,
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+        )
+        # Should fail due to missing file, not unknown argument
+        self.assertNotIn("unrecognized arguments", result.stderr)
+
+    def test_fix_cli_accepts_odv_file(self):
+        """CLI fix subcommand should accept --odv-file flag."""
+        result = subprocess.run(
+            [sys.executable, "-m", "albator_cli", "fix", "--dry-run",
+             "--odv-file", "/nonexistent/odv.yaml"],
+            capture_output=True, text=True,
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+        )
+        self.assertNotIn("unrecognized arguments", result.stderr)
+
+    def test_report_cli_accepts_odv_file(self):
+        """CLI report subcommand should accept --odv-file flag."""
+        result = subprocess.run(
+            [sys.executable, "-m", "albator_cli", "report", "--dry-run",
+             "--odv-file", "/nonexistent/odv.yaml"],
+            capture_output=True, text=True,
+            cwd=os.path.join(os.path.dirname(__file__), ".."),
+        )
+        self.assertNotIn("unrecognized arguments", result.stderr)
 
 
 if __name__ == "__main__":

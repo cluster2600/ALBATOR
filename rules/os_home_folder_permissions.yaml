@@ -4,6 +4,7 @@ severity: "medium"
 discussion: "User home folders should not be world-readable. Incorrect permissions on home directories can expose sensitive files such as SSH keys, browser data, and application credentials to other local users. CIS Benchmark Section 6.1.3 requires home folder permissions to be set to 700 or more restrictive."
 check: "/bin/ls -ld /Users/$(/usr/bin/stat -f '%Su' /dev/console) | /usr/bin/awk '{print $1}' | /usr/bin/grep -q 'drwx------'"
 fix: "sudo /bin/chmod 700 /Users/$(/usr/bin/stat -f '%Su' /dev/console)"
+fix_odv: "sudo /bin/chmod {ODV_VALUE} /Users/$(/usr/bin/stat -f '%Su' /dev/console)"
 references:
   cci: ["CCI-000366"]
   cce: ["CCE-92860-7"]

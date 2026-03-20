@@ -4,6 +4,7 @@ severity: "medium"
 discussion: "A login window banner provides a legal notice or warning to users before they authenticate. CIS Benchmark Section 5.7 and NIST 800-53 AC-8 require organizations to display a system use notification message before granting access. The banner text file must exist at /Library/Security/PolicyBanner.txt."
 check: "/bin/test -f /Library/Security/PolicyBanner.txt && /bin/echo '1' || /bin/echo '0'"
 fix: "sudo /bin/cat > /Library/Security/PolicyBanner.txt << 'BANNER'\nThis system is for authorized use only. By using this system, you consent to monitoring and compliance with organizational policies.\nBANNER"
+fix_odv: "sudo /bin/bash -c 'printf \"%s\\n\" \"{ODV_VALUE}\" > /Library/Security/PolicyBanner.txt'"
 references:
   cci: ["CCI-000048"]
   cce: ["CCE-92845-8"]

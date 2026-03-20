@@ -4,6 +4,8 @@ severity: "medium"
 discussion: "The install.log file must be retained for at least 365 days. This log records software installation activity and is critical for forensic analysis. The asl.conf TTL setting controls retention."
 check: "/usr/bin/grep -q 'install.log.*ttl=365' /etc/asl/com.apple.install"
 fix: "sudo /usr/bin/sed -i '' 's/^\\(.*install.log.*\\)ttl=[0-9]*/\\1ttl=365/' /etc/asl/com.apple.install"
+check_odv: "/usr/bin/grep -q 'install.log.*ttl={ODV_VALUE}' /etc/asl/com.apple.install"
+fix_odv: "sudo /usr/bin/sed -i '' 's/^\\(.*install.log.*\\)ttl=[0-9]*/\\1ttl={ODV_VALUE}/' /etc/asl/com.apple.install"
 references:
   cci: ["CCI-000366"]
   cce: ["CCE-92833-4"]

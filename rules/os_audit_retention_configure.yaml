@@ -4,6 +4,7 @@ severity: "medium"
 discussion: "Audit logs must be retained for a minimum period to support incident investigation. The expire-after setting controls how long audit logs are kept before automatic deletion. CIS recommends retaining logs for at least 7 days (168 hours) or as required by organizational policy."
 check: "/usr/bin/grep -q '^expire-after:' /etc/security/audit_control"
 fix: "sudo /usr/bin/sed -i '' 's/^expire-after:.*/expire-after:7d/' /etc/security/audit_control; sudo /usr/sbin/audit -s"
+fix_odv: "sudo /usr/bin/sed -i '' 's/^expire-after:.*/expire-after:{ODV_VALUE}/' /etc/security/audit_control; sudo /usr/sbin/audit -s"
 references:
   cci: ["CCI-000366"]
   cce: ["CCE-92831-8"]

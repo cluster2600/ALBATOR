@@ -124,6 +124,58 @@ def get_odv_value(rule, odv_values=None):
     return odv_meta.get("default")
 
 
+def substitute_odv_command(command, rule, odv_values=None):
+    """Substitute {ODV_VALUE} placeholder in a command template with the effective ODV value.
+
+    Args:
+        command: Command string potentially containing {ODV_VALUE}.
+        rule: Rule dict with ODV metadata.
+        odv_values: Optional org-customized ODV values dict.
+
+    Returns:
+        Command string with {ODV_VALUE} replaced, or original command if no placeholder.
+    """
+    if "{ODV_VALUE}" not in command:
+        return command
+    odv_meta = extract_rule_odv(rule)
+    if odv_meta is None:
+        return command
+    value = get_odv_value(rule, odv_values)
+    if value is None:
+        return command
+    return command.replace("{ODV_VALUE}", str(value))
+
+
+def get_effective_check_command(rule, odv_values=None):
+    """Get the effective check command for a rule, using ODV template if available and overrides provided.
+
+    Args:
+        rule: Rule dict.
+        odv_values: Optional org-customized ODV values dict.
+
+    Returns:
+        The check command string to execute.
+    """
+    if odv_values and "check_odv" in rule:
+        return substitute_odv_command(rule["check_odv"], rule, odv_values)
+    return rule.get("check", "")
+
+
+def get_effective_fix_command(rule, odv_values=None):
+    """Get the effective fix command for a rule, using ODV template if available and overrides provided.
+
+    Args:
+        rule: Rule dict.
+        odv_values: Optional org-customized ODV values dict.
+
+    Returns:
+        The fix command string to execute.
+    """
+    if odv_values and "fix_odv" in rule:
+        return substitute_odv_command(rule["fix_odv"], rule, odv_values)
+    return rule.get("fix", "")
+
+
 def list_odv_rules(rules):
     """List all rules that have tunable ODV parameters.
 

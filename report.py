@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 
 from scan import load_rules, load_profile, filter_rules_by_profile, \
     filter_rules_by_severity, run_check
+from odv import load_odv_defaults, get_effective_check_command
 
 
 # ---------------------------------------------------------------------------
@@ -137,7 +138,7 @@ def _nist_families_from_rules(rules):
 # ---------------------------------------------------------------------------
 
 def generate_report(rules_dir, profiles_dir=None, profile_name=None,
-                    min_severity=None, dry_run=False, timeout=30):
+                    min_severity=None, dry_run=False, timeout=30, odv_file=None):
     """Generate a comprehensive compliance report.
 
     Returns a dict with:
@@ -149,6 +150,11 @@ def generate_report(rules_dir, profiles_dir=None, profile_name=None,
       - level_summary: L1 vs L2 breakdown
     """
     rules = load_rules(rules_dir)
+
+    # Load ODV overrides if provided
+    odv_values = None
+    if odv_file:
+        odv_values = load_odv_defaults(odv_file)
 
     if profile_name:
         if not profiles_dir:
@@ -186,9 +192,9 @@ def generate_report(rules_dir, profiles_dir=None, profile_name=None,
         elif dry_run:
             entry["status"] = "dry-run"
             entry["severity"] = rule.get("severity", "unknown")
-            entry["check"] = rule.get("check", "")
+            entry["check"] = get_effective_check_command(rule, odv_values)
         else:
-            ok, detail = run_check(rule, timeout=timeout)
+            ok, detail = run_check(rule, timeout=timeout, odv_values=odv_values)
             entry["severity"] = rule.get("severity", "unknown")
             if ok:
                 entry["status"] = "pass"

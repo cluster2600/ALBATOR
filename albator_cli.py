@@ -306,6 +306,8 @@ def main():
                              help="List rules without running checks")
     parser_scan.add_argument("--timeout", type=int, default=30,
                              help="Per-check timeout in seconds (default: 30)")
+    parser_scan.add_argument("--odv-file", type=str, default=None,
+                             help="Path to ODV overrides YAML file for customized thresholds")
 
     parser_fix = subparsers.add_parser("fix", help="Remediate non-compliant rules by running fix commands")
     parser_fix.add_argument("--profile", type=str, default=None,
@@ -319,6 +321,8 @@ def main():
                             help="Per-check timeout in seconds (default: 30)")
     parser_fix.add_argument("--fix-timeout", type=int, default=60,
                             help="Per-fix timeout in seconds (default: 60)")
+    parser_fix.add_argument("--odv-file", type=str, default=None,
+                            help="Path to ODV overrides YAML file for customized thresholds")
 
     parser_rollback = subparsers.add_parser("rollback", help="List or apply rollback metadata to reverse hardening changes")
     parser_rollback.add_argument("--list", action="store_true", dest="list_mode",
@@ -348,6 +352,8 @@ def main():
                                choices=["text", "json", "csv"],
                                dest="output_format",
                                help="Output format: text, json, or csv (default: text)")
+    parser_report.add_argument("--odv-file", type=str, default=None,
+                               help="Path to ODV overrides YAML file for customized thresholds")
 
     # Bash script commands
     bash_scripts = {
@@ -402,6 +408,7 @@ def main():
                 min_severity=args.severity,
                 dry_run=args.dry_run,
                 timeout=args.timeout,
+                odv_file=args.odv_file,
             )
         except FileNotFoundError as e:
             if args.json_output:
@@ -430,6 +437,7 @@ def main():
                 dry_run=args.dry_run,
                 check_timeout=args.check_timeout,
                 fix_timeout=args.fix_timeout,
+                odv_file=args.odv_file,
             )
         except (FileNotFoundError, ValueError) as e:
             if args.json_output:
@@ -504,6 +512,7 @@ def main():
                 min_severity=args.severity,
                 dry_run=args.dry_run,
                 timeout=args.timeout,
+                odv_file=args.odv_file,
             )
         except (FileNotFoundError, ValueError) as e:
             if args.json_output or args.output_format == "json":
